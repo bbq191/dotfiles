@@ -1,0 +1,23 @@
+{
+  "user": {
+    "name": "afu",
+    "email": "afu@example.com",
+    "editor": "code-insiders",
+    "browser": "brave"
+  },
+  "paths": {
+    "projects": "~/Projects",
+    "dotfiles": "~/dotfiles"
+  },
+  "environment": {
+    "EDITOR": "code-insiders",
+    "BROWSER": "brave",
+    "LANG": "zh_CN.UTF-8",
+    "XDG_CONFIG_HOME": "${HOME}/AppData/Local"
+  },
+  "features": {
+    "git_integration": true,
+    "nodejs_management": true,
+    "python_management": true
+  }
+}

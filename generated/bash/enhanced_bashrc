@@ -1,0 +1,726 @@
+#!/bin/bash
+# =============================================================================
+#                    增强的 Bash 配置文件 - 融合 ZSH 功能
+# =============================================================================
+# 由 dotfiles 生成器自动生成，请勿手动编辑
+# 基于 Arch Linux .zshrc 的功能完全移植到 Bash
+# 生成时间: $(date)
+# 模板版本: 2.0.0 (ZSH Enhanced)
+
+# =============================================================================
+#                               1. 基础环境设置
+# =============================================================================
+
+
+# 代理设置
+export HTTPS_PROXY="http://127.0.0.1:6153"
+export HTTP_PROXY="http://127.0.0.1:6153"
+export ALL_PROXY="socks5://127.0.0.1:6153"
+export NO_PROXY="localhost,127.*,192.168.*,10.*,30.*,40.*,172.16.*,172.17.*,172.18.*,172.19.*,172.20.*,172.21.*,172.22.*,172.23.*,172.24.*,172.25.*,172.26.*,172.27.*,172.28.*,172.29.*,172.30.*,172.31.*"
+
+
+# 基础系统环境变量
+
+export EDITOR="code-insiders"
+
+export BROWSER="brave"
+
+export LANG="zh_CN.UTF-8"
+
+export XDG_CONFIG_HOME="${HOME}/AppData/Local"
+
+
+# 用户自定义环境变量
+export DEFAULT_USER=$USER
+export MANWIDTH=999
+export LESSHISTFILE=-
+
+# =============================================================================
+#                               2. XDG 目录规范
+# =============================================================================
+
+# 遵循 XDG Base Directory 规范
+
+export XDG_CONFIG_HOME="$HOME/AppData/Local"
+export XDG_DATA_HOME="$HOME/AppData/Local"
+export XDG_STATE_HOME="$HOME/AppData/Local"
+export XDG_CACHE_HOME="$HOME/AppData/Local/Temp"
+
+
+# =============================================================================
+#                               3. 开发环境配置
+# =============================================================================
+
+# Android 开发环境
+
+export ANDROID_HOME="$XDG_DATA_HOME/android"
+
+export ANDROID_USER_HOME="$XDG_DATA_HOME/android"
+
+export ANDROID_SDK_ROOT="$ANDROID_HOME"
+
+# Go 语言环境
+
+export GOPATH="$XDG_DATA_HOME/go"
+
+export GOMODCACHE="$XDG_CACHE_HOME/go/mod"
+
+export GOPROXY="https://goproxy.cn,direct"
+
+# Java 环境
+
+export _JAVA_OPTIONS="-Djava.util.prefs.userRoot="$XDG_CONFIG_HOME"/java"
+
+# Rust 环境
+
+export CARGO_HOME="$XDG_DATA_HOME/cargo"
+
+export RUSTUP_HOME="$XDG_DATA_HOME/rustup"
+
+# Python 环境
+
+export PYTHONPATH="$XDG_DATA_HOME/python"
+
+export PYTHONUSERBASE="$XDG_DATA_HOME/python"
+
+export PIPENV_VENV_IN_PROJECT="1"
+
+# Ruby 环境
+
+export GEM_HOME="$XDG_DATA_HOME/gem"
+
+export GEM_SPEC_CACHE="$XDG_CACHE_HOME/gem"
+
+# Node.js 环境
+
+export FNM_HOME="$XDG_DATA_HOME/fnm"
+
+export NPM_CONFIG_USERCONFIG="$XDG_CONFIG_HOME/npm/config"
+
+export NPM_CONFIG_CACHE="$XDG_CACHE_HOME/npm"
+
+export NPM_CONFIG_PREFIX="$XDG_DATA_HOME/npm"
+
+export PNPM_HOME="$XDG_DATA_HOME/pnpm"
+
+export YARN_CACHE_FOLDER="$XDG_CACHE_HOME/yarn"
+
+# Maven 环境
+
+export MAVEN_OPTS="-Dmaven.repo.local=$XDG_DATA_HOME/maven/repository"
+
+# Gradle 环境
+
+export GRADLE_USER_HOME="$XDG_DATA_HOME/gradle"
+
+
+# =============================================================================
+#                               4. PATH 环境变量构建
+# =============================================================================
+# fnm (Fast Node Manager) 用于管理多个 Node.js 版本
+export PATH="/c/Users/afu/AppData/Local/fnm_multishells/23984_1753425089543":"$PATH"
+export FNM_MULTISHELL_PATH="C:\\Users\\afu\\AppData\\Local\\fnm_multishells\\23984_1753425089543"
+export FNM_VERSION_FILE_STRATEGY="local"    # 使用本地 .node-version 文件
+export FNM_DIR="C:\\Users\\afu\\AppData\\Roaming\\fnm"      # fnm 安装目录
+export FNM_LOGLEVEL="info"                  # 日志级别
+export FNM_NODE_DIST_MIRROR="https://nodejs.org/dist"       # Node.js 下载镜像
+export FNM_COREPACK_ENABLED="false"         # 禁用 Corepack
+export FNM_RESOLVE_ENGINES="true"           # 自动解析 engines 字段
+export FNM_ARCH="x64"                       # 系统架构
+
+# Claude Code 工具的 Git Bash 路径配置
+export CLAUDE_CODE_GIT_BASH_PATH="C:\\Applications\\DevEnvironment\\Git\\bin\\bash.exe"
+
+# MySQL 命令行工具路径
+export MYSQL="/C/Program Files/MySQL/MySQL Server 8.0/bin"
+
+# 构建增强的 PATH（按优先级顺序）
+export PATH="$MYSQL":"$PATH"
+
+# =============================================================================
+#                               5. Bash 历史记录增强配置
+# =============================================================================
+
+# 历史文件位置（遵循 XDG 规范）
+export HISTFILE="$HOME/dotfiles/generated/bash/history"
+[ -d "$(dirname "$HISTFILE")" ] || mkdir -p "$(dirname "$HISTFILE")"
+
+# 历史记录设置
+export HISTSIZE=10000
+export HISTFILESIZE=50000
+
+# 历史记录选项（Bash 版本的 ZSH 功能）
+export HISTCONTROL=ignoreboth:erasedups  # 忽略重复和空格开头的命令
+shopt -s histappend                      # 追加历史而不是覆盖
+shopt -s histverify                      # 历史扩展时给用户确认机会
+shopt -s nocaseglob                      # 启用不区分大小写的文件名匹配（glob 模式）
+
+# 禁用终端铃声，防止屏幕闪烁
+if [[ $- == *i* ]]; then
+    # 禁用所有铃声（包括视觉铃声和声音铃声）
+    bind 'set bell-style none'
+    # 或者可以选择只禁用视觉铃声，保留声音（如果需要的话）
+    # bind 'set bell-style audible'
+fi
+
+# =============================================================================
+#                               6. 现代化工具集成
+# =============================================================================
+
+# 现代化命令替代（智能检测和回退）
+
+# Ls 替代
+if command -v eza &> /dev/null; then
+    
+    alias ls='eza --color=auto --group-directories-first'
+    
+    alias ll='eza -l --color=auto --group-directories-first'
+    
+    alias la='eza -la --color=auto --group-directories-first'
+    
+    alias lt='eza --tree --color=auto'
+    
+
+else
+    
+    alias ls='ls --color=auto --group-directories-first'
+    
+    alias ll='ls --color=auto --group-directories-first'
+    
+    alias la='ls --color=auto --group-directories-first'
+    
+    alias lt='ls --color=auto --group-directories-first'
+    
+
+fi
+
+
+# Cat 替代
+if command -v bat &> /dev/null; then
+    
+    alias cat='bat'
+    
+    alias catn='bat --style=plain'
+    
+
+fi
+
+
+# Grep 替代
+if command -v rg &> /dev/null; then
+    
+    alias grep='rg'
+    
+
+fi
+
+
+# Find 替代
+if command -v fd &> /dev/null; then
+    
+    alias find='fd'
+    
+
+fi
+
+
+# Du 替代
+if command -v dust &> /dev/null; then
+    
+    alias du='dust'
+    
+
+fi
+
+
+# Df 替代
+if command -v duf &> /dev/null; then
+    
+    alias df='duf'
+    
+
+else
+    
+    alias df='df -h'
+    
+
+fi
+
+
+# Ps 替代
+if command -v procs &> /dev/null; then
+    
+    alias ps='procs'
+    
+
+fi
+
+
+# Top 替代
+if command -v htop &> /dev/null; then
+    
+    alias top='htop'
+    
+
+fi
+
+
+# Cd 替代
+if command -v zoxide &> /dev/null; then
+    
+    alias cd='z'
+    
+
+fi
+
+
+
+# =============================================================================
+#                               7. FZF 集成配置
+# =============================================================================
+
+
+# FZF 命令配置（智能检测 fd/find）
+if command -v fd > /dev/null; then
+    export FZF_DEFAULT_COMMAND="fd --type f --hidden --follow --exclude .git"
+    export FZF_CTRL_T_COMMAND="fd --type f --hidden --follow --exclude .git"
+    export FZF_ALT_C_COMMAND="fd --type d --hidden --follow --exclude .git"
+else
+    export FZF_DEFAULT_COMMAND="find . -type f -not -path '*/\.git/*'"
+    export FZF_CTRL_T_COMMAND="find . -type f -not -path '*/\.git/*'"
+    export FZF_ALT_C_COMMAND="find . -type d -not -path '*/\.git/*'"
+fi
+
+# FZF 主题配置
+export FZF_DEFAULT_OPTS="--color=fg:#f8f8f2,bg:#282a36,hl:#bd93f9 --color=fg+:#f8f8f2,bg+:#44475a,hl+:#bd93f9 --color=info:#8be9fd,prompt:#50fa7b,pointer:#ff79c6 --color=marker:#ff79c6,spinner:#ffb86c,header:#6272a4 --height=60% --layout=reverse --border --margin=1 --padding=1"
+
+# FZF 键绑定和补全初始化 (仅在交互模式下)
+if [[ $- == *i* ]] && command -v fzf > /dev/null; then
+    # 启用 FZF 键绑定 (Ctrl+T, Ctrl+R, Alt+C)
+    eval "$(fzf --bash)"
+fi
+
+# FZF 预览配置
+if command -v bat > /dev/null; then
+    export FZF_CTRL_T_OPTS="--preview 'bat -n --color=always --line-range :500 {}'"
+else
+    export FZF_CTRL_T_OPTS="--preview 'cat {}'"
+fi
+
+if command -v eza > /dev/null; then
+    export FZF_ALT_C_OPTS="--preview 'eza --tree --color=always {} | head -200'"
+elif command -v tree > /dev/null; then
+    export FZF_ALT_C_OPTS="--preview 'tree -C {} | head -200'"
+else
+    export FZF_ALT_C_OPTS="--preview 'ls -la {}'"
+fi
+
+
+
+# =============================================================================
+#                               8. 别名定义
+# =============================================================================
+
+# 安全操作别名
+alias cp="cp -i"
+alias mv='mv -i'
+alias rm='rm -i'
+
+# 系统信息别名
+alias free='free -m -h'
+alias df='df -h'
+
+# 网络工具别名 (ports 由函数提供)
+# alias ports='netstat -tulanp'
+
+# Git 增强别名
+alias g='git'
+
+alias gs='git status'
+
+alias ga='git add'
+
+alias gaa='git add --all'
+
+alias gc='git commit -m'
+
+alias gca='git commit --amend'
+
+alias gp='git push'
+
+alias gl='git log --oneline'
+
+alias gco='git checkout'
+
+alias gb='git branch'
+
+alias gd='git diff'
+
+alias gds='git diff --staged'
+
+# 扩展 Git 别名（避免与基础别名重复）
+# 注意：基础 Git 别名由配置文件动态生成，此处仅添加不在配置中的扩展别名
+alias gcb='git checkout -b'
+alias gst='git stash'
+alias gsta='git stash apply'
+alias glg='git log --oneline --decorate --graph'
+alias glog='git log --oneline --decorate --graph --all'
+
+# 编辑器别名
+alias vim='code-insiders'
+alias vi='code-insiders'
+
+# Python 工具
+alias py='python'
+alias py3='python3'
+alias pip='pip3'
+
+# 导航别名
+
+alias ..='cd ..'
+
+alias ...='cd ../..'
+
+alias ....='cd ../../..'
+
+alias ~='cd ~'
+
+alias projects='cd ~/Projects'
+
+alias dotfiles='cd ~/dotfiles'
+
+
+# 系统别名
+
+alias open='explorer'
+
+alias which='which'
+
+alias grep='grep --color=auto'
+
+
+# =============================================================================
+#                               9. 高级函数定义
+# =============================================================================
+
+
+# 创建目录并进入
+mkcd() { mkdir -p "$1" && cd "$1"; }
+
+
+# 智能提取各种压缩格式
+extract() {
+    if [ -f "$1" ]; then
+        case "$1" in
+            *.tar.bz2)   tar xjf "$1"     ;;
+            *.tar.gz)    tar xzf "$1"     ;;
+            *.bz2)       bunzip2 "$1"     ;;
+            *.rar)       unrar x "$1"     ;;
+            *.gz)        gunzip "$1"      ;;
+            *.tar)       tar xf "$1"      ;;
+            *.tbz2)      tar xjf "$1"     ;;
+            *.tgz)       tar xzf "$1"     ;;
+            *.zip)       unzip "$1"       ;;
+            *.Z)         uncompress "$1"  ;;
+            *.7z)        7z x "$1"        ;;
+            *.xz)        unxz "$1"        ;;
+            *.lzma)      unlzma "$1"      ;;
+            *)           echo "'$1' 无法被 extract() 提取" ;;
+        esac
+    else
+        echo "'$1' 不是有效文件"
+    fi
+}
+
+
+# 杀死占用指定端口的进程
+killport() {
+    if [ -z "$1" ]; then
+        echo "用法: killport <端口号>"
+        return 1
+    fi
+    lsof -ti:$1 | xargs kill -9
+}
+
+
+# 快速启动 HTTP 服务器
+serve() {
+    local port=${1:-8000}
+    if command -v python > /dev/null; then
+        python -m http.server "$port"
+    elif command -v python3 > /dev/null; then
+        python3 -m http.server "$port"
+    else
+        echo "需要安装 Python"
+    fi
+}
+
+
+# 获取天气信息
+weather() {
+    local location=${1:-"Beijing"}
+    curl -s "wttr.in/$location?lang=zh"
+}
+
+
+# 获取公网 IP 地址
+myip() {
+    curl -s ipinfo.io/ip
+}
+
+
+# 显示端口使用情况
+ports() {
+    netstat -tulanp
+}
+
+
+# 显示内存占用最高的进程
+psmem() {
+    ps aux | sort -nr -k 4 | head -10
+}
+
+
+# 显示 CPU 占用最高的进程
+pscpu() {
+    ps aux | sort -nr -k 3 | head -10
+}
+
+
+# 快速查找文件
+findfile() {
+    if command -v fd > /dev/null; then
+        fd -t f "$1"
+    else
+        find . -name "*$1*" -type f 2>/dev/null
+    fi
+}
+
+
+# 快速查找目录
+finddir() {
+    if command -v fd > /dev/null; then
+        fd -t d "$1"
+    else
+        find . -name "*$1*" -type d 2>/dev/null
+    fi
+}
+
+
+# 备份文件
+backup() {
+    cp "$1" "$1.bak.$(date +%Y%m%d_%H%M%S)"
+}
+
+
+# 清理已合并的 Git 分支
+gitclean() {
+    git branch --merged | grep -v '\*\|main\|master\|develop' | xargs -n 1 git branch -d
+}
+
+
+# 重新加载 shell 配置
+reload() {
+    source ~/.bash_profile && echo "Bash 配置已重新加载"
+}
+
+
+# 显示系统信息
+sysinfo() {
+    echo "=== 系统信息 ==="
+    uname -a
+    echo ""
+    echo "=== 内存使用 ==="
+    free -h
+    echo ""
+    echo "=== 磁盘使用 ==="
+    df -h
+}
+
+
+
+# =============================================================================
+#                               10. 外部工具自动初始化
+# =============================================================================
+
+# 检查并初始化常用工具 (仅在交互模式下)
+if [[ $- == *i* ]]; then
+
+    command -v thefuck > /dev/null && eval "$(thefuck --alias)"
+
+    command -v gh_copilot > /dev/null && eval "$(gh copilot alias -- bash)"
+
+    command -v fnm > /dev/null && eval "$(fnm env --use-on-cd)"
+
+    command -v zoxide > /dev/null && eval "$(zoxide init bash)"
+
+    command -v starship > /dev/null && eval "$(starship init bash)"
+
+    command -v atuin > /dev/null && eval "$(atuin init bash)"
+
+fi
+
+# =============================================================================
+#                               11. 按键绑定增强
+# =============================================================================
+
+# 历史搜索绑定 (仅在交互模式下)
+if [[ $- == *i* ]]; then
+    bind '"\e[A": history-search-backward'  # 上箭头
+    bind '"\e[B": history-search-forward'   # 下箭头
+fi
+
+# 单词导航 (仅在交互模式下)
+if [[ $- == *i* ]]; then
+    bind '"\e[1;5C": forward-word'          # Ctrl+右箭头
+    bind '"\e[1;5D": backward-word'         # Ctrl+左箭头
+fi
+
+# 行导航 (仅在交互模式下)
+if [[ $- == *i* ]]; then
+    bind '"\e[3~": delete-char'             # Delete 键
+    bind '"\e[H": beginning-of-line'        # Home 键
+    bind '"\e[F": end-of-line'              # End 键
+fi
+
+# =============================================================================
+#                               12. 补全系统增强
+# =============================================================================
+
+# 启用可编程补全
+if ! shopt -oq posix; then
+  if [ -f /usr/share/bash-completion/bash_completion ]; then
+    . /usr/share/bash-completion/bash_completion
+  elif [ -f /etc/bash_completion ]; then
+    . /etc/bash_completion
+  fi
+fi
+
+# 补全选项 (仅在交互模式下)
+if [[ $- == *i* ]]; then
+    bind 'set completion-ignore-case on'     # 忽略大小写
+    bind 'set show-all-if-ambiguous on'      # 显示所有匹配项
+    bind 'set menu-complete-display-prefix on' # 显示公共前缀
+fi
+
+# =============================================================================
+#                               13. Git 集成增强
+# =============================================================================
+
+
+# 增强的 Git 分支显示函数
+parse_git_branch() {
+    # 安全检查：确保在Git仓库中且Git命令可用
+    if ! command -v git >/dev/null 2>&1; then
+        return 0
+    fi
+    
+    # 检查是否在Git仓库中
+    if ! git rev-parse --git-dir >/dev/null 2>&1; then
+        return 0
+    fi
+    
+    local branch status ahead
+    
+    # 获取分支名，使用更安全的方法
+    branch=$(git symbolic-ref --short HEAD 2>/dev/null || git describe --tags --exact-match 2>/dev/null || git rev-parse --short HEAD 2>/dev/null)
+    
+    if [[ -n "$branch" ]]; then
+        status=""
+        ahead=""
+        
+        # 检查工作区状态
+        if [[ -n "$(git status --porcelain 2>/dev/null)" ]]; then
+            status="*"
+        fi
+        
+        # 检查是否有提交领先（更安全的方式）
+        if git rev-parse --verify @{upstream} >/dev/null 2>&1; then
+            local ahead_count
+            ahead_count=$(git rev-list --count @{upstream}..HEAD 2>/dev/null)
+            if [[ -n "$ahead_count" && "$ahead_count" -gt 0 ]]; then
+                ahead="↑$ahead_count"
+            fi
+        fi
+        
+        echo "($branch$status$ahead)"
+    fi
+}
+
+# 增强的命令提示符
+if [[ $- == *i* ]]; then
+    # 基础提示符（如果Git分支函数失败，确保有基本提示符）
+    export PS1="\[\033[32m\]\u@\h\[\033[00m\]:\[\033[34m\]\w\[\033[00m\]\$ "
+    
+    # 如果Git可用，添加分支显示
+    if command -v git > /dev/null; then
+        export PS1="\[\033[32m\]\u@\h\[\033[00m\]:\[\033[34m\]\w\[\033[33m\]\$(parse_git_branch)\[\033[00m\]\$ "
+    fi
+fi
+
+
+
+# =============================================================================
+#                               14. 性能优化
+# =============================================================================
+
+# 编译优化（如果支持）
+
+export MAKEFLAGS="-j$(nproc)"
+
+
+# =============================================================================
+#                               15. Windows 特定设置
+# =============================================================================
+
+if [[ "$OSTYPE" == "msys" || "$OSTYPE" == "win32" ]]; then
+    # Windows 路径转换
+    export BROWSER="brave.exe"
+
+    # Windows 别名增强
+    alias start='explorer'
+    alias notepad='notepad.exe'
+    alias cls='clear'
+
+    # Windows 特定的服务管理
+    alias services='services.msc'
+    alias regedit='regedit.exe'
+fi
+
+# =============================================================================
+#                               16. 启动消息和状态
+# =============================================================================
+
+# 启动消息 (仅在交互模式下)
+if [[ $- == *i* ]]; then
+    echo "🚀 增强 Bash 环境已加载 - 融合 ZSH 功能"
+    echo "📁 项目目录: ~/Projects"
+    echo "⚡ 编辑器: code-insiders"
+    echo "🔧 现代工具: $(command -v eza >/dev/null && echo 'eza' || echo 'ls'), $(command -v bat >/dev/null && echo 'bat' || echo 'cat'), $(command -v fd >/dev/null && echo 'fd' || echo 'find')"
+
+    # 显示可用功能
+    echo ""
+    echo "💡 增强功能:"
+    echo "   📂 现代文件操作: ll, la, lt"
+    echo "   🔍 智能搜索: fzf 集成"
+    echo "   🌐 网络工具: myip, weather, ports"
+    echo "   🛠️  系统工具: sysinfo, psmem, pscpu"
+    echo "   🔧 开发工具: extract, killport, serve"
+    echo "   📦 Git 增强: 分支状态显示"
+    echo ""
+fi
+
+# =============================================================================
+#                               17. 自定义配置加载
+# =============================================================================
+
+# 加载本地自定义配置（如果存在）
+if [ -f ~/.bashrc.local ]; then
+    if [[ $- == *i* ]]; then
+        echo "🔧 加载本地自定义配置..."
+    fi
+    source ~/.bashrc.local
+fi
+
+# 标记配置加载完成
+export DOTFILES_ENHANCED_BASH_LOADED=1

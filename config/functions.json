@@ -1,0 +1,32 @@
+{
+  "mkcd": {
+    "description": "创建目录并进入",
+    "bash": "mkcd() { mkdir -p \"$1\" && cd \"$1\"; }",
+    "powershell": "function mkcd($dir) { New-Item -ItemType Directory -Force -Path $dir | Set-Location }"
+  },
+  "extract": {
+    "description": "智能解压缩",
+    "bash": "extract() { case $1 in *.tar.gz) tar -xzf \"$1\";; *.zip) unzip \"$1\";; *.7z) 7z x \"$1\";; *) echo 'Unknown format';; esac }",
+    "powershell": "function extract($file) { switch -regex ($file) { '\\.zip$' { Expand-Archive $file }; '\\.7z$' { & 7z x $file }; default { Write-Host 'Unknown format' } } }"
+  },
+  "findfile": {
+    "description": "快速查找文件",
+    "bash": "findfile() { find . -name \"*$1*\" -type f 2>/dev/null; }",
+    "powershell": "function findfile($pattern) { Get-ChildItem -Recurse -Name \"*$pattern*\" -ErrorAction SilentlyContinue }"
+  },
+  "gitclean": {
+    "description": "清理 Git 仓库",
+    "bash": "gitclean() { git branch --merged | grep -v '\\*\\|main\\|master' | xargs -n 1 git branch -d; }",
+    "powershell": "function gitclean { git branch --merged | Where-Object { $_ -notmatch '\\*|main|master' } | ForEach-Object { git branch -d $_.Trim() } }"
+  },
+  "weather": {
+    "description": "获取天气信息",
+    "bash": "weather() { curl -s \"wttr.in/$1?format=3\"; }",
+    "powershell": "function weather($city) { (Invoke-WebRequest -Uri \"wttr.in/$city?format=3\").Content }"
+  },
+  "ports": {
+    "description": "查看端口占用",
+    "bash": "ports() { netstat -tulpn | grep LISTEN; }",
+    "powershell": "function ports { Get-NetTCPConnection | Where-Object State -eq Listen | Select-Object LocalAddress,LocalPort,State }"
+  }
+}

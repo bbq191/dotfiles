@@ -1,0 +1,429 @@
+#!/bin/bash
+# =============================================================================
+#                    增强的 Bash 配置文件 - 融合 ZSH 功能
+# =============================================================================
+# 由 dotfiles 生成器自动生成，请勿手动编辑
+# 基于 Arch Linux .zshrc 的功能完全移植到 Bash
+# 生成时间: $(date)
+# 模板版本: 2.0.0 (ZSH Enhanced)
+
+# =============================================================================
+#                               1. 基础环境设置
+# =============================================================================
+
+{% if config.zsh_integration.proxy.enabled %}
+# 代理设置
+export HTTPS_PROXY="{{ config.zsh_integration.proxy.settings.https_proxy }}"
+export HTTP_PROXY="{{ config.zsh_integration.proxy.settings.http_proxy }}"
+export ALL_PROXY="{{ config.zsh_integration.proxy.settings.all_proxy }}"
+export NO_PROXY="{{ config.zsh_integration.proxy.settings.no_proxy }}"
+{% endif %}
+
+# 基础系统环境变量
+{% for key, value in config.shared.environment.items() %}
+export {{ key }}="{{ value }}"
+{% endfor %}
+
+# 用户自定义环境变量
+export DEFAULT_USER=$USER
+export MANWIDTH=999
+export LESSHISTFILE=-
+
+# =============================================================================
+#                               2. XDG 目录规范
+# =============================================================================
+{% if config.zsh_integration.xdg_directories.enabled %}
+# 遵循 XDG Base Directory 规范
+
+export XDG_CONFIG_HOME="{{ config.zsh_integration.xdg_directories.config_home }}"
+export XDG_DATA_HOME="{{ config.zsh_integration.xdg_directories.data_home }}"
+export XDG_STATE_HOME="{{ config.zsh_integration.xdg_directories.state_home }}"
+export XDG_CACHE_HOME="{{ config.zsh_integration.xdg_directories.cache_home }}"
+{% endif %}
+
+# =============================================================================
+#                               3. 开发环境配置
+# =============================================================================
+
+# Android 开发环境
+{% for key, value in config.zsh_integration.development_environments.android.items() %}
+export {{ key }}="{{ value }}"
+{% endfor %}
+# Go 语言环境
+{% for key, value in config.zsh_integration.development_environments.go.items() %}
+export {{ key }}="{{ value }}"
+{% endfor %}
+# Java 环境
+{% for key, value in config.zsh_integration.development_environments.java.items() %}
+export {{ key }}="{{ value }}"
+{% endfor %}
+# Rust 环境
+{% for key, value in config.zsh_integration.development_environments.rust.items() %}
+export {{ key }}="{{ value }}"
+{% endfor %}
+# Python 环境
+{% for key, value in config.zsh_integration.development_environments.python.items() %}
+export {{ key }}="{{ value }}"
+{% endfor %}
+# Ruby 环境
+{% for key, value in config.zsh_integration.development_environments.ruby.items() %}
+export {{ key }}="{{ value }}"
+{% endfor %}
+# Node.js 环境
+{% for key, value in config.zsh_integration.development_environments.node.items() %}
+export {{ key }}="{{ value }}"
+{% endfor %}
+# Maven 环境
+{% for key, value in config.zsh_integration.development_environments.maven.items() %}
+export {{ key }}="{{ value }}"
+{% endfor %}
+# Gradle 环境
+{% for key, value in config.zsh_integration.development_environments.gradle.items() %}
+export {{ key }}="{{ value }}"
+{% endfor %}
+
+# =============================================================================
+#                               4. PATH 环境变量构建
+# =============================================================================
+# fnm (Fast Node Manager) 用于管理多个 Node.js 版本
+export PATH="/c/Users/afu/AppData/Local/fnm_multishells/23984_1753425089543":"$PATH"
+export FNM_MULTISHELL_PATH="C:\\Users\\afu\\AppData\\Local\\fnm_multishells\\23984_1753425089543"
+export FNM_VERSION_FILE_STRATEGY="local"    # 使用本地 .node-version 文件
+export FNM_DIR="C:\\Users\\afu\\AppData\\Roaming\\fnm"      # fnm 安装目录
+export FNM_LOGLEVEL="info"                  # 日志级别
+export FNM_NODE_DIST_MIRROR="https://nodejs.org/dist"       # Node.js 下载镜像
+export FNM_COREPACK_ENABLED="false"         # 禁用 Corepack
+export FNM_RESOLVE_ENGINES="true"           # 自动解析 engines 字段
+export FNM_ARCH="x64"                       # 系统架构
+
+# Claude Code 工具的 Git Bash 路径配置
+export CLAUDE_CODE_GIT_BASH_PATH="C:\\Applications\\DevEnvironment\\Git\\bin\\bash.exe"
+
+# MySQL 命令行工具路径
+export MYSQL="/C/Program Files/MySQL/MySQL Server 8.0/bin"
+
+# 构建增强的 PATH（按优先级顺序）
+export PATH="$MYSQL":"$PATH"
+
+# =============================================================================
+#                               5. Bash 历史记录增强配置
+# =============================================================================
+
+# 历史文件位置（遵循 XDG 规范）
+export HISTFILE="{{ config.zsh_integration.history_advanced.file }}"
+[ -d "$(dirname "$HISTFILE")" ] || mkdir -p "$(dirname "$HISTFILE")"
+
+# 历史记录设置
+export HISTSIZE={{ config.zsh_integration.history_advanced.size }}
+export HISTFILESIZE={{ config.zsh_integration.history_advanced.save_size }}
+
+# 历史记录选项（Bash 版本的 ZSH 功能）
+export HISTCONTROL=ignoreboth:erasedups  # 忽略重复和空格开头的命令
+shopt -s histappend                      # 追加历史而不是覆盖
+shopt -s histverify                      # 历史扩展时给用户确认机会
+shopt -s nocaseglob                      # 启用不区分大小写的文件名匹配（glob 模式）
+
+# 禁用终端铃声，防止屏幕闪烁
+if [[ $- == *i* ]]; then
+    # 禁用所有铃声（包括视觉铃声和声音铃声）
+    bind 'set bell-style none'
+    # 或者可以选择只禁用视觉铃声，保留声音（如果需要的话）
+    # bind 'set bell-style audible'
+fi
+
+# =============================================================================
+#                               6. 现代化工具集成
+# =============================================================================
+
+# 现代化命令替代（智能检测和回退）
+{% for tool_name, tool_config in config.zsh_integration.modern_tools.replacements.items() %}
+# {{ tool_name|title }} 替代
+if command -v {{ tool_config.tool }} &> /dev/null; then
+    {% for alias_name, alias_command in tool_config.aliases.items() %}
+    alias {{ alias_name }}='{{ alias_command }}'
+    {% endfor %}
+{% if tool_config.fallback is defined %}
+else
+    {% for alias_name, alias_command in tool_config.aliases.items() %}
+    alias {{ alias_name }}='{{ tool_config.fallback }}'
+    {% endfor %}
+{% endif %}
+fi
+
+{% endfor %}
+
+# =============================================================================
+#                               7. FZF 集成配置
+# =============================================================================
+{% if config.zsh_integration.fzf_config.enabled %}
+
+# FZF 命令配置（智能检测 fd/find）
+if command -v fd > /dev/null; then
+    export FZF_DEFAULT_COMMAND="{{ config.zsh_integration.fzf_config.commands.default }}"
+    export FZF_CTRL_T_COMMAND="{{ config.zsh_integration.fzf_config.commands.ctrl_t }}"
+    export FZF_ALT_C_COMMAND="{{ config.zsh_integration.fzf_config.commands.alt_c }}"
+else
+    export FZF_DEFAULT_COMMAND="{{ config.zsh_integration.fzf_config.commands.fallback_default }}"
+    export FZF_CTRL_T_COMMAND="{{ config.zsh_integration.fzf_config.commands.fallback_ctrl_t }}"
+    export FZF_ALT_C_COMMAND="{{ config.zsh_integration.fzf_config.commands.fallback_alt_c }}"
+fi
+
+# FZF 主题配置
+export FZF_DEFAULT_OPTS="{{ config.zsh_integration.fzf_config.theme.colors }} {{ config.zsh_integration.fzf_config.theme.layout }}"
+
+# FZF 键绑定和补全初始化 (仅在交互模式下)
+if [[ $- == *i* ]] && command -v fzf > /dev/null; then
+    # 启用 FZF 键绑定 (Ctrl+T, Ctrl+R, Alt+C)
+    eval "$(fzf --bash)"
+fi
+
+# FZF 预览配置
+if command -v bat > /dev/null; then
+    export FZF_CTRL_T_OPTS="{{ config.zsh_integration.fzf_config.preview.ctrl_t }}"
+else
+    export FZF_CTRL_T_OPTS="{{ config.zsh_integration.fzf_config.preview.ctrl_t_fallback }}"
+fi
+
+if command -v eza > /dev/null; then
+    export FZF_ALT_C_OPTS="{{ config.zsh_integration.fzf_config.preview.alt_c }}"
+elif command -v tree > /dev/null; then
+    export FZF_ALT_C_OPTS="{{ config.zsh_integration.fzf_config.preview.alt_c_fallback }}"
+else
+    export FZF_ALT_C_OPTS="{{ config.zsh_integration.fzf_config.preview.alt_c_final_fallback }}"
+fi
+
+{% endif %}
+
+# =============================================================================
+#                               8. 别名定义
+# =============================================================================
+
+# 安全操作别名
+alias cp="cp -i"
+alias mv='mv -i'
+alias rm='rm -i'
+
+# 系统信息别名
+alias free='free -m -h'
+alias df='df -h'
+
+# 网络工具别名 (ports 由函数提供)
+# alias ports='netstat -tulanp'
+
+# Git 增强别名
+alias g='git'
+{% for alias, command in config.aliases.git.items() %}
+alias {{ alias }}='{{ command }}'
+{% endfor %}
+# 扩展 Git 别名（避免与基础别名重复）
+# 注意：基础 Git 别名由配置文件动态生成，此处仅添加不在配置中的扩展别名
+alias gcb='git checkout -b'
+alias gst='git stash'
+alias gsta='git stash apply'
+alias glg='git log --oneline --decorate --graph'
+alias glog='git log --oneline --decorate --graph --all'
+
+# 编辑器别名
+alias vim='{{ config.shared.user.editor }}'
+alias vi='{{ config.shared.user.editor }}'
+
+# Python 工具
+alias py='python'
+alias py3='python3'
+alias pip='pip3'
+
+# 导航别名
+{% for alias, command in config.aliases.navigation.items() %}
+alias {{ alias }}='{{ command }}'
+{% endfor %}
+
+# 系统别名
+{% for alias, command in config.aliases.system.bash.items() %}
+alias {{ alias }}='{{ command }}'
+{% endfor %}
+
+# =============================================================================
+#                               9. 高级函数定义
+# =============================================================================
+
+{% for name, func in config.advanced_functions.items() %}
+# {{ func.description }}
+{{ func.bash }}
+
+{% endfor %}
+
+# =============================================================================
+#                               10. 外部工具自动初始化
+# =============================================================================
+
+# 检查并初始化常用工具 (仅在交互模式下)
+if [[ $- == *i* ]]; then
+{% for tool, init_command in config.zsh_integration.external_tools.auto_init.items() %}
+    command -v {{ tool.split()[0] if ' ' in tool else tool }} > /dev/null && {{ init_command.replace('{shell}', 'bash') }}
+{% endfor %}
+fi
+
+# =============================================================================
+#                               11. 按键绑定增强
+# =============================================================================
+
+# 历史搜索绑定 (仅在交互模式下)
+if [[ $- == *i* ]]; then
+    bind '"\e[A": history-search-backward'  # 上箭头
+    bind '"\e[B": history-search-forward'   # 下箭头
+fi
+
+# 单词导航 (仅在交互模式下)
+if [[ $- == *i* ]]; then
+    bind '"\e[1;5C": forward-word'          # Ctrl+右箭头
+    bind '"\e[1;5D": backward-word'         # Ctrl+左箭头
+fi
+
+# 行导航 (仅在交互模式下)
+if [[ $- == *i* ]]; then
+    bind '"\e[3~": delete-char'             # Delete 键
+    bind '"\e[H": beginning-of-line'        # Home 键
+    bind '"\e[F": end-of-line'              # End 键
+fi
+
+# =============================================================================
+#                               12. 补全系统增强
+# =============================================================================
+
+# 启用可编程补全
+if ! shopt -oq posix; then
+  if [ -f /usr/share/bash-completion/bash_completion ]; then
+    . /usr/share/bash-completion/bash_completion
+  elif [ -f /etc/bash_completion ]; then
+    . /etc/bash_completion
+  fi
+fi
+
+# 补全选项 (仅在交互模式下)
+if [[ $- == *i* ]]; then
+    bind 'set completion-ignore-case on'     # 忽略大小写
+    bind 'set show-all-if-ambiguous on'      # 显示所有匹配项
+    bind 'set menu-complete-display-prefix on' # 显示公共前缀
+fi
+
+# =============================================================================
+#                               13. Git 集成增强
+# =============================================================================
+{% if config.shared.features.git_integration %}
+
+# 增强的 Git 分支显示函数
+parse_git_branch() {
+    # 安全检查：确保在Git仓库中且Git命令可用
+    if ! command -v git >/dev/null 2>&1; then
+        return 0
+    fi
+    
+    # 检查是否在Git仓库中
+    if ! git rev-parse --git-dir >/dev/null 2>&1; then
+        return 0
+    fi
+    
+    local branch status ahead
+    
+    # 获取分支名，使用更安全的方法
+    branch=$(git symbolic-ref --short HEAD 2>/dev/null || git describe --tags --exact-match 2>/dev/null || git rev-parse --short HEAD 2>/dev/null)
+    
+    if [[ -n "$branch" ]]; then
+        status=""
+        ahead=""
+        
+        # 检查工作区状态
+        if [[ -n "$(git status --porcelain 2>/dev/null)" ]]; then
+            status="*"
+        fi
+        
+        # 检查是否有提交领先（更安全的方式）
+        if git rev-parse --verify @{upstream} >/dev/null 2>&1; then
+            local ahead_count
+            ahead_count=$(git rev-list --count @{upstream}..HEAD 2>/dev/null)
+            if [[ -n "$ahead_count" && "$ahead_count" -gt 0 ]]; then
+                ahead="↑$ahead_count"
+            fi
+        fi
+        
+        echo "($branch$status$ahead)"
+    fi
+}
+
+# 增强的命令提示符
+if [[ $- == *i* ]]; then
+    # 基础提示符（如果Git分支函数失败，确保有基本提示符）
+    export PS1="\[\033[32m\]\u@\h\[\033[00m\]:\[\033[34m\]\w\[\033[00m\]\$ "
+    
+    # 如果Git可用，添加分支显示
+    if command -v git > /dev/null; then
+        export PS1="\[\033[32m\]\u@\h\[\033[00m\]:\[\033[34m\]\w\[\033[33m\]\$(parse_git_branch)\[\033[00m\]\$ "
+    fi
+fi
+
+{% endif %}
+
+# =============================================================================
+#                               14. 性能优化
+# =============================================================================
+
+# 编译优化（如果支持）
+{% if config.zsh_integration.performance.makeflags %}
+export MAKEFLAGS="{{ config.zsh_integration.performance.makeflags }}"
+{% endif %}
+
+# =============================================================================
+#                               15. Windows 特定设置
+# =============================================================================
+
+if [[ "$OSTYPE" == "msys" || "$OSTYPE" == "win32" ]]; then
+    # Windows 路径转换
+    export BROWSER="{{ config.shared.user.browser }}.exe"
+
+    # Windows 别名增强
+    alias start='explorer'
+    alias notepad='notepad.exe'
+    alias cls='clear'
+
+    # Windows 特定的服务管理
+    alias services='services.msc'
+    alias regedit='regedit.exe'
+fi
+
+# =============================================================================
+#                               16. 启动消息和状态
+# =============================================================================
+
+# 启动消息 (仅在交互模式下)
+if [[ $- == *i* ]]; then
+    echo "🚀 增强 Bash 环境已加载 - 融合 ZSH 功能"
+    echo "📁 项目目录: {{ config.shared.paths.projects }}"
+    echo "⚡ 编辑器: {{ config.shared.user.editor }}"
+    echo "🔧 现代工具: $(command -v eza >/dev/null && echo 'eza' || echo 'ls'), $(command -v bat >/dev/null && echo 'bat' || echo 'cat'), $(command -v fd >/dev/null && echo 'fd' || echo 'find')"
+
+    # 显示可用功能
+    echo ""
+    echo "💡 增强功能:"
+    echo "   📂 现代文件操作: ll, la, lt"
+    echo "   🔍 智能搜索: fzf 集成"
+    echo "   🌐 网络工具: myip, weather, ports"
+    echo "   🛠️  系统工具: sysinfo, psmem, pscpu"
+    echo "   🔧 开发工具: extract, killport, serve"
+    echo "   📦 Git 增强: 分支状态显示"
+    echo ""
+fi
+
+# =============================================================================
+#                               17. 自定义配置加载
+# =============================================================================
+
+# 加载本地自定义配置（如果存在）
+if [ -f ~/.bashrc.local ]; then
+    if [[ $- == *i* ]]; then
+        echo "🔧 加载本地自定义配置..."
+    fi
+    source ~/.bashrc.local
+fi
+
+# 标记配置加载完成
+export DOTFILES_ENHANCED_BASH_LOADED=1

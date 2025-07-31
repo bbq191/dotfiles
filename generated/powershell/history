@@ -1,0 +1,37 @@
+la
+eza
+ll
+ls
+la
+ll
+eza -la
+la
+python C:\Users\afu\dotfiles\scripts\enhanced_generate.py
+la
+ll
+lt
+cd dotfile
+cd
+cd ~
+cd .\dotfiles\
+lt
+  Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope CurrentUser -Force
+  . $PROFILE
+$PSVersionTable
+  Remove-Module PSReadLine -Force
+$PSVersionTable
+winget search powershell
+la
+ll
+lt
+la
+ll
+ls
+C:\Users\afu\dotfiles\deep_debug.ps1
+  C:\Users\afu\dotfiles\ultimate_psreadline_fix.ps1
+  C:\Users\afu\dotfiles\psreadline_core_diagnosis.ps1
+cls
+C:\Users\afu\dotfiles\psreadline_core_diagnosis.ps1
+cls
+C:\Users\afu\dotfiles\fix_keybinding_trigger.ps1
+C:\Users\afu\dotfiles\setup_fzf_keybindings.ps1

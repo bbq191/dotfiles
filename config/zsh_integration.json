@@ -1,0 +1,224 @@
+{
+  "proxy": {
+    "enabled": true,
+    "settings": {
+      "https_proxy": "http://127.0.0.1:6153",
+      "http_proxy": "http://127.0.0.1:6153",
+      "all_proxy": "socks5://127.0.0.1:6153",
+      "no_proxy": "localhost,127.*,192.168.*,10.*,30.*,40.*,172.16.*,172.17.*,172.18.*,172.19.*,172.20.*,172.21.*,172.22.*,172.23.*,172.24.*,172.25.*,172.26.*,172.27.*,172.28.*,172.29.*,172.30.*,172.31.*"
+    }
+  },
+
+  "xdg_directories": {
+    "enabled": true,
+    "config_home": "$HOME/AppData/Local",
+    "data_home": "$HOME/AppData/Local",
+    "state_home": "$HOME/AppData/Local",
+    "cache_home": "$HOME/AppData/Local/Temp",
+    "runtime_dir": "/run/user/$(id -u)",
+    "user_bin": "$HOME/.local/bin"
+  },
+
+  "history_advanced": {
+    "file": "$HOME/dotfiles/generated/bash/history",
+    "size": 10000,
+    "save_size": 50000,
+    "options": {
+      "share_history": true,
+      "hist_expire_dups_first": true,
+      "hist_ignore_dups": true,
+      "hist_ignore_all_dups": true,
+      "hist_ignore_space": true,
+      "hist_save_no_dups": true,
+      "hist_verify": true,
+      "hist_beep": true,
+      "extended_history": true
+    }
+  },
+
+  "completion_advanced": {
+    "cache_path": "$XDG_CACHE_HOME/zsh/zcompcache",
+    "dump_file": "$XDG_CACHE_HOME/zsh/zcompdump-$ZSH_VERSION",
+    "options": {
+      "auto_menu": true,
+      "always_to_end": true,
+      "complete_in_word": true,
+      "flow_control": true
+    },
+    "styles": {
+      "matcher_list": "m:{a-zA-Z}={A-Za-z} r:|[._-]=* r:|=* l:|=* r:|=*",
+      "list_colors": "${(s.:.)LS_COLORS}",
+      "special_dirs": true,
+      "systemctl_tag_order": "commands",
+      "pacman_force_list": true,
+      "pacman_menu": true,
+      "accept_exact": "*(N)",
+      "use_cache": true
+    }
+  },
+
+  "modern_tools": {
+    "replacements": {
+      "ls": {
+        "tool": "eza",
+        "fallback": "ls --color=auto --group-directories-first",
+        "aliases": {
+          "ls": "eza --color=auto --group-directories-first",
+          "ll": "eza -l --color=auto --group-directories-first",
+          "la": "eza -la --color=auto --group-directories-first",
+          "lt": "eza --tree --color=auto"
+        }
+      },
+      "cat": {
+        "tool": "bat",
+        "aliases": {
+          "cat": "bat",
+          "catn": "bat --style=plain"
+        }
+      },
+      "grep": {
+        "tool": "rg",
+        "aliases": {
+          "grep": "rg"
+        }
+      },
+      "find": {
+        "tool": "fd",
+        "aliases": {
+          "find": "fd"
+        }
+      },
+      "du": {
+        "tool": "dust",
+        "aliases": {
+          "du": "dust"
+        }
+      },
+      "df": {
+        "tool": "duf",
+        "fallback": "df -h",
+        "aliases": {
+          "df": "duf"
+        }
+      },
+      "ps": {
+        "tool": "procs",
+        "aliases": {
+          "ps": "procs"
+        }
+      },
+      "top": {
+        "tool": "htop",
+        "aliases": {
+          "top": "htop"
+        }
+      },
+      "cd": {
+        "tool": "zoxide",
+        "aliases": {
+          "cd": "z"
+        }
+      }
+    }
+  },
+
+  "development_environments": {
+    "android": {
+      "ANDROID_HOME": "$XDG_DATA_HOME/android",
+      "ANDROID_USER_HOME": "$XDG_DATA_HOME/android",
+      "ANDROID_SDK_ROOT": "$ANDROID_HOME"
+    },
+    "go": {
+      "GOPATH": "$XDG_DATA_HOME/go",
+      "GOMODCACHE": "$XDG_CACHE_HOME/go/mod",
+      "GOPROXY": "https://goproxy.cn,direct"
+    },
+    "java": {
+      "_JAVA_OPTIONS": "-Djava.util.prefs.userRoot=\"$XDG_CONFIG_HOME\"/java"
+    },
+    "rust": {
+      "CARGO_HOME": "$XDG_DATA_HOME/cargo",
+      "RUSTUP_HOME": "$XDG_DATA_HOME/rustup"
+    },
+    "python": {
+      "PYTHONPATH": "$XDG_DATA_HOME/python",
+      "PYTHONUSERBASE": "$XDG_DATA_HOME/python",
+      "PIPENV_VENV_IN_PROJECT": "1"
+    },
+    "ruby": {
+      "GEM_HOME": "$XDG_DATA_HOME/gem",
+      "GEM_SPEC_CACHE": "$XDG_CACHE_HOME/gem"
+    },
+    "node": {
+      "FNM_HOME": "$XDG_DATA_HOME/fnm",
+      "NPM_CONFIG_USERCONFIG": "$XDG_CONFIG_HOME/npm/config",
+      "NPM_CONFIG_CACHE": "$XDG_CACHE_HOME/npm",
+      "NPM_CONFIG_PREFIX": "$XDG_DATA_HOME/npm",
+      "PNPM_HOME": "$XDG_DATA_HOME/pnpm",
+      "YARN_CACHE_FOLDER": "$XDG_CACHE_HOME/yarn"
+    },
+    "maven": {
+      "MAVEN_OPTS": "-Dmaven.repo.local=$XDG_DATA_HOME/maven/repository"
+    },
+    "gradle": {
+      "GRADLE_USER_HOME": "$XDG_DATA_HOME/gradle"
+    }
+  },
+
+  "fzf_config": {
+    "enabled": true,
+    "commands": {
+      "default": "fd --type f --hidden --follow --exclude .git",
+      "ctrl_t": "fd --type f --hidden --follow --exclude .git",
+      "alt_c": "fd --type d --hidden --follow --exclude .git",
+      "fallback_default": "find . -type f -not -path '*/\\.git/*'",
+      "fallback_ctrl_t": "find . -type f -not -path '*/\\.git/*'",
+      "fallback_alt_c": "find . -type d -not -path '*/\\.git/*'"
+    },
+    "theme": {
+      "colors": "--color=fg:#f8f8f2,bg:#282a36,hl:#bd93f9 --color=fg+:#f8f8f2,bg+:#44475a,hl+:#bd93f9 --color=info:#8be9fd,prompt:#50fa7b,pointer:#ff79c6 --color=marker:#ff79c6,spinner:#ffb86c,header:#6272a4",
+      "layout": "--height=60% --layout=reverse --border --margin=1 --padding=1"
+    },
+    "preview": {
+      "ctrl_t": "--preview 'bat -n --color=always --line-range :500 {}'",
+      "ctrl_t_fallback": "--preview 'cat {}'",
+      "alt_c": "--preview 'eza --tree --color=always {} | head -200'",
+      "alt_c_fallback": "--preview 'tree -C {} | head -200'",
+      "alt_c_final_fallback": "--preview 'ls -la {}'"
+    }
+  },
+
+  "keybindings": {
+    "history_search": {
+      "up_arrow": "history-search-backward",
+      "down_arrow": "history-search-forward"
+    },
+    "word_navigation": {
+      "ctrl_right": "forward-word",
+      "ctrl_left": "backward-word"
+    },
+    "line_navigation": {
+      "delete": "delete-char",
+      "home": "beginning-of-line",
+      "end": "end-of-line"
+    }
+  },
+
+  "external_tools": {
+    "auto_init": {
+      "thefuck": "eval \"$(thefuck --alias)\"",
+      "gh_copilot": "eval \"$(gh copilot alias -- {shell})\"",
+      "fnm": "eval \"$(fnm env --use-on-cd)\"",
+      "zoxide": "eval \"$(zoxide init {shell})\"",
+      "starship": "eval \"$(starship init {shell})\"",
+      "atuin": "eval \"$(atuin init {shell})\""
+    }
+  },
+
+  "performance": {
+    "makeflags": "-j$(nproc)",
+    "async_loading": true,
+    "completion_cache": true,
+    "path_deduplication": true
+  }
+}
