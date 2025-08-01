@@ -23,10 +23,5 @@
     "description": "获取天气信息",
     "bash": "weather() { curl -s \"wttr.in/$1?format=3\"; }",
     "powershell": "function weather($city) { (Invoke-WebRequest -Uri \"wttr.in/$city?format=3\").Content }"
-  },
-  "ports": {
-    "description": "查看端口占用",
-    "bash": "ports() { netstat -tulpn | grep LISTEN; }",
-    "powershell": "function ports { Get-NetTCPConnection | Where-Object State -eq Listen | Select-Object LocalAddress,LocalPort,State }"
   }
 }

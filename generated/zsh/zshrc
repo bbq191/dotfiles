@@ -146,7 +146,16 @@ myip() {
 
 # 显示端口使用情况
 ports() {
-    netstat -tulanp
+    if command -v ss > /dev/null 2>&1; then
+        echo "监听端口:"
+        ss -tuln | head -1
+        ss -tuln | grep LISTEN | sort -k5 -n
+    elif command -v netstat > /dev/null 2>&1; then
+        echo "监听端口:"
+        netstat -an | grep LISTEN | sort
+    else
+        echo "错误: 未找到 ss 或 netstat 命令"
+    fi
 }
 
 

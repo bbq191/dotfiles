@@ -43,9 +43,9 @@
 
   "ports": {
     "description": "显示端口使用情况",
-    "bash": "ports() {\n    netstat -tulanp\n}",
+    "bash": "ports() {\n    if command -v ss > /dev/null 2>&1; then\n        echo \"监听端口:\"\n        ss -tuln | head -1\n        ss -tuln | grep LISTEN | sort -k5 -n\n    elif command -v netstat > /dev/null 2>&1; then\n        echo \"监听端口:\"\n        netstat -an | grep LISTEN | sort\n    else\n        echo \"错误: 未找到 ss 或 netstat 命令\"\n    fi\n}",
     "powershell": "function ports {\n    Get-NetTCPConnection | Where-Object State -eq Listen | Select-Object LocalAddress,LocalPort,State,OwningProcess | Sort-Object LocalPort\n}",
-    "zsh": "ports() {\n    netstat -tulanp\n}"
+    "zsh": "ports() {\n    if command -v ss > /dev/null 2>&1; then\n        echo \"监听端口:\"\n        ss -tuln | head -1\n        ss -tuln | grep LISTEN | sort -k5 -n\n    elif command -v netstat > /dev/null 2>&1; then\n        echo \"监听端口:\"\n        netstat -an | grep LISTEN | sort\n    else\n        echo \"错误: 未找到 ss 或 netstat 命令\"\n    fi\n}"
   },
 
   "psmem": {
