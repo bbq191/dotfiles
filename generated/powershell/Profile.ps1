@@ -138,7 +138,7 @@ $env:EDITOR_HOME = "C:\Applications\Code-Insiders"
 # =============================================================================
 
 # 构建增强的 PATH（按优先级顺序）
-$env:PATH = "$env:EDITOR_HOME/bin;$env:MYSQL_HOME/bin;$env:PATH"
+$env:PATH = "$env:PYTHONPATH;$env:PYTHONUSERBASE;$env:GOPATH;$env:GOMODCACHE;$env:EDITOR_HOME/bin;$env:MYSQL_HOME/bin;$env:PATH"
 
 # =============================================================================
 #                               5. PowerShell 历史记录增强配置

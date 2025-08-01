@@ -98,7 +98,7 @@ export {{ key }}="{{ value }}"
 #                               4. PATH 环境变量构建
 # =============================================================================
 # 构建增强的 PATH（按优先级顺序）
-export PATH="$NPM_HOME":"$EDITOR_HOME/bin":"$MYSQL_HOME/bin":"$PATH"
+export PATH="PYTHONPATH":"PYTHONUSERBASE":"GOMODCACHE":"$GOPATH":"$NPM_HOME":"$EDITOR_HOME/bin":"$MYSQL_HOME/bin":"$PATH"
 
 # =============================================================================
 #                               5. Bash 历史记录增强配置

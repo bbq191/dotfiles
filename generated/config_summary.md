@@ -1,7 +1,8 @@
 # Dotfiles 配置摘要
 
 ## 生成时间
-
+The current date is: 周五 2025/08/01 
+Enter the new date: (yy-mm-dd)
 
 ## 加载的配置文件
 - shared.json

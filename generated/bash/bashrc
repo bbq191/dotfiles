@@ -130,7 +130,7 @@ export CLAUDE_CODE_GIT_BASH_PATH="C:\Applications\DevEnvironment\Git\bin\bash.ex
 #                               4. PATH 环境变量构建
 # =============================================================================
 # 构建增强的 PATH（按优先级顺序）
-export PATH="$NPM_HOME":"$EDITOR_HOME/bin":"$MYSQL_HOME/bin":"$PATH"
+export PATH="PYTHONPATH":"PYTHONUSERBASE":"GOMODCACHE":"$GOPATH":"$NPM_HOME":"$EDITOR_HOME/bin":"$MYSQL_HOME/bin":"$PATH"
 
 # =============================================================================
 #                               5. Bash 历史记录增强配置
@@ -434,7 +434,23 @@ killport() {
         echo "用法: killport <端口号>"
         return 1
     fi
-    lsof -ti:$1 | xargs kill -9
+    
+    # 在Windows环境下使用netstat和taskkill
+    if [[ "$OSTYPE" == "msys" || "$OSTYPE" == "cygwin" ]]; then
+        local pids=$(netstat -ano | grep ":$1 " | awk '{print $5}' | sort -u)
+        if [ -z "$pids" ]; then
+            echo "端口 $1 上没有活动进程"
+            return 0
+        fi
+        for pid in $pids; do
+            if [ "$pid" != "0" ]; then
+                taskkill //PID $pid //F 2>/dev/null && echo "已终止PID $pid (端口 $1)"
+            fi
+        done
+    else
+        # 在Linux/macOS环境下使用lsof
+        lsof -ti:$1 | xargs kill -9
+    fi
 }
 
 
