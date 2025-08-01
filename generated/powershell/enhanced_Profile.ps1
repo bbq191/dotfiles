@@ -98,7 +98,7 @@ $env:GEM_SPEC_CACHE = "$env:XDG_CACHE_HOME/gem"
 
 # Node.js 环境
 
-$env:FNM_HOME = "$env:XDG_DATA_HOME/fnm"
+$env:NPM_HOME = "$env:XDG_DATA_HOME/npm"
 
 $env:NPM_CONFIG_USERCONFIG = "$env:XDG_CONFIG_HOME/npm/config"
 
@@ -121,29 +121,24 @@ $env:MAVEN_OPTS = "-Dmaven.repo.local=$env:XDG_DATA_HOME/maven/repository"
 $env:GRADLE_USER_HOME = "$env:XDG_DATA_HOME/gradle"
 
 
+# MySQL 环境
+
+$env:MYSQL_HOME = "C:\Program Files\MySQL\MySQL Server 8.0"
+
+
+# vscode 环境
+
+$env:EDITOR_HOME = "C:\Applications\Code-Insiders"
+
+
+# ClaudeCode 不支持 Windows
+
 # =============================================================================
 #                               4. PATH 环境变量构建
 # =============================================================================
 
-# fnm (Fast Node Manager) 用于管理多个 Node.js 版本
-$env:PATH = "C:\Users\afu\AppData\Local\fnm_multishells\23984_1753425089543;$env:PATH"
-$env:FNM_MULTISHELL_PATH = "C:\Users\afu\AppData\Local\fnm_multishells\23984_1753425089543"
-$env:FNM_VERSION_FILE_STRATEGY = "local"    # 使用本地 .node-version 文件
-$env:FNM_DIR = "C:\Users\afu\AppData\Roaming\fnm"      # fnm 安装目录
-$env:FNM_LOGLEVEL = "info"                  # 日志级别
-$env:FNM_NODE_DIST_MIRROR = "https://nodejs.org/dist"       # Node.js 下载镜像
-$env:FNM_COREPACK_ENABLED = "false"         # 禁用 Corepack
-$env:FNM_RESOLVE_ENGINES = "true"           # 自动解析 engines 字段
-$env:FNM_ARCH = "x64"                       # 系统架构
-
-# Claude Code 工具的 Git Bash 路径配置
-$env:CLAUDE_CODE_GIT_BASH_PATH = "C:\Applications\DevEnvironment\Git\bin\bash.exe"
-
-# MySQL 命令行工具路径
-$env:MYSQL = "C:\Program Files\MySQL\MySQL Server 8.0\bin"
-
 # 构建增强的 PATH（按优先级顺序）
-$env:PATH = "$env:MYSQL;$env:PATH"
+$env:PATH = "$env:EDITOR_HOME/bin;$env:MYSQL_HOME/bin;$env:PATH"
 
 # =============================================================================
 #                               5. PowerShell 历史记录增强配置
@@ -424,7 +419,7 @@ function ~ { Set-Location $env:USERPROFILE }
 
 
 
-function projects { Set-Location "~/Projects" }
+function projects { Set-Location "/C/Develpoers/my-projs" }
 
 
 
@@ -670,7 +665,7 @@ if (Get-Module -ListAvailable -Name PSReadLine) {
 
     # Tab 补全增强
     Set-PSReadLineKeyHandler -Key Tab -Function MenuComplete
-    
+
     # FZF 键绑定 (如果 FZF 可用) - 使用小写语法确保兼容性
     if (Get-Command fzf -ErrorAction SilentlyContinue) {
         # Ctrl+T - 文件搜索
@@ -685,17 +680,17 @@ if (Get-Module -ListAvailable -Name PSReadLine) {
                         # fd 方式
                         $files = & cmd.exe /c $env:FZF_CTRL_T_COMMAND 2>$null
                     }
-                    
+
                     if ($files) {
                         # 使用 FZF 选择文件
                         $selection = $files | fzf --preview "bat --color=always --style=numbers --line-range=:500 {}" --preview-window right:50%:wrap
-                        
+
                         if ($selection) {
                             # 如果选择的路径包含空格，添加引号
                             if ($selection -match '\s') {
                                 $selection = "`"$selection`""
                             }
-                            
+
                             # 插入选择的文件路径
                             [Microsoft.PowerShell.PSConsoleReadLine]::Insert($selection)
                         }
@@ -705,7 +700,7 @@ if (Get-Module -ListAvailable -Name PSReadLine) {
                 [Microsoft.PowerShell.PSConsoleReadLine]::Insert("# 文件搜索错误: $($_.Exception.Message)")
             }
         } -Description "FZF 文件搜索"
-        
+
         # Alt+C - 目录搜索
         Set-PSReadLineKeyHandler -Key "alt+c" -ScriptBlock {
             try {
@@ -718,11 +713,11 @@ if (Get-Module -ListAvailable -Name PSReadLine) {
                         # fd 方式
                         $dirs = & cmd.exe /c $env:FZF_ALT_C_COMMAND 2>$null
                     }
-                    
+
                     if ($dirs) {
                         # 使用 FZF 选择目录
                         $selection = $dirs | fzf --preview "eza -la --color=always {}" --preview-window right:50%:wrap
-                        
+
                         if ($selection) {
                             # 切换到选择的目录
                             Set-Location $selection
@@ -734,17 +729,17 @@ if (Get-Module -ListAvailable -Name PSReadLine) {
                 [Microsoft.PowerShell.PSConsoleReadLine]::Insert("# 目录搜索错误: $($_.Exception.Message)")
             }
         } -Description "FZF 目录搜索"
-        
+
         # Ctrl+R - 历史搜索
         Set-PSReadLineKeyHandler -Key "ctrl+r" -ScriptBlock {
             try {
                 # 获取 PowerShell 历史
                 $history = Get-History | Select-Object -ExpandProperty CommandLine | Sort-Object -Unique
-                
+
                 if ($history) {
                     # 使用 FZF 选择历史命令
                     $selection = $history | fzf --tac --no-sort --preview "echo {}" --preview-window down:3:wrap
-                    
+
                     if ($selection) {
                         # 清除当前行并插入选择的命令
                         [Microsoft.PowerShell.PSConsoleReadLine]::RevertLine()
@@ -857,14 +852,6 @@ function regedit { regedit.exe }
 
 # 启动消息
 Write-Host "🚀 增强 PowerShell 环境已加载 - 融合 ZSH 功能" -ForegroundColor Cyan
-Write-Host "📁 项目目录: ~/Projects" -ForegroundColor Green
-Write-Host "⚡ 编辑器: code-insiders" -ForegroundColor Yellow
-$modernTools = @()
-if (Get-Command eza -ErrorAction SilentlyContinue) { $modernTools += "eza" } else { $modernTools += "ls" }
-if (Get-Command bat -ErrorAction SilentlyContinue) { $modernTools += "bat" } else { $modernTools += "cat" }
-if (Get-Command fd -ErrorAction SilentlyContinue) { $modernTools += "fd" } else { $modernTools += "find" }
-Write-Host "🔧 现代工具: $($modernTools -join ', ')" -ForegroundColor Magenta
-
 # 显示可用功能
 Write-Host ""
 Write-Host "💡 增强功能:" -ForegroundColor White

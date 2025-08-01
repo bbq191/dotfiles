@@ -150,7 +150,7 @@
       "GEM_SPEC_CACHE": "$XDG_CACHE_HOME/gem"
     },
     "node": {
-      "FNM_HOME": "$XDG_DATA_HOME/fnm",
+      "NPM_HOME": "$XDG_DATA_HOME/npm",
       "NPM_CONFIG_USERCONFIG": "$XDG_CONFIG_HOME/npm/config",
       "NPM_CONFIG_CACHE": "$XDG_CACHE_HOME/npm",
       "NPM_CONFIG_PREFIX": "$XDG_DATA_HOME/npm",
@@ -162,6 +162,23 @@
     },
     "gradle": {
       "GRADLE_USER_HOME": "$XDG_DATA_HOME/gradle"
+    },
+    "vscode": {
+      "EDITOR_HOME": {
+        "bash": "/c/Applications/Code-Insiders",
+        "powershell": "C:\\Applications\\Code-Insiders",
+        "zsh": "/c/Applications/Code-Insiders"
+      }
+    },
+    "mysql": {
+      "MYSQL_HOME": {
+        "bash": "/c/Program Files/MySQL/MySQL Server 8.0",
+        "powershell": "C:\\Program Files\\MySQL\\MySQL Server 8.0",
+        "zsh": "/c/Program Files/MySQL/MySQL Server 8.0"
+      }
+    },
+    "claude_code": {
+      "CLAUDE_CODE_GIT_BASH_PATH": "C:\\Applications\\DevEnvironment\\Git\\bin\\bash.exe"
     }
   },
 

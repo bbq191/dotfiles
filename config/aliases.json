@@ -4,7 +4,7 @@
     "...": "cd ../..",
     "....": "cd ../../..",
     "~": "cd ~",
-    "projects": "cd ~/Projects",
+    "projects": "cd /C/Develpoers/my-projs",
     "dotfiles": "cd ~/dotfiles"
   },
   "file_operations": {

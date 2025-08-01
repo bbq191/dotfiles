@@ -19,8 +19,11 @@
 
 import json
 import os
+import shutil
+import subprocess
 from pathlib import Path
 from jinja2 import Template
+from datetime import datetime
 
 class EnhancedDotfilesGenerator:
     """
@@ -49,6 +52,114 @@ class EnhancedDotfilesGenerator:
             'advanced_functions.json',
             'zsh_integration.json'
         ]
+    
+    def resolve_path_for_shell(self, path_config, shell_type):
+        """
+        解析针对特定 shell 类型的路径
+        
+        Args:
+            path_config: 路径配置（可能是字符串或字典）
+            shell_type: shell 类型 ('bash', 'powershell', 'zsh')
+            
+        Returns:
+            str: 针对特定 shell 的路径
+        """
+        if isinstance(path_config, str):
+            return path_config
+        elif isinstance(path_config, dict):
+            return path_config.get(shell_type, path_config.get('bash', ''))
+        else:
+            return str(path_config)
+    
+    def process_development_environments(self, config, shell_type):
+        """
+        处理开发环境配置，解析多路径格式
+        
+        Args:
+            config: 配置字典
+            shell_type: shell 类型
+            
+        Returns:
+            dict: 处理后的开发环境配置
+        """
+        import copy
+        
+        if 'zsh_integration' not in config or 'development_environments' not in config['zsh_integration']:
+            return {}
+            
+        dev_envs = copy.deepcopy(config['zsh_integration']['development_environments'])
+        processed_envs = {}
+        
+        for env_name, env_config in dev_envs.items():
+            processed_env = {}
+            for var_name, var_value in env_config.items():
+                processed_env[var_name] = self.resolve_path_for_shell(var_value, shell_type)
+            processed_envs[env_name] = processed_env
+            
+        return processed_envs
+    
+    def get_powershell_profile_path(self):
+        """
+        获取 PowerShell 默认配置文件路径
+        
+        Returns:
+            Path: PowerShell 配置文件路径
+        """
+        # 直接使用 PowerShell 7+ 的正确路径
+        user_home = Path.home()
+        return user_home / "Documents" / "PowerShell" / "Microsoft.PowerShell_profile.ps1"
+    
+    def backup_existing_profile(self, profile_path):
+        """
+        备份现有的 PowerShell 配置文件
+        
+        Args:
+            profile_path (Path): 配置文件路径
+            
+        Returns:
+            bool: 是否备份成功
+        """
+        if not profile_path.exists():
+            return True
+            
+        try:
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            backup_path = profile_path.with_suffix(f".backup.{timestamp}.ps1")
+            shutil.copy2(profile_path, backup_path)
+            print(f"✅ 已备份现有配置: {backup_path.name}")
+            return True
+        except Exception as e:
+            print(f"❌ 备份配置失败: {e}")
+            return False
+    
+    def deploy_powershell_profile(self, source_path):
+        """
+        将生成的 PowerShell 配置部署到默认位置
+        
+        Args:
+            source_path (Path): 生成的配置文件路径
+            
+        Returns:
+            bool: 是否部署成功
+        """
+        try:
+            profile_path = self.get_powershell_profile_path()
+            
+            # 确保目录存在
+            profile_path.parent.mkdir(parents=True, exist_ok=True)
+            
+            # 备份现有配置
+            if not self.backup_existing_profile(profile_path):
+                return False
+            
+            # 复制新配置
+            shutil.copy2(source_path, profile_path)
+            print(f"✅ PowerShell 配置已部署到: {profile_path}")
+            return True
+            
+        except Exception as e:
+            print(f"❌ 部署 PowerShell 配置失败: {e}")
+            return False
         
     def load_config(self):
         """
@@ -117,9 +228,15 @@ class EnhancedDotfilesGenerator:
                 with open(template_file, 'r', encoding='utf-8') as f:
                     template = Template(f.read())
                 
+                # 处理开发环境路径
+                import copy
+                processed_config = copy.deepcopy(config)
+                if 'zsh_integration' in processed_config:
+                    processed_config['zsh_integration']['development_environments'] = self.process_development_environments(config, 'bash')
+                
                 # 渲染模板
                 bashrc_content = template.render(
-                    config=config,
+                    config=processed_config,
                     shell='bash'
                 )
                 
@@ -166,9 +283,15 @@ class EnhancedDotfilesGenerator:
                 with open(template_file, 'r', encoding='utf-8') as f:
                     template = Template(f.read())
                 
+                # 处理开发环境路径
+                import copy
+                processed_config = copy.deepcopy(config)
+                if 'zsh_integration' in processed_config:
+                    processed_config['zsh_integration']['development_environments'] = self.process_development_environments(config, 'powershell')
+                
                 # 渲染模板
                 profile_content = template.render(
-                    config=config,
+                    config=processed_config,
                     shell='powershell'
                 )
                 
@@ -184,6 +307,15 @@ class EnhancedDotfilesGenerator:
                         f.write(profile_content)
                 
                 print("✅ PowerShell 配置文件已生成")
+                
+                # 自动部署到 PowerShell 默认位置
+                print("🔄 正在部署 PowerShell 配置到默认位置...")
+                deploy_source = enhanced_file if output_name == "enhanced_Profile.ps1" else output_file
+                if self.deploy_powershell_profile(deploy_source):
+                    print("🎉 PowerShell 配置已自动部署！")
+                else:
+                    print("⚠️ 自动部署失败，请手动复制配置文件")
+                    
             else:
                 print(f"⚠️  PowerShell 模板文件未找到: {template_file}")
                 
@@ -237,8 +369,14 @@ command -v {{ tool.split()[0] if ' ' in tool else tool }} > /dev/null && {{ init
 echo "🚀 ZSH 环境已加载 - dotfiles 系统"
 """
             
+            # 处理开发环境路径
+            import copy
+            processed_config = copy.deepcopy(config)
+            if 'zsh_integration' in processed_config:
+                processed_config['zsh_integration']['development_environments'] = self.process_development_environments(config, 'zsh')
+            
             template = Template(zsh_template)
-            zshrc_content = template.render(config=config, shell='zsh')
+            zshrc_content = template.render(config=processed_config, shell='zsh')
             
             output_file = zsh_dir / "zshrc"
             with open(output_file, 'w', encoding='utf-8') as f:

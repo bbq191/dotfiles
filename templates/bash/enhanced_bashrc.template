@@ -81,29 +81,24 @@ export {{ key }}="{{ value }}"
 {% for key, value in config.zsh_integration.development_environments.gradle.items() %}
 export {{ key }}="{{ value }}"
 {% endfor %}
+# vscode 环境
+{% for key, value in config.zsh_integration.development_environments.vscode.items() %}
+export {{ key }}="{{ value }}"
+{% endfor %}
+# mysql 环境
+{% for key, value in config.zsh_integration.development_environments.mysql.items() %}
+export {{ key }}="{{ value }}"
+{% endfor %}
+# claude code 环境
+{% for key, value in config.zsh_integration.development_environments.claude_code.items() %}
+export {{ key }}="{{ value }}"
+{% endfor %}
 
 # =============================================================================
 #                               4. PATH 环境变量构建
 # =============================================================================
-# fnm (Fast Node Manager) 用于管理多个 Node.js 版本
-export PATH="/c/Users/afu/AppData/Local/fnm_multishells/23984_1753425089543":"$PATH"
-export FNM_MULTISHELL_PATH="C:\\Users\\afu\\AppData\\Local\\fnm_multishells\\23984_1753425089543"
-export FNM_VERSION_FILE_STRATEGY="local"    # 使用本地 .node-version 文件
-export FNM_DIR="C:\\Users\\afu\\AppData\\Roaming\\fnm"      # fnm 安装目录
-export FNM_LOGLEVEL="info"                  # 日志级别
-export FNM_NODE_DIST_MIRROR="https://nodejs.org/dist"       # Node.js 下载镜像
-export FNM_COREPACK_ENABLED="false"         # 禁用 Corepack
-export FNM_RESOLVE_ENGINES="true"           # 自动解析 engines 字段
-export FNM_ARCH="x64"                       # 系统架构
-
-# Claude Code 工具的 Git Bash 路径配置
-export CLAUDE_CODE_GIT_BASH_PATH="C:\\Applications\\DevEnvironment\\Git\\bin\\bash.exe"
-
-# MySQL 命令行工具路径
-export MYSQL="/C/Program Files/MySQL/MySQL Server 8.0/bin"
-
 # 构建增强的 PATH（按优先级顺序）
-export PATH="$MYSQL":"$PATH"
+export PATH="$NPM_HOME":"$EDITOR_HOME/bin":"$MYSQL_HOME/bin":"$PATH"
 
 # =============================================================================
 #                               5. Bash 历史记录增强配置
@@ -317,26 +312,26 @@ parse_git_branch() {
     if ! command -v git >/dev/null 2>&1; then
         return 0
     fi
-    
+
     # 检查是否在Git仓库中
     if ! git rev-parse --git-dir >/dev/null 2>&1; then
         return 0
     fi
-    
+
     local branch status ahead
-    
+
     # 获取分支名，使用更安全的方法
     branch=$(git symbolic-ref --short HEAD 2>/dev/null || git describe --tags --exact-match 2>/dev/null || git rev-parse --short HEAD 2>/dev/null)
-    
+
     if [[ -n "$branch" ]]; then
         status=""
         ahead=""
-        
+
         # 检查工作区状态
         if [[ -n "$(git status --porcelain 2>/dev/null)" ]]; then
             status="*"
         fi
-        
+
         # 检查是否有提交领先（更安全的方式）
         if git rev-parse --verify @{upstream} >/dev/null 2>&1; then
             local ahead_count
@@ -345,7 +340,7 @@ parse_git_branch() {
                 ahead="↑$ahead_count"
             fi
         fi
-        
+
         echo "($branch$status$ahead)"
     fi
 }
@@ -354,7 +349,7 @@ parse_git_branch() {
 if [[ $- == *i* ]]; then
     # 基础提示符（如果Git分支函数失败，确保有基本提示符）
     export PS1="\[\033[32m\]\u@\h\[\033[00m\]:\[\033[34m\]\w\[\033[00m\]\$ "
-    
+
     # 如果Git可用，添加分支显示
     if command -v git > /dev/null; then
         export PS1="\[\033[32m\]\u@\h\[\033[00m\]:\[\033[34m\]\w\[\033[33m\]\$(parse_git_branch)\[\033[00m\]\$ "
@@ -396,11 +391,7 @@ fi
 
 # 启动消息 (仅在交互模式下)
 if [[ $- == *i* ]]; then
-    echo "🚀 增强 Bash 环境已加载 - 融合 ZSH 功能"
-    echo "📁 项目目录: {{ config.shared.paths.projects }}"
-    echo "⚡ 编辑器: {{ config.shared.user.editor }}"
-    echo "🔧 现代工具: $(command -v eza >/dev/null && echo 'eza' || echo 'ls'), $(command -v bat >/dev/null && echo 'bat' || echo 'cat'), $(command -v fd >/dev/null && echo 'fd' || echo 'find')"
-
+    echo "🚀 增强 Bash 环境已加载"
     # 显示可用功能
     echo ""
     echo "💡 增强功能:"

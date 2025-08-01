@@ -6,7 +6,7 @@
     "browser": "brave"
   },
   "paths": {
-    "projects": "~/Projects",
+    "projects": "C:\\Develpoers\\my-projs",
     "dotfiles": "~/dotfiles"
   },
   "environment": {
