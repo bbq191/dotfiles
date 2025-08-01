@@ -35,3 +35,42 @@ C:\Users\afu\dotfiles\psreadline_core_diagnosis.ps1
 cls
 C:\Users\afu\dotfiles\fix_keybinding_trigger.ps1
 C:\Users\afu\dotfiles\setup_fzf_keybindings.ps1
+. $
+echo $PROFILE
+fnm
+mysql
+myslq
+fnm
+code-insiders
+python C:\Users\afu\dotfiles\scripts\enhanced_generate.py
+mysql
+code-insiders
+code-insiders.exe
+echo $EDITOR_HOME
+$ENV
+printenv
+echo $PROFILE
+echo $MYSQL_HOME
+la
+projects
+mysql
+code-insiders
+mysql
+code-insiders.cmd
+mysql
+code-insiders
+la
+pwd
+ports
+myip
+z
+z chat2sql
+la
+gs
+...
+cd .\mylabs\chattosql\
+la
+gs
+pscpu
+psmem
+ports
