@@ -1,0 +1,177 @@
+{
+  "version": "2.0.0",
+  "description": "Phase 2 开发体验增强工具集成配置",
+  "container_tools": {
+    "docker": {
+      "enabled": true,
+      "aliases": {
+        "dk": "docker",
+        "dps": "docker ps",
+        "dimg": "docker images",
+        "dex": "docker exec -it",
+        "dlogs": "docker logs -f",
+        "dprune": "docker system prune -f"
+      },
+      "functions": {
+        "docker_cleanup": "docker system prune -af && docker volume prune -f",
+        "docker_stats": "docker stats --format 'table {{.Container}}\\t{{.CPUPerc}}\\t{{.MemUsage}}\\t{{.NetIO}}'"
+      }
+    },
+    "k9s": {
+      "enabled": true,
+      "aliases": {
+        "k": "kubectl",
+        "k9": "k9s"
+      }
+    },
+    "podman": {
+      "enabled": false,
+      "aliases": {
+        "pm": "podman",
+        "pps": "podman ps"
+      }
+    }
+  },
+  "database_tools": {
+    "pgcli": {
+      "enabled": true,
+      "aliases": {
+        "pg": "pgcli"
+      },
+      "connection_shortcuts": {
+        "pgdev": "pgcli postgresql://postgres:password@localhost:5432/myapp_dev",
+        "pgtest": "pgcli postgresql://postgres:password@localhost:5432/myapp_test"
+      },
+      "xdg_config": {
+        "config_file": "$XDG_CONFIG_HOME/pgcli/config",
+        "history_file": "$XDG_STATE_HOME/pgcli/history",
+        "log_file": "$XDG_STATE_HOME/pgcli/log"
+      }
+    },
+    "mycli": {
+      "enabled": true,
+      "aliases": {
+        "my": "mycli"
+      },
+      "connection_shortcuts": {
+        "mydev": "mycli -u root -p -h localhost myapp_dev",
+        "mytest": "mycli -u root -p -h localhost myapp_test"
+      },
+      "xdg_config": {
+        "config_file": "$XDG_CONFIG_HOME/mycli/myclirc",
+        "history_file": "$XDG_STATE_HOME/mycli/history",
+        "log_file": "$XDG_STATE_HOME/mycli/log"
+      }
+    },
+    "redis-cli": {
+      "enabled": true,
+      "aliases": {
+        "redis": "redis-cli",
+        "rping": "redis-cli ping"
+      },
+      "connection_shortcuts": {
+        "rdev": "redis-cli -h localhost -p 6379 -n 0",
+        "rcache": "redis-cli -h localhost -p 6379 -n 1"
+      }
+    },
+    "mongosh": {
+      "enabled": true,
+      "aliases": {
+        "mongo": "mongosh"
+      },
+      "connection_shortcuts": {
+        "mongodev": "mongosh mongodb://localhost:27017/myapp_dev"
+      }
+    },
+    "sqlite3": {
+      "enabled": true,
+      "aliases": {
+        "sqlite": "sqlite3"
+      }
+    }
+  },
+  "security_tools": {
+    "gpg": {
+      "enabled": true,
+      "aliases": {
+        "gpg-list": "gpg --list-keys",
+        "gpg-sign": "gpg --armor --detach-sign",
+        "gpg-verify": "gpg --verify"
+      },
+      "functions": {
+        "gpg-backup": "gpg --armor --export-secret-keys > gpg-private-backup.asc",
+        "gpg-import": "gpg --import"
+      },
+      "xdg_config": {
+        "gnupg_home": "$XDG_DATA_HOME/gnupg",
+        "backup_dir": "$XDG_DATA_HOME/dotfiles/gpg_backup"
+      }
+    },
+    "mkcert": {
+      "enabled": true,
+      "aliases": {
+        "cert-local": "mkcert localhost 127.0.0.1 ::1",
+        "cert-install": "mkcert -install"
+      }
+    },
+    "pass": {
+      "enabled": false,
+      "aliases": {
+        "p": "pass",
+        "pgen": "pass generate",
+        "pcopy": "pass -c"
+      }
+    },
+    "openssl": {
+      "enabled": true,
+      "aliases": {
+        "ssl-genkey": "openssl genrsa -out private.key 2048",
+        "ssl-gencsr": "openssl req -new -key private.key -out request.csr"
+      }
+    }
+  },
+  "environment_variables": {
+    "container": {
+      "DOCKER_BUILDKIT": "1",
+      "COMPOSE_DOCKER_CLI_BUILD": "1"
+    },
+    "database": {
+      "PGUSER": "postgres",
+      "PGHOST": "localhost",
+      "PGPORT": "5432",
+      "MYSQL_HOST": "localhost",
+      "MYSQL_PORT": "3306",
+      "REDIS_URL": "redis://localhost:6379"
+    },
+    "security": {
+      "GPG_TTY": "$(tty)"
+    }
+  },
+  "shell_functions": {
+    "dev-env": {
+      "description": "启动完整开发环境",
+      "command": "cd ~/projects && docker-compose up -d && echo '开发环境已启动'"
+    },
+    "db-connect": {
+      "description": "快速连接数据库",
+      "command": "python3 ~/.dotfiles/templates/database/db-connect.py"
+    },
+    "ssh-manage": {
+      "description": "管理SSH配置",
+      "command": "python3 ~/.dotfiles/templates/ssh/ssh-config-manager.py"
+    },
+    "cert-gen": {
+      "description": "生成本地开发证书",
+      "command": "cd ~/projects && mkcert localhost 127.0.0.1 ::1"
+    },
+    "container-cleanup": {
+      "description": "清理容器资源",
+      "command": "docker system prune -af && docker volume prune -f && echo '容器清理完成'"
+    }
+  },
+  "completions": {
+    "docker": "command -v docker &> /dev/null && source <(docker completion bash)",
+    "kubectl": "command -v kubectl &> /dev/null && source <(kubectl completion bash)",
+    "gh": "command -v gh &> /dev/null && eval \"$(gh completion bash)\""
+  }
+}

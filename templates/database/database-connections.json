@@ -1,0 +1,144 @@
+{
+  "version": "1.0.0",
+  "description": "数据库连接配置模板",
+  "connections": {
+    "postgresql": {
+      "local_dev": {
+        "host": "localhost",
+        "port": 5432,
+        "database": "myapp_dev",
+        "username": "postgres",
+        "password": "password",
+        "cli_tool": "pgcli",
+        "connection_string": "postgresql://postgres:password@localhost:5432/myapp_dev",
+        "alias": "pgdev"
+      },
+      "docker_dev": {
+        "host": "localhost",
+        "port": 5432,
+        "database": "myapp_dev",
+        "username": "postgres",
+        "password": "password",
+        "cli_tool": "pgcli",
+        "connection_string": "postgresql://postgres:password@localhost:5432/myapp_dev",
+        "alias": "pgdocker"
+      },
+      "test": {
+        "host": "localhost",
+        "port": 5433,
+        "database": "myapp_test",
+        "username": "postgres",
+        "password": "password",
+        "cli_tool": "pgcli",
+        "connection_string": "postgresql://postgres:password@localhost:5433/myapp_test",
+        "alias": "pgtest"
+      }
+    },
+    "mysql": {
+      "local_dev": {
+        "host": "localhost",
+        "port": 3306,
+        "database": "myapp_dev",
+        "username": "root",
+        "password": "password",
+        "cli_tool": "mycli",
+        "connection_string": "mysql://root:password@localhost:3306/myapp_dev",
+        "alias": "mydev"
+      },
+      "docker_dev": {
+        "host": "localhost",
+        "port": 3306,
+        "database": "myapp_dev",
+        "username": "root",
+        "password": "password",
+        "cli_tool": "mycli",
+        "connection_string": "mysql://root:password@localhost:3306/myapp_dev",
+        "alias": "mydocker"
+      }
+    },
+    "redis": {
+      "local_dev": {
+        "host": "localhost",
+        "port": 6379,
+        "database": 0,
+        "password": "",
+        "cli_tool": "redis-cli",
+        "connection_string": "redis://localhost:6379/0",
+        "alias": "redisdev"
+      },
+      "docker_dev": {
+        "host": "localhost",
+        "port": 6379,
+        "database": 0,
+        "password": "",
+        "cli_tool": "redis-cli",
+        "connection_string": "redis://localhost:6379/0",
+        "alias": "redisdocker"
+      },
+      "cache": {
+        "host": "localhost",
+        "port": 6379,
+        "database": 1,
+        "password": "",
+        "cli_tool": "redis-cli",
+        "connection_string": "redis://localhost:6379/1",
+        "alias": "rediscache"
+      }
+    },
+    "mongodb": {
+      "local_dev": {
+        "host": "localhost",
+        "port": 27017,
+        "database": "myapp_dev",
+        "username": "",
+        "password": "",
+        "cli_tool": "mongosh",
+        "connection_string": "mongodb://localhost:27017/myapp_dev",
+        "alias": "mongodev"
+      },
+      "docker_dev": {
+        "host": "localhost",
+        "port": 27017,
+        "database": "myapp_dev",
+        "username": "admin",
+        "password": "password",
+        "cli_tool": "mongosh",
+        "connection_string": "mongodb://admin:password@localhost:27017/myapp_dev",
+        "alias": "mongodocker"
+      }
+    },
+    "sqlite": {
+      "local_dev": {
+        "database_file": "./database/development.sqlite3",
+        "cli_tool": "sqlite3",
+        "alias": "sqlitedev"
+      },
+      "test": {
+        "database_file": "./database/test.sqlite3",
+        "cli_tool": "sqlite3",
+        "alias": "sqlitetest"
+      }
+    }
+  },
+  "connection_templates": {
+    "pgcli": "pgcli {connection_string}",
+    "mycli": "mycli -u {username} -p{password} -h {host} -P {port} {database}",
+    "redis-cli": "redis-cli -h {host} -p {port} -n {database}",
+    "mongosh": "mongosh {connection_string}",
+    "sqlite3": "sqlite3 {database_file}"
+  },
+  "environment_variables": {
+    "DATABASE_URL": "{connection_string}",
+    "POSTGRES_HOST": "{host}",
+    "POSTGRES_PORT": "{port}",
+    "POSTGRES_DB": "{database}",
+    "POSTGRES_USER": "{username}",
+    "POSTGRES_PASSWORD": "{password}",
+    "REDIS_URL": "{connection_string}",
+    "MYSQL_HOST": "{host}",
+    "MYSQL_PORT": "{port}",
+    "MYSQL_DATABASE": "{database}",
+    "MYSQL_USER": "{username}",
+    "MYSQL_PASSWORD": "{password}"
+  }
+}

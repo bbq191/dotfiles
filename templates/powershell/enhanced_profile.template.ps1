@@ -239,7 +239,128 @@ if (Get-Module -ListAvailable -Name PSReadLine) {
 }
 
 # =============================================================================
-#                               6. 现代化工具集成（别名）
+#                               6. Phase 2: 开发体验增强工具集成
+# =============================================================================
+
+{% if config.phase2_integration is defined %}
+# 容器工具集成
+{% if config.phase2_integration.container_tools.docker.enabled %}
+# Docker 工具集成
+if (Get-Command docker -ErrorAction SilentlyContinue) {
+    {% for alias_name, alias_command in config.phase2_integration.container_tools.docker.aliases.items() %}
+    Set-Alias {{ alias_name }} '{{ alias_command }}'
+    {% endfor %}
+    
+    # Docker 实用函数
+    {% for func_name, func_command in config.phase2_integration.container_tools.docker.functions.items() %}
+    function {{ func_name }} { {{ func_command }} }
+    {% endfor %}
+}
+{% endif %}
+
+{% if config.phase2_integration.container_tools.k9s.enabled %}
+# Kubernetes 工具集成
+if (Get-Command kubectl -ErrorAction SilentlyContinue) {
+    {% for alias_name, alias_command in config.phase2_integration.container_tools.k9s.aliases.items() %}
+    Set-Alias {{ alias_name }} '{{ alias_command }}'
+    {% endfor %}
+}
+
+if (Get-Command k9s -ErrorAction SilentlyContinue) {
+    Set-Alias k9 'k9s'
+}
+{% endif %}
+
+# 数据库工具集成
+{% if config.phase2_integration.database_tools.pgcli.enabled %}
+# PostgreSQL CLI 工具
+if ((Get-Command pgcli -ErrorAction SilentlyContinue) -or (Test-Path "C:\Users\afu\.local\bin\pgcli.exe")) {
+    {% for alias_name, alias_command in config.phase2_integration.database_tools.pgcli.aliases.items() %}
+    Set-Alias {{ alias_name }} '{{ alias_command }}'
+    {% endfor %}
+    
+    # PostgreSQL 连接快捷方式
+    {% for shortcut_name, shortcut_command in config.phase2_integration.database_tools.pgcli.connection_shortcuts.items() %}
+    function {{ shortcut_name }} { {{ shortcut_command }} }
+    {% endfor %}
+}
+{% endif %}
+
+{% if config.phase2_integration.database_tools.mycli.enabled %}
+# MySQL CLI 工具
+if ((Get-Command mycli -ErrorAction SilentlyContinue) -or (Test-Path "C:\Users\afu\.local\bin\mycli.exe")) {
+    {% for alias_name, alias_command in config.phase2_integration.database_tools.mycli.aliases.items() %}
+    Set-Alias {{ alias_name }} '{{ alias_command }}'
+    {% endfor %}
+    
+    # MySQL 连接快捷方式
+    {% for shortcut_name, shortcut_command in config.phase2_integration.database_tools.mycli.connection_shortcuts.items() %}
+    function {{ shortcut_name }} { {{ shortcut_command }} }
+    {% endfor %}
+}
+{% endif %}
+
+{% if config.phase2_integration.database_tools.redis-cli.enabled %}
+# Redis CLI 工具
+if ((Get-Command redis-cli -ErrorAction SilentlyContinue) -or (Test-Path "C:\Applications\DevEnvironment\MemuraiDeveloper\memurai-cli.exe")) {
+    {% for alias_name, alias_command in config.phase2_integration.database_tools.redis-cli.aliases.items() %}
+    Set-Alias {{ alias_name }} '{{ alias_command }}'
+    {% endfor %}
+    
+    # Redis 连接快捷方式
+    {% for shortcut_name, shortcut_command in config.phase2_integration.database_tools.redis-cli.connection_shortcuts.items() %}
+    function {{ shortcut_name }} { {{ shortcut_command }} }
+    {% endfor %}
+}
+{% endif %}
+
+# 安全工具集成
+{% if config.phase2_integration.security_tools.gpg.enabled %}
+# GPG 工具集成
+if (Get-Command gpg -ErrorAction SilentlyContinue) {
+    {% for alias_name, alias_command in config.phase2_integration.security_tools.gpg.aliases.items() %}
+    Set-Alias {{ alias_name }} '{{ alias_command }}'
+    {% endfor %}
+    
+    # GPG 实用函数
+    {% for func_name, func_command in config.phase2_integration.security_tools.gpg.functions.items() %}
+    function {{ func_name }} { {{ func_command }} }
+    {% endfor %}
+    
+    # GPG 环境变量
+    $env:GPG_TTY = "CON"
+}
+{% endif %}
+
+{% if config.phase2_integration.security_tools.mkcert.enabled %}
+# mkcert 本地证书工具
+if (Get-Command mkcert -ErrorAction SilentlyContinue) {
+    {% for alias_name, alias_command in config.phase2_integration.security_tools.mkcert.aliases.items() %}
+    Set-Alias {{ alias_name }} '{{ alias_command }}'
+    {% endfor %}
+}
+{% endif %}
+
+# Phase 2 环境变量
+{% for category, env_vars in config.phase2_integration.environment_variables.items() %}
+# {{ category|title }} 环境变量
+{% for key, value in env_vars.items() %}
+$env:{{ key }} = "{{ value }}"
+{% endfor %}
+{% endfor %}
+
+# Phase 2 自定义函数
+{% for func_name, func_config in config.phase2_integration.shell_functions.items() %}
+# {{ func_config.description }}
+function {{ func_name }} {
+    {{ func_config.command }}
+}
+{% endfor %}
+
+{% endif %}
+
+# =============================================================================
+#                               7. 现代化工具集成（别名）
 # =============================================================================
 
 # 现代化命令替代（智能检测和回退）- 避免内置别名冲突

@@ -166,6 +166,106 @@ class ToolsHealthCheck:
         
         return results
     
+    def check_container_tools(self) -> List[Tuple[str, bool, str]]:
+        """检查容器和编排工具"""
+        tools = [
+            ("docker", ["--version"], "Docker 容器平台"),
+            ("k9s", ["version"], "Kubernetes TUI"),
+            ("podman", ["--version"], "Podman 容器引擎"),
+            ("kubectl", ["version", "--client"], "Kubernetes CLI"),
+        ]
+        
+        results = []
+        for tool, args, description in tools:
+            success, output = self.check_command(tool, args)
+            
+            if success:
+                results.append((tool, True, f"✅ {output} - {description}"))
+            else:
+                results.append((tool, False, f"❌ {output} - {description}"))
+        
+        return results
+    
+    def check_database_tools(self) -> List[Tuple[str, bool, str]]:
+        """检查数据库工具"""
+        tools = [
+            ("pgcli", ["--version"], "PostgreSQL CLI 客户端"),
+            ("mycli", ["--version"], "MySQL CLI 客户端"),
+            ("redis-cli", ["--version"], "Redis CLI 客户端"),
+            ("mongosh", ["--version"], "MongoDB Shell"),
+            ("sqlite3", ["--version"], "SQLite 命令行工具"),
+        ]
+        
+        results = []
+        for tool, args, description in tools:
+            success, output = self.check_command(tool, args)
+            
+            # 特殊处理自定义路径的数据库工具
+            if not success:
+                custom_paths = {
+                    "pgcli": [r"C:\Users\afu\.local\bin\pgcli.exe"],
+                    "mycli": [r"C:\Users\afu\.local\bin\mycli.exe"],
+                    "redis-cli": [r"C:\Applications\DevEnvironment\MemuraiDeveloper\memurai-cli.exe"]
+                }
+                
+                if tool in custom_paths:
+                    for custom_path in custom_paths[tool]:
+                        if os.path.exists(custom_path):
+                            success, output = self.check_command(custom_path, args)
+                            if success:
+                                break
+            
+            if success:
+                results.append((tool, True, f"✅ {output} - {description}"))
+            else:
+                results.append((tool, False, f"❌ {output} - {description}"))
+        
+        return results
+    
+    def check_security_tools(self) -> List[Tuple[str, bool, str]]:
+        """检查安全工具"""
+        tools = [
+            ("gpg", ["--version"], "GPG 加密工具"),
+            ("mkcert", ["-version"], "本地开发证书工具"),
+            ("pass", ["version"], "密码管理器"),
+            ("openssl", ["version"], "SSL/TLS 工具包"),
+        ]
+        
+        results = []
+        for tool, args, description in tools:
+            success, output = self.check_command(tool, args)
+            
+            if success:
+                results.append((tool, True, f"✅ {output} - {description}"))
+            else:
+                results.append((tool, False, f"❌ {output} - {description}"))
+        
+        
+        results = []
+        for tool, args, description in tools:
+            success, output = self.check_command(tool, args)
+            
+            # 特殊处理自定义路径的工具
+            if not success:
+                custom_paths = {
+                    "gh": [r"C:\Applications\DevEnvironment\github-cli\gh.exe"],
+                    "mlr": [r"C:\Applications\DevEnvironment\miller\miller-6.13.0-windows-amd64\mlr.exe"]
+                }
+                
+                if tool in custom_paths:
+                    for custom_path in custom_paths[tool]:
+                        if os.path.exists(custom_path):
+                            success, output = self.check_command(custom_path, args)
+                            if success:
+                                break
+            
+            if success:
+                results.append((tool, True, f"✅ {output} - {description}"))
+            else:
+                results.append((tool, False, f"❌ {output} - {description}"))
+        
+        return results
+    
     def check_package_managers(self) -> List[Tuple[str, bool, str]]:
         """检查包管理器"""
         managers = [
@@ -294,6 +394,36 @@ class ToolsHealthCheck:
                 self.results["passed"].append(f"tool_{name}")
             else:
                 self.results["failed"].append(f"tool_{name}")
+        
+        # 检查容器工具
+        print("\n🐳 容器工具检查:")
+        container_results = self.check_container_tools()
+        for name, success, output in container_results:
+            print(f"  {output}")
+            if success:
+                self.results["passed"].append(f"container_{name}")
+            else:
+                self.results["failed"].append(f"container_{name}")
+        
+        # 检查数据库工具
+        print("\n🗄️  数据库工具检查:")
+        db_results = self.check_database_tools()
+        for name, success, output in db_results:
+            print(f"  {output}")
+            if success:
+                self.results["passed"].append(f"database_{name}")
+            else:
+                self.results["failed"].append(f"database_{name}")
+        
+        # 检查安全工具
+        print("\n🔒 安全工具检查:")
+        security_results = self.check_security_tools()
+        for name, success, output in security_results:
+            print(f"  {output}")
+            if success:
+                self.results["passed"].append(f"security_{name}")
+            else:
+                self.results["failed"].append(f"security_{name}")
         
         # 检查 Git 配置
         print("\n⚙️  Git 配置检查:")

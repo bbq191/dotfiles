@@ -11,16 +11,41 @@
 
   "xdg_directories": {
     "enabled": true,
-    "config_home": "$HOME/AppData/Local",
-    "data_home": "$HOME/AppData/Local",
-    "state_home": "$HOME/AppData/Local",
-    "cache_home": "$HOME/AppData/Local/Temp",
-    "runtime_dir": "/run/user/$(id -u)",
-    "user_bin": "$HOME/.local/bin"
+    "config_home": {
+      "linux": "$HOME/.config",
+      "macos": "$HOME/.config",
+      "windows": "$HOME/AppData/Local"
+    },
+    "data_home": {
+      "linux": "$HOME/.local/share",
+      "macos": "$HOME/.local/share", 
+      "windows": "$HOME/AppData/Local"
+    },
+    "state_home": {
+      "linux": "$HOME/.local/state",
+      "macos": "$HOME/.local/state",
+      "windows": "$HOME/AppData/Local/State"
+    },
+    "cache_home": {
+      "linux": "$HOME/.cache",
+      "macos": "$HOME/.cache",
+      "windows": "$HOME/AppData/Local/Temp"
+    },
+    "runtime_dir": {
+      "linux": "/run/user/$(id -u)",
+      "macos": "/tmp",
+      "windows": "%TEMP%"
+    },
+    "user_bin": {
+      "linux": "$HOME/.local/bin",
+      "macos": "$HOME/.local/bin",
+      "windows": "$HOME/AppData/Local/Programs"
+    }
   },
 
   "history_advanced": {
-    "file": "$HOME/dotfiles/generated/bash/history",
+    "file": "$XDG_STATE_HOME/bash/history",
+    "backup_dir": "$XDG_DATA_HOME/dotfiles/history_backup",
     "size": 10000,
     "save_size": 50000,
     "options": {

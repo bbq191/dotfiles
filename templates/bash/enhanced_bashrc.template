@@ -228,7 +228,131 @@ if [[ $- == *i* ]]; then
 fi
 
 # =============================================================================
-#                               6. 现代化工具集成
+#                               6. Phase 2: 开发体验增强工具集成
+# =============================================================================
+
+{% if config.phase2_integration is defined %}
+# 容器工具集成
+{% if config.phase2_integration.container_tools.docker.enabled %}
+# Docker 工具集成
+if command -v docker &> /dev/null; then
+    {% for alias_name, alias_command in config.phase2_integration.container_tools.docker.aliases.items() %}
+    alias {{ alias_name }}='{{ alias_command }}'
+    {% endfor %}
+    
+    # Docker 实用函数
+    {% for func_name, func_command in config.phase2_integration.container_tools.docker.functions.items() %}
+    {{ func_name }}() { {{ func_command }}; }
+    {% endfor %}
+fi
+{% endif %}
+
+{% if config.phase2_integration.container_tools.k9s.enabled %}
+# Kubernetes 工具集成
+if command -v kubectl &> /dev/null; then
+    {% for alias_name, alias_command in config.phase2_integration.container_tools.k9s.aliases.items() %}
+    alias {{ alias_name }}='{{ alias_command }}'
+    {% endfor %}
+    
+    # 启用 kubectl 补全
+    source <(kubectl completion bash)
+fi
+
+if command -v k9s &> /dev/null; then
+    alias k9='k9s'
+fi
+{% endif %}
+
+# 数据库工具集成
+{% if config.phase2_integration.database_tools.pgcli.enabled %}
+# PostgreSQL CLI 工具
+if command -v pgcli &> /dev/null || [ -f "C:\Users\afu\.local\bin\pgcli.exe" ]; then
+    {% for alias_name, alias_command in config.phase2_integration.database_tools.pgcli.aliases.items() %}
+    alias {{ alias_name }}='{{ alias_command }}'
+    {% endfor %}
+    
+    # PostgreSQL 连接快捷方式
+    {% for shortcut_name, shortcut_command in config.phase2_integration.database_tools.pgcli.connection_shortcuts.items() %}
+    alias {{ shortcut_name }}='{{ shortcut_command }}'
+    {% endfor %}
+fi
+{% endif %}
+
+{% if config.phase2_integration.database_tools.mycli.enabled %}
+# MySQL CLI 工具
+if command -v mycli &> /dev/null || [ -f "C:\Users\afu\.local\bin\mycli.exe" ]; then
+    {% for alias_name, alias_command in config.phase2_integration.database_tools.mycli.aliases.items() %}
+    alias {{ alias_name }}='{{ alias_command }}'
+    {% endfor %}
+    
+    # MySQL 连接快捷方式
+    {% for shortcut_name, shortcut_command in config.phase2_integration.database_tools.mycli.connection_shortcuts.items() %}
+    alias {{ shortcut_name }}='{{ shortcut_command }}'
+    {% endfor %}
+fi
+{% endif %}
+
+{% if config.phase2_integration.database_tools.redis-cli.enabled %}
+# Redis CLI 工具
+if command -v redis-cli &> /dev/null || [ -f "C:\Applications\DevEnvironment\MemuraiDeveloper\memurai-cli.exe" ]; then
+    {% for alias_name, alias_command in config.phase2_integration.database_tools.redis-cli.aliases.items() %}
+    alias {{ alias_name }}='{{ alias_command }}'
+    {% endfor %}
+    
+    # Redis 连接快捷方式
+    {% for shortcut_name, shortcut_command in config.phase2_integration.database_tools.redis-cli.connection_shortcuts.items() %}
+    alias {{ shortcut_name }}='{{ shortcut_command }}'
+    {% endfor %}
+fi
+{% endif %}
+
+# 安全工具集成
+{% if config.phase2_integration.security_tools.gpg.enabled %}
+# GPG 工具集成
+if command -v gpg &> /dev/null; then
+    {% for alias_name, alias_command in config.phase2_integration.security_tools.gpg.aliases.items() %}
+    alias {{ alias_name }}='{{ alias_command }}'
+    {% endfor %}
+    
+    # GPG 实用函数
+    {% for func_name, func_command in config.phase2_integration.security_tools.gpg.functions.items() %}
+    {{ func_name }}() { {{ func_command }}; }
+    {% endfor %}
+    
+    # GPG 环境变量
+    export GPG_TTY=$(tty)
+fi
+{% endif %}
+
+{% if config.phase2_integration.security_tools.mkcert.enabled %}
+# mkcert 本地证书工具
+if command -v mkcert &> /dev/null; then
+    {% for alias_name, alias_command in config.phase2_integration.security_tools.mkcert.aliases.items() %}
+    alias {{ alias_name }}='{{ alias_command }}'
+    {% endfor %}
+fi
+{% endif %}
+
+# Phase 2 环境变量
+{% for category, env_vars in config.phase2_integration.environment_variables.items() %}
+# {{ category|title }} 环境变量
+{% for key, value in env_vars.items() %}
+export {{ key }}="{{ value }}"
+{% endfor %}
+{% endfor %}
+
+# Phase 2 自定义函数
+{% for func_name, func_config in config.phase2_integration.shell_functions.items() %}
+# {{ func_config.description }}
+{{ func_name }}() {
+    {{ func_config.command }}
+}
+{% endfor %}
+
+{% endif %}
+
+# =============================================================================
+#                               7. 现代化工具集成
 # =============================================================================
 
 # zoxide 智能目录跳转初始化
