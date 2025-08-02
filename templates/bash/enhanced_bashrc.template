@@ -42,7 +42,96 @@ export XDG_CACHE_HOME="{{ config.zsh_integration.xdg_directories.cache_home }}"
 {% endif %}
 
 # =============================================================================
-#                               3. 开发环境配置
+#                               3. 版本管理器初始化
+# =============================================================================
+
+{% if config.zsh_integration.version_managers.fnm.enabled %}
+# fnm (Node.js 版本管理)
+{% for key, value in config.zsh_integration.version_managers.fnm.env_vars.items() %}
+export {{ key }}="{{ value }}"
+{% endfor %}
+if command -v fnm > /dev/null; then
+    eval "$(fnm env --use-on-cd)"
+fi
+{% endif %}
+
+{% if config.zsh_integration.version_managers.pyenv.enabled %}
+# pyenv-win (Python 版本管理) 
+{% for key, value in config.zsh_integration.version_managers.pyenv.env_vars.items() %}
+{% if value is mapping %}
+export {{ key }}="{{ value.bash }}"
+{% else %}
+export {{ key }}="{{ value }}"
+{% endif %}
+{% endfor %}
+{% for path in config.zsh_integration.version_managers.pyenv.path_additions %}
+export PATH="{{ path }}:$PATH"
+{% endfor %}
+# pyenv-win 不需要 init 命令，只需要正确的 PATH 和环境变量
+{% endif %}
+
+{% if config.zsh_integration.version_managers.jabba.enabled %}
+# jabba (Java 版本管理)
+{% for key, value in config.zsh_integration.version_managers.jabba.env_vars.items() %}
+{% if value is mapping %}
+export {{ key }}="{{ value.bash }}"
+{% else %}
+export {{ key }}="{{ value }}"
+{% endif %}
+{% endfor %}
+{% for path in config.zsh_integration.version_managers.jabba.path_additions %}
+export PATH="{{ path }}:$PATH"
+{% endfor %}
+# jabba-win 不需要 jabba.sh，只需要正确的 PATH
+{% endif %}
+
+{% if config.zsh_integration.version_managers.g.enabled %}
+# g (Go 版本管理)
+{% for key, value in config.zsh_integration.version_managers.g.env_vars.items() %}
+{% if value is mapping %}
+export {{ key }}="{{ value.bash }}"
+{% else %}  
+export {{ key }}="{{ value }}"
+{% endif %}
+{% endfor %}
+{% for path in config.zsh_integration.version_managers.g.path_additions %}
+export PATH="{{ path }}:$PATH"
+{% endfor %}
+{% endif %}
+
+# =============================================================================
+#                               4. Git 工具配置
+# =============================================================================
+
+{% if config.zsh_integration.git_tools.delta.enabled %}
+# 配置 Git Delta
+if command -v delta > /dev/null; then
+    {% for key, value in config.zsh_integration.git_tools.delta.git_config.items() %}
+    git config --global {{ key }} "{{ value }}"
+    {% endfor %}
+fi
+{% endif %}
+
+{% if config.zsh_integration.git_tools.lazygit.enabled %}
+# lazygit 别名
+if command -v lazygit > /dev/null; then
+    {% for alias, command in config.zsh_integration.git_tools.lazygit.aliases.items() %}
+    alias {{ alias }}="{{ command }}"
+    {% endfor %}
+fi
+{% endif %}
+
+{% if config.zsh_integration.git_tools.gh.enabled %}
+# GitHub CLI 别名
+if command -v gh > /dev/null; then
+    {% for alias, command in config.zsh_integration.git_tools.gh.aliases.items() %}
+    alias {{ alias }}="{{ command }}"
+    {% endfor %}
+fi
+{% endif %}
+
+# =============================================================================
+#                               5. 开发环境配置
 # =============================================================================
 
 # Android 开发环境
@@ -89,6 +178,18 @@ export {{ key }}="{{ value }}"
 {% for key, value in config.zsh_integration.development_environments.mysql.items() %}
 export {{ key }}="{{ value }}"
 {% endfor %}
+# pyenv 环境
+{% for key, value in config.zsh_integration.development_environments.pyenv.items() %}
+export {{ key }}="{{ value.bash }}"
+{% endfor %}
+# miller 环境  
+{% for key, value in config.zsh_integration.development_environments.miller.items() %}
+export {{ key }}="{{ value.bash }}"
+{% endfor %}
+# github cli 环境
+{% for key, value in config.zsh_integration.development_environments.github_cli.items() %}
+export {{ key }}="{{ value.bash }}"
+{% endfor %}
 # claude code 环境
 {% for key, value in config.zsh_integration.development_environments.claude_code.items() %}
 export {{ key }}="{{ value }}"
@@ -98,7 +199,7 @@ export {{ key }}="{{ value }}"
 #                               4. PATH 环境变量构建
 # =============================================================================
 # 构建增强的 PATH（按优先级顺序）
-export PATH="PYTHONPATH":"PYTHONUSERBASE":"GOMODCACHE":"$GOPATH":"$NPM_HOME":"$EDITOR_HOME/bin":"$MYSQL_HOME/bin":"$PATH"
+export PATH="PYTHONPATH":"PYTHONUSERBASE":"GOMODCACHE":"$GOPATH":"$NPM_HOME":"$EDITOR_HOME/bin":"$MYSQL_HOME/bin":"{{ config.zsh_integration.development_environments.pyenv.PYENV_PATH.bash }}/bin":"{{ config.zsh_integration.development_environments.miller.MILLER_PATH.bash }}":"{{ config.zsh_integration.development_environments.github_cli.GH_PATH.bash }}":"$PATH"
 
 # =============================================================================
 #                               5. Bash 历史记录增强配置
@@ -130,8 +231,22 @@ fi
 #                               6. 现代化工具集成
 # =============================================================================
 
+# zoxide 智能目录跳转初始化
+{% if config.zsh_integration.modern_tools.replacements.cd.tool == "zoxide" %}
+{% for key, value in config.zsh_integration.modern_tools.replacements.cd.env_vars.items() %}
+export {{ key }}="{{ value }}"
+{% endfor %}
+if command -v zoxide > /dev/null; then
+    eval "$(zoxide init bash)"
+    {% for alias_name, alias_command in config.zsh_integration.modern_tools.replacements.cd.aliases.items() %}
+    alias {{ alias_name }}="{{ alias_command }}"
+    {% endfor %}
+fi
+{% endif %}
+
 # 现代化命令替代（智能检测和回退）
 {% for tool_name, tool_config in config.zsh_integration.modern_tools.replacements.items() %}
+{% if tool_name != "cd" %}
 # {{ tool_name|title }} 替代
 if command -v {{ tool_config.tool }} &> /dev/null; then
     {% for alias_name, alias_command in tool_config.aliases.items() %}
@@ -144,6 +259,7 @@ else
     {% endfor %}
 {% endif %}
 fi
+{% endif %}
 
 {% endfor %}
 

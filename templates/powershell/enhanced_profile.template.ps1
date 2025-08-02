@@ -41,7 +41,56 @@ $env:XDG_CACHE_HOME = "{{ config.zsh_integration.xdg_directories.cache_home }}"
 {% endif %}
 
 # =============================================================================
-#                               3. 开发环境配置
+#                               3. 版本管理器初始化
+# =============================================================================
+
+{% if config.zsh_integration.version_managers.fnm.enabled %}
+# fnm (Node.js 版本管理)
+{% for key, value in config.zsh_integration.version_managers.fnm.env_vars.items() %}
+$env:{{ key }} = "{{ value }}"
+{% endfor %}
+if (Get-Command fnm -ErrorAction SilentlyContinue) {
+    fnm env --use-on-cd | Out-String | Invoke-Expression
+}
+{% endif %}
+
+{% if config.zsh_integration.version_managers.pyenv.enabled %}
+# pyenv-win (Python 版本管理)
+{% for key, value in config.zsh_integration.version_managers.pyenv.env_vars.items() %}
+{% if value is mapping %}
+$env:{{ key }} = "{{ value.powershell }}"
+{% else %}
+$env:{{ key }} = "{{ value }}"
+{% endif %}
+{% endfor %}
+# pyenv-win 不需要初始化命令，只需要正确的 PATH 和环境变量
+{% endif %}
+
+{% if config.zsh_integration.version_managers.jabba.enabled %}
+# jabba (Java 版本管理)
+{% for key, value in config.zsh_integration.version_managers.jabba.env_vars.items() %}
+{% if value is mapping %}
+$env:{{ key }} = "{{ value.powershell }}"
+{% else %}
+$env:{{ key }} = "{{ value }}"
+{% endif %}
+{% endfor %}
+# jabba-win 不需要 jabba.sh，只需要正确的 PATH
+{% endif %}
+
+{% if config.zsh_integration.version_managers.g.enabled %}
+# g (Go 版本管理)
+{% for key, value in config.zsh_integration.version_managers.g.env_vars.items() %}
+{% if value is mapping %}
+$env:{{ key }} = "{{ value.powershell }}"
+{% else %}
+$env:{{ key }} = "{{ value }}"
+{% endif %}
+{% endfor %}
+{% endif %}
+
+# =============================================================================
+#                               4. 开发环境配置
 # =============================================================================
 
 # Android 开发环境
@@ -99,14 +148,61 @@ $env:{{ key }} = "{{ value.replace('$XDG_DATA_HOME', '$env:XDG_DATA_HOME') }}"
 $env:{{ key }} = "{{ value.replace('$XDG_DATA_HOME', '$env:XDG_DATA_HOME') }}"
 {% endfor %}
 
-# ClaudeCode 不支持 Windows
+# pyenv 环境
+{% for key, value in config.zsh_integration.development_environments.pyenv.items() %}
+$env:{{ key }} = "{{ value.powershell }}"
+{% endfor %}
+
+# miller 环境
+{% for key, value in config.zsh_integration.development_environments.miller.items() %}
+$env:{{ key }} = "{{ value.powershell }}"
+{% endfor %}
+
+# github cli 环境
+{% for key, value in config.zsh_integration.development_environments.github_cli.items() %}
+$env:{{ key }} = "{{ value.powershell }}"
+{% endfor %}
+
+# claude code 环境
+{% for key, value in config.zsh_integration.development_environments.claude_code.items() %}
+$env:{{ key }} = "{{ value }}"
+{% endfor %}
 
 # =============================================================================
-#                               4. PATH 环境变量构建
+#                               5. PATH 环境变量构建
 # =============================================================================
 
 # 构建增强的 PATH（按优先级顺序）
-$env:PATH = "$env:PYTHONPATH;$env:PYTHONUSERBASE;$env:GOPATH;$env:GOMODCACHE;$env:EDITOR_HOME/bin;$env:MYSQL_HOME/bin;$env:PATH"
+$pathParts = @()
+
+# 版本管理器路径
+{% if config.zsh_integration.version_managers.pyenv.enabled %}
+{% for path in config.zsh_integration.version_managers.pyenv.path_additions %}
+$pathParts += "{{ path.replace('$PYENV_ROOT', '$env:PYENV_ROOT') }}"
+{% endfor %}
+{% endif %}
+
+{% if config.zsh_integration.version_managers.jabba.enabled %}
+{% for path in config.zsh_integration.version_managers.jabba.path_additions %}
+$pathParts += "{{ path.replace('$JABBA_HOME', '$env:JABBA_HOME') }}"
+{% endfor %}
+{% endif %}
+
+{% if config.zsh_integration.version_managers.g.enabled %}
+{% for path in config.zsh_integration.version_managers.g.path_additions %}
+$pathParts += "{{ path.replace('$G_HOME', '$env:G_HOME').replace('$GOROOT', '$env:GOROOT') }}"
+{% endfor %}
+{% endif %}
+
+# 开发环境路径
+$pathParts += "$env:EDITOR_HOME\bin"
+$pathParts += "$env:MYSQL_HOME\bin" 
+$pathParts += "C:\Applications\DevEnvironment\miller\miller-6.13.0-windows-amd64"
+$pathParts += "C:\Applications\DevEnvironment\github-cli"
+
+# 合并路径
+$newPath = ($pathParts + $env:PATH.Split(';')) -join ';'
+$env:PATH = $newPath
 
 # =============================================================================
 #                               5. PowerShell 历史记录增强配置

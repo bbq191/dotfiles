@@ -1,9 +1,11 @@
-# 🚀 统一 Dotfiles 管理系统
+# 🚀 统一 Dotfiles 管理系统 v2.0
 
-> Windows 11 + Git Bash 环境下的跨 Shell 配置管理方案
+> Windows 11 + Git Bash 环境下的跨 Shell 配置管理方案  
+> ✨ **新增**: 自动化工具安装和健康检查系统
 
 ## 📋 目录
 
+- [Phase 1 完成成果](#phase-1-完成成果) 🆕
 - [系统概述](#系统概述)
 - [快速开始](#快速开始)
 - [配置文件说明](#配置文件说明)
@@ -12,19 +14,54 @@
 - [故障排除](#故障排除)
 - [高级用法](#高级用法)
 
+## 🎉 Phase 1 完成成果
+
+> **实施完成时间**: 2025-08-02  
+> **最终健康检查通过率**: 76.9% (20/26项)
+
+### ✅ 核心成就
+
+**🛠️ 自动化安装系统**
+- ✅ 主安装脚本 (349行代码)
+- ✅ Windows平台包管理配置 (25个工具)
+- ✅ 健康检查脚本 (300+行代码，已修复自定义路径检测)
+
+**🔧 成功集成的现代化工具 (11个)**
+- 版本管理器: `fnm`, `pyenv` (自定义路径)
+- Git增强: `delta`, `lazygit`
+- 系统工具: `zoxide`, `btop`, `jq`, `yq`, `dog`
+- 开发工具: `gh` (自定义路径), `mlr` (自定义路径)
+
+**🚀 系统优化**
+- 跨Shell配置同步 (Bash + PowerShell)
+- 智能回退机制
+- 自定义安装路径支持
+- Windows兼容性优化
+
+### 🔍 检测脚本修复详情
+- **pyenv检测**: 修复Windows `.bat`文件执行问题
+- **gh检测**: 添加自定义路径 `C:\Applications\DevEnvironment\github-cli\gh.exe`
+- **mlr检测**: 添加自定义路径 `C:\Applications\DevEnvironment\miller\miller-6.13.0-windows-amd64\mlr.exe`
+
 ## 🎯 系统概述
 
 本系统基于以下核心理念：
 
+- **🔄 自动化安装**：一键安装现代化开发工具栈 *(Phase 1 已完成)*
+- **🔍 健康检查**：26个检查点的系统诊断，76.9%通过率 *(Phase 1 已完成)*
 - **单一数据源**：所有配置统一存储在 JSON 文件中
 - **模板驱动**：使用 Jinja2 模板引擎生成各 shell 配置
 - **跨平台一致性**：PowerShell 和 Bash 提供相同的用户体验
-- **自动化管理**：一键生成和同步所有配置文件
+- **🛠️ 工具集成**：11个核心工具完全配置，检测脚本已修复 *(Phase 1 已完成)*
 
 ### 目录结构
 
 ```
 ~/dotfiles/
+├── install/             # 自动化安装系统 (Phase 1 新增)
+│   ├── install.py      # 主安装脚本
+│   ├── packages/       # 各平台包配置
+│   └── checks/         # 健康检查脚本
 ├── config/              # 配置数据源（JSON 格式）
 │   ├── shared.json     # 共享配置（用户信息、环境变量等）
 │   ├── aliases.json    # 别名定义
@@ -48,6 +85,24 @@
 ```
 
 ## 🚀 快速开始
+
+### 🆕 自动化工具安装 (Phase 1 新功能)
+
+```bash
+# 🔍 快速健康检查
+python install/install.py --health-check
+
+# 📦 查看所有可用工具类别  
+python install/install.py --list-categories
+
+# 🚀 自动安装核心工具 (推荐)
+python install/install.py --categories modern_tools development --non-interactive
+
+# 或者交互式安装
+python install/install.py
+```
+
+**当前工具状态**: 核心工具 100% ✅ | 总体 76.9% (20/26) | 检测脚本已修复
 
 ### 1. 重新生成配置
 
