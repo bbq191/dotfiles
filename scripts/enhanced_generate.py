@@ -240,16 +240,14 @@ class EnhancedDotfilesGenerator:
                     shell='bash'
                 )
                 
-                # 写入文件
-                output_file = bash_dir / "bashrc"
+                # 只写入enhanced版本文件
+                if output_name == "enhanced_bashrc":
+                    output_file = bash_dir / "enhanced_bashrc"
+                else:
+                    output_file = bash_dir / "bashrc"
+                
                 with open(output_file, 'w', encoding='utf-8') as f:
                     f.write(bashrc_content)
-                
-                # 同时创建增强版本的符号链接
-                if output_name == "enhanced_bashrc":
-                    enhanced_file = bash_dir / "enhanced_bashrc"
-                    with open(enhanced_file, 'w', encoding='utf-8') as f:
-                        f.write(bashrc_content)
                 
                 print("✅ Bash 配置文件已生成")
             else:
@@ -295,16 +293,16 @@ class EnhancedDotfilesGenerator:
                     shell='powershell'
                 )
                 
-                # 写入文件
-                output_file = ps_dir / "Profile.ps1"
+                # 只写入enhanced版本文件
+                if output_name == "enhanced_Profile.ps1":
+                    output_file = ps_dir / "enhanced_Profile.ps1"
+                    enhanced_file = output_file  # 用于后续部署引用
+                else:
+                    output_file = ps_dir / "Profile.ps1"
+                    enhanced_file = output_file
+                
                 with open(output_file, 'w', encoding='utf-8') as f:
                     f.write(profile_content)
-                
-                # 同时创建增强版本
-                if output_name == "enhanced_Profile.ps1":
-                    enhanced_file = ps_dir / "enhanced_Profile.ps1"
-                    with open(enhanced_file, 'w', encoding='utf-8') as f:
-                        f.write(profile_content)
                 
                 print("✅ PowerShell 配置文件已生成")
                 
@@ -445,18 +443,26 @@ echo "🚀 ZSH 环境已加载 - dotfiles 系统"
         try:
             validation_results = []
             
-            # 检查 Bash 配置
-            bash_config = self.generated_dir / "bash" / "bashrc"
-            if bash_config.exists():
-                size = bash_config.stat().st_size
+            # 检查 Bash 配置（优先检查enhanced版本）
+            bash_enhanced = self.generated_dir / "bash" / "enhanced_bashrc"
+            bash_standard = self.generated_dir / "bash" / "bashrc"
+            if bash_enhanced.exists():
+                size = bash_enhanced.stat().st_size
+                validation_results.append(f"✅ Bash 配置: {size} 字节")
+            elif bash_standard.exists():
+                size = bash_standard.stat().st_size
                 validation_results.append(f"✅ Bash 配置: {size} 字节")
             else:
                 validation_results.append("❌ Bash 配置文件不存在")
             
-            # 检查 PowerShell 配置
-            ps_config = self.generated_dir / "powershell" / "Profile.ps1"
-            if ps_config.exists():
-                size = ps_config.stat().st_size
+            # 检查 PowerShell 配置（优先检查enhanced版本）
+            ps_enhanced = self.generated_dir / "powershell" / "enhanced_Profile.ps1"
+            ps_standard = self.generated_dir / "powershell" / "Profile.ps1"
+            if ps_enhanced.exists():
+                size = ps_enhanced.stat().st_size
+                validation_results.append(f"✅ PowerShell 配置: {size} 字节")
+            elif ps_standard.exists():
+                size = ps_standard.stat().st_size
                 validation_results.append(f"✅ PowerShell 配置: {size} 字节")
             else:
                 validation_results.append("❌ PowerShell 配置文件不存在")

@@ -129,9 +129,27 @@
       "ANDROID_SDK_ROOT": "$ANDROID_HOME"
     },
     "go": {
-      "GOPATH": "$XDG_DATA_HOME/go",
-      "GOMODCACHE": "$XDG_CACHE_HOME/go/mod",
-      "GOPROXY": "https://goproxy.cn,direct"
+      "GOROOT": {
+        "bash": "/C/Applications/DevEnvironment/golang",
+        "powershell": "C:\\Applications\\DevEnvironment\\golang",
+        "zsh": "/C/Applications/DevEnvironment/golang"
+      },
+      "GOPATH": {
+        "bash": "$XDG_DATA_HOME/go",
+        "powershell": "$env:XDG_DATA_HOME\\go",
+        "zsh": "$XDG_DATA_HOME/go"
+      },
+      "GOMODCACHE": {
+        "bash": "$XDG_CACHE_HOME/go/mod",
+        "powershell": "$env:XDG_CACHE_HOME\\go\\mod",
+        "zsh": "$XDG_CACHE_HOME/go/mod"
+      },
+      "GOPROXY": "https://goproxy.cn,direct",
+      "GOBIN": {
+        "bash": "$GOPATH/bin",
+        "powershell": "$env:GOPATH\\bin",
+        "zsh": "$GOPATH/bin"
+      }
     },
     "java": {
       "_JAVA_OPTIONS": "-Djava.util.prefs.userRoot=\"$XDG_CONFIG_HOME\"/java"

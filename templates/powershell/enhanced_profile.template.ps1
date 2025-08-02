@@ -51,7 +51,7 @@ $env:{{ key }} = "{{ value.replace('$XDG_DATA_HOME', '$env:XDG_DATA_HOME').repla
 
 # Go 语言环境
 {% for key, value in config.zsh_integration.development_environments.go.items() %}
-$env:{{ key }} = "{{ value.replace('$XDG_DATA_HOME', '$env:XDG_DATA_HOME').replace('$XDG_CACHE_HOME', '$env:XDG_CACHE_HOME') }}"
+$env:{{ key }} = "{{ value }}"
 {% endfor %}
 
 # Java 环境
@@ -123,13 +123,11 @@ if (Get-Module -ListAvailable -Name PSReadLine) {
     Set-PSReadLineOption -MaximumHistoryCount {{ config.zsh_integration.history_advanced.size }}
 
     # 启用历史预测（类似 ZSH autosuggestions）- 检查版本兼容性
-    try {
+    $psReadLineVersion = (Get-Module PSReadLine).Version
+    if ($psReadLineVersion -and $psReadLineVersion -ge [Version]"2.1.0") {
         # PSReadLine 2.1.0+ 支持预测功能
         Set-PSReadLineOption -PredictionSource History -ErrorAction SilentlyContinue
         Set-PSReadLineOption -PredictionViewStyle InlineView -ErrorAction SilentlyContinue
-    } catch {
-        # 旧版本回退到基础历史搜索
-        Write-Host "PSReadLine 版本较旧，启用基础历史功能" -ForegroundColor Yellow
     }
 
     # 历史搜索和补全选项
