@@ -2,6 +2,7 @@
 """
 Dotfiles 自动安装脚本
 支持 Windows, macOS, Linux 平台
+包含 XDG Base Directory 规范支持
 """
 
 import sys
@@ -12,6 +13,15 @@ import argparse
 import shutil
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
+
+# 导入XDG迁移器
+sys.path.append(str(Path(__file__).parent.parent / 'scripts'))
+try:
+    from migrate_to_xdg import XDGMigrator
+    XDG_AVAILABLE = True
+except ImportError:
+    print("⚠️  XDG迁移模块不可用")
+    XDG_AVAILABLE = False
 
 class DotfilesInstaller:
     def __init__(self, config_dir: Path):
@@ -185,6 +195,50 @@ class DotfilesInstaller:
             except subprocess.CalledProcessError:
                 print(f"   ❌ 设置 {key} 失败")
     
+    def setup_xdg_compliance(self, tools: Optional[List[str]] = None) -> bool:
+        """设置XDG Base Directory规范合规性"""
+        if not XDG_AVAILABLE:
+            print("❌ XDG迁移模块不可用，跳过XDG设置")
+            return False
+            
+        print("\n🏗️  设置 XDG Base Directory 规范合规性...")
+        
+        try:
+            migrator = XDGMigrator()
+            
+            # 如果没有指定工具，使用默认列表
+            if tools is None:
+                tools = ['mycli', 'pgcli', 'docker', 'k9s']
+            
+            # 过滤只处理已安装的工具
+            installed_tools = []
+            for tool in tools:
+                if self.is_tool_installed(tool):
+                    installed_tools.append(tool)
+                else:
+                    print(f"⏭️  跳过未安装的工具: {tool}")
+            
+            if not installed_tools:
+                print("ℹ️  没有找到要迁移的工具")
+                return True
+                
+            print(f"🔧 开始为以下工具设置XDG规范: {', '.join(installed_tools)}")
+            
+            # 执行迁移
+            success = migrator.run_migration(installed_tools)
+            
+            if success:
+                print("✅ XDG Base Directory 规范设置完成")
+                print("📝 请重新启动shell或运行 source ~/.bashrc 使环境变量生效")
+            else:
+                print("⚠️  XDG设置过程中遇到一些问题")
+                
+            return success
+            
+        except Exception as e:
+            print(f"❌ XDG设置失败: {e}")
+            return False
+    
     def run_health_check(self) -> bool:
         """运行健康检查"""
         print("\n🔍 运行健康检查...")
@@ -306,6 +360,13 @@ def main():
                        help="强制重新安装已有工具")
     parser.add_argument("--list-categories", action="store_true",
                        help="列出所有可用的工具类别")
+    parser.add_argument("--setup-xdg", action="store_true",
+                       help="设置XDG Base Directory规范合规性")
+    parser.add_argument("--xdg-tools", nargs="+",
+                       choices=['mycli', 'pgcli', 'docker', 'k9s'],
+                       help="指定要设置XDG规范的工具")
+    parser.add_argument("--skip-xdg", action="store_true",
+                       help="跳过XDG Base Directory规范设置")
     
     args = parser.parse_args()
     
@@ -324,7 +385,14 @@ def main():
         if args.health_check:
             success = installer.run_health_check()
             sys.exit(0 if success else 1)
+            
+        elif args.setup_xdg:
+            # 仅运行XDG设置
+            success = installer.setup_xdg_compliance(args.xdg_tools)
+            sys.exit(0 if success else 1)
+            
         else:
+            # 正常安装流程
             success = installer.install_all(
                 interactive=not args.non_interactive,
                 categories=args.categories,
@@ -332,7 +400,20 @@ def main():
             )
             
             if success:
-                print("\n🎊 恭喜！所有工具安装完成，您的开发环境已准备就绪！")
+                print("\n🎊 恭喜！所有工具安装完成！")
+                
+                # 根据参数决定是否设置XDG规范
+                if not args.skip_xdg and XDG_AVAILABLE:
+                    print("\n🔧 正在设置 XDG Base Directory 规范...")
+                    xdg_success = installer.setup_xdg_compliance(args.xdg_tools)
+                    if xdg_success:
+                        print("✅ XDG规范设置完成")
+                    else:
+                        print("⚠️  XDG规范设置遇到一些问题")
+                elif args.skip_xdg:
+                    print("⏭️  跳过XDG Base Directory规范设置")
+                    
+                print("\n🚀 您的开发环境已准备就绪！")
             else:
                 print("\n⚠️  安装过程中遇到一些问题，请检查上述错误信息")
                 sys.exit(1)

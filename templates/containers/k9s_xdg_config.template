@@ -1,0 +1,126 @@
+# k9s XDG 配置模板
+# 文件位置: $XDG_CONFIG_HOME/k9s/config.yaml
+#
+# k9s 完全支持 XDG Base Directory 规范
+# 所有配置、皮肤、插件等都会自动存储在XDG目录中
+
+k9s:
+  # 刷新频率(毫秒)
+  refreshRate: 2000
+  
+  # 最大日志行数
+  maxConnRetry: 5
+  
+  # 启用鼠标支持
+  readOnly: false
+  
+  # 无头模式(用于CI/CD)
+  noExitOnCtrlC: false
+  
+  # UI配置
+  ui:
+    # 启用鼠标
+    enableMouse: true
+    # 无头模式
+    headless: false
+    # 无Logo模式  
+    logoless: false
+    # 无面包屑导航
+    crumbsless: false
+    # 启用反应式UI
+    reactive: false
+    # 无图标
+    noIcons: false
+    
+  # 跳过最新版本检查
+  skipLatestRevCheck: false
+  
+  # 禁用Pod计数
+  disablePodCounting: false
+  
+  # Shell Pod配置
+  shellPod:
+    image: busybox:1.35.0
+    namespace: default
+    limits:
+      cpu: 100m
+      memory: 100Mi
+    
+  # 图像扫描配置  
+  imageScans:
+    enable: false
+    exclusions:
+      namespaces: []
+      labels: {}
+      
+  # 日志配置
+  logger:
+    # 日志级别: trace, debug, info, warn, error, fatal, panic
+    level: info
+    # 日志文件位置(k9s会自动使用XDG规范路径)
+    # 在Windows下会自动使用: %USERPROFILE%\AppData\Local\State\k9s\k9s.log
+    # 启用颜色
+    textWrap: false
+    # 日志缓冲区大小
+    buffer: 5000
+    # 单行高度
+    singleLine: false
+    
+  # 皮肤主题(存储在 $XDG_DATA_HOME/k9s/skins/)
+  skin: default
+  
+  # 集群配置
+  clusters:
+    # 使用当前上下文
+    "*":
+      # 命名空间
+      namespace:
+        active: default
+        lockFavorites: false
+        favorites:
+          - default
+          - kube-system
+          - kube-public
+      # 视图配置  
+      view:
+        active: pods
+      # 功能开关
+      featureGates:
+        nodeShell: false
+      # Shell配置
+      shellPod:
+        image: busybox:1.35.0
+        namespace: default
+        limits:
+          cpu: 100m
+          memory: 100Mi
+      # 端口转发
+      portForwardAddress: localhost
+
+# 快捷键配置
+keyMap:
+  # 全局快捷键
+  global:
+    # 退出
+    quit: 
+      - Ctrl-c
+      - q
+    # 帮助
+    help: "?"
+    # 刷新
+    refresh: Ctrl-r
+    # 切换全屏
+    toggleWide: w
+    # 切换标题
+    toggleHeader: t
+    
+  # 日志视图快捷键  
+  logs:
+    # 全屏切换
+    fullScreen: f
+    # 换行切换
+    wrap: w
+    # 时间戳切换
+    timestamp: t
+    # 清屏
+    clearScreen: Ctrl-k

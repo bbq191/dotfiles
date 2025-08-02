@@ -1,0 +1,123 @@
+# pgcli XDG 配置模板
+# 文件位置: $XDG_CONFIG_HOME/pgcli/config
+#
+# pgcli 完全支持 XDG Base Directory 规范
+# 所有文件(配置、历史、日志)都会自动存储在XDG目录中
+
+[main]
+# 启用多行编辑
+multi_line = False
+
+# 历史文件 (自动使用 $XDG_STATE_HOME/pgcli/history)
+# 不需要手动设置，pgcli会自动遵循XDG规范
+
+# 日志文件 (自动使用 $XDG_STATE_HOME/pgcli/log)
+log_file = default
+log_level = INFO
+
+# 关键词和函数名大小写
+keyword_casing = auto
+function_casing = auto
+
+# 单行模式结果显示
+single_connection = False
+
+# 启用Vi模式
+vi = False
+
+# 表格输出格式
+table_format = psql
+
+# 语法高亮样式
+syntax_style = default
+
+# 提示符配置
+prompt = '\u@\h:\d> '
+
+# 启用智能补全
+smart_completion = True
+
+# 更宽的补全菜单
+wider_completion_menu = False
+
+# 搜索大小写敏感
+search_case_insensitive = True
+
+# 显示查询执行时间
+timing = True
+
+# 启用扩展表格格式
+expanded = auto
+
+# 显示行号
+show_line_numbers = False
+
+# 分页器
+pager = less -SRXF -F -X
+
+# 历史搜索
+history_search = incremental
+
+# 自动建议
+auto_suggest = False
+
+# 补全时忽略大小写
+completion_case_insensitive = False
+
+# 补全查询缓存时间(秒)
+completion_query_cache = 50
+
+# 自动垂直输出的行数阈值
+auto_vertical_output = 5
+
+# 截断长文本的字符数
+truncate_long_text = 0
+
+# 启用鱼式自动建议
+fish_suggestion = False
+
+# 启用表格边框
+table_format_no_header = False
+
+# 连接超时
+connect_timeout = 10
+
+[colors]
+# Token样式定义
+Token.Menu.Completions.Completion.Current = 'bg:#ffffff #000000'
+Token.Menu.Completions.Completion = 'bg:#008888 #ffffff'
+Token.Menu.Completions.MultiColumnMeta = 'bg:#aaffff #000000'
+Token.Menu.Completions.ProgressButton = 'bg:#003333'
+Token.Menu.Completions.ProgressBar = 'bg:#00aaaa'
+Token.SelectedText = '#ffffff bg:#6666aa'
+Token.SearchMatch = '#ffffff bg:#4444aa'
+Token.SearchMatch.Current = '#ffffff bg:#44aa44'
+Token.Toolbar = 'bg:#222222 #aaaaaa'
+Token.Toolbar.Off = 'bg:#222222 #888888'
+Token.Toolbar.On = 'bg:#222222 #ffffff'
+Token.Toolbar.Search = noinherit bold
+Token.Toolbar.Search.Text = nobold
+Token.Toolbar.System = noinherit bold
+Token.Toolbar.Arg = noinherit bold
+Token.Toolbar.Arg.Text = nobold
+
+# 自定义语法高亮
+Token.Output.Header = bold
+Token.Output.OddRow = ''
+Token.Output.EvenRow = ''
+Token.Output.SelectedRows = 'bg:#0087ff #ffffff'
+
+[alias_dsn]
+# 数据库连接别名
+# 示例配置:
+# local = postgresql://user:password@localhost:5432/database
+# dev = postgresql://user:password@dev-server:5432/database  
+# test = postgresql://user:password@test-server:5432/database
+# prod = postgresql://user:password@prod-server:5432/database
+
+[named_queries]
+# 预定义的命名查询
+# 示例:
+# show_tables = SELECT table_name FROM information_schema.tables WHERE table_schema = 'public'
+# show_indexes = SELECT indexname, tablename FROM pg_indexes WHERE schemaname = 'public'
+# show_size = SELECT pg_size_pretty(pg_database_size(current_database())) as size
