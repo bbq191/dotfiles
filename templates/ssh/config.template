@@ -27,66 +27,20 @@ Host *
     StrictHostKeyChecking ask
     VerifyHostKeyDNS yes
     HashKnownHosts yes
-    
-    # 禁用不安全的算法
-    KexAlgorithms curve25519-sha256@libssh.org,diffie-hellman-group16-sha512,diffie-hellman-group18-sha512
-    HostKeyAlgorithms rsa-sha2-512,rsa-sha2-256,ssh-ed25519
-    Ciphers chacha20-poly1305@openssh.com,aes256-gcm@openssh.com,aes128-gcm@openssh.com,aes256-ctr,aes192-ctr,aes128-ctr
-    MACs hmac-sha2-256-etm@openssh.com,hmac-sha2-512-etm@openssh.com,hmac-sha2-256,hmac-sha2-512
 
 # =============================================================================
-# 开发服务器配置
+# 常用服务器配置示例
 # =============================================================================
 
-# 示例：个人开发服务器
+# 开发服务器示例
 Host dev
     HostName dev.example.com
     User developer
     Port 22
     IdentityFile ~/.ssh/id_ed25519_dev
     ForwardAgent yes
-    # 端口转发示例
-    # LocalForward 3000 localhost:3000
-    # LocalForward 5432 localhost:5432
 
-# 示例：生产服务器（更严格的安全设置）
-Host prod
-    HostName prod.example.com
-    User deploy
-    Port 2222
-    IdentityFile ~/.ssh/id_ed25519_prod
-    ForwardAgent no
-    StrictHostKeyChecking yes
-    # 只允许特定的命令
-    # RemoteCommand sudo systemctl status myapp
-
-# 示例：跳板机配置
-Host bastion
-    HostName bastion.example.com
-    User admin
-    Port 22
-    IdentityFile ~/.ssh/id_ed25519_bastion
-    ForwardAgent yes
-
-# 通过跳板机访问内网服务器
-Host internal-*
-    ProxyJump bastion
-    User developer
-    IdentityFile ~/.ssh/id_ed25519_internal
-
-Host internal-db
-    HostName 10.0.1.100
-    User dbadmin
-
-Host internal-app
-    HostName 10.0.1.101
-    User appuser
-
-# =============================================================================
-# Git 服务配置
-# =============================================================================
-
-# GitHub
+# GitHub 配置
 Host github.com
     HostName github.com
     User git
@@ -94,91 +48,7 @@ Host github.com
     UseKeychain yes
     AddKeysToAgent yes
 
-# GitLab
-Host gitlab.com
-    HostName gitlab.com
-    User git
-    IdentityFile ~/.ssh/id_ed25519_gitlab
-    UseKeychain yes
-    AddKeysToAgent yes
-
-# 私有 Git 服务器
-Host git.company.com
-    HostName git.company.com
-    User git
-    Port 2222
-    IdentityFile ~/.ssh/id_ed25519_company
-
 # =============================================================================
-# 云服务提供商
+# 配置说明
 # =============================================================================
-
-# AWS EC2
-Host aws-*
-    User ec2-user
-    IdentityFile ~/.ssh/id_rsa_aws
-    StrictHostKeyChecking no
-    UserKnownHostsFile /dev/null
-
-Host aws-web
-    HostName ec2-xx-xx-xx-xx.compute-1.amazonaws.com
-
-Host aws-db
-    HostName ec2-yy-yy-yy-yy.compute-1.amazonaws.com
-
-# Google Cloud Platform
-Host gcp-*
-    User admin
-    IdentityFile ~/.ssh/id_rsa_gcp
-    
-# DigitalOcean
-Host do-*
-    User root
-    IdentityFile ~/.ssh/id_rsa_digitalocean
-
-# =============================================================================
-# 本地开发环境
-# =============================================================================
-
-# Docker 容器
-Host docker-*
-    User root
-    Port 2222
-    StrictHostKeyChecking no
-    UserKnownHostsFile /dev/null
-
-# Vagrant 虚拟机
-Host vagrant
-    HostName 127.0.0.1
-    User vagrant
-    Port 2222
-    IdentityFile ~/.vagrant.d/insecure_private_key
-    StrictHostKeyChecking no
-    UserKnownHostsFile /dev/null
-
-# WSL2 (Windows Subsystem for Linux)
-Host wsl
-    HostName localhost
-    User username
-    Port 2222
-
-# =============================================================================
-# 特殊用途配置
-# =============================================================================
-
-# 文件传输优化
-Host transfer-*
-    Compression no
-    Cipher arcfour
-
-# 仅用于端口转发
-Host tunnel-*
-    ExitOnForwardFailure yes
-    LocalForward 8080 localhost:80
-    RemoteCommand echo "Tunnel established"
-
-# 临时调试主机
-Host debug-*
-    LogLevel DEBUG3
-    StrictHostKeyChecking no
-    UserKnownHostsFile /dev/null
+# 更多配置示例和详细说明请参考：docs/SSH_EXAMPLES.md

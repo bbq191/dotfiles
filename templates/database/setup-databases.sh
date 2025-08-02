@@ -12,21 +12,10 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # 日志函数
-log_info() {
-    echo -e "${BLUE}[INFO]${NC} $1"
-}
-
-log_success() {
-    echo -e "${GREEN}[SUCCESS]${NC} $1"
-}
-
-log_warn() {
-    echo -e "${YELLOW}[WARN]${NC} $1"
-}
-
-log_error() {
-    echo -e "${RED}[ERROR]${NC} $1"
-}
+log_info() { echo -e "${BLUE}[INFO]${NC} $1"; }
+log_success() { echo -e "${GREEN}[SUCCESS]${NC} $1"; }
+log_warn() { echo -e "${YELLOW}[WARN]${NC} $1"; }
+log_error() { echo -e "${RED}[ERROR]${NC} $1"; }
 
 # 检查 Docker 是否运行
 check_docker() {
@@ -109,38 +98,11 @@ start_redis() {
     log_info "连接命令: redis-cli -h localhost -p ${port}"
 }
 
-# 启动 MongoDB
-start_mongodb() {
-    local container_name="dev-mongodb"
-    local port="${1:-27017}"
-    local username="${2:-admin}"
-    local password="${3:-password}"
-    
-    log_info "启动 MongoDB 容器..."
-    
-    if docker ps -a --format 'table {{.Names}}' | grep -q "^${container_name}$"; then
-        log_warn "容器 ${container_name} 已存在，正在重启..."
-        docker restart "${container_name}"
-    else
-        docker run -d \
-            --name "${container_name}" \
-            -e MONGO_INITDB_ROOT_USERNAME="${username}" \
-            -e MONGO_INITDB_ROOT_PASSWORD="${password}" \
-            -e MONGO_INITDB_DATABASE=myapp_dev \
-            -p "${port}:27017" \
-            -v mongodb_dev_data:/data/db \
-            mongo:6
-    fi
-    
-    log_success "MongoDB 已启动在端口 ${port}"
-    log_info "连接命令: mongosh mongodb://${username}:${password}@localhost:${port}/myapp_dev"
-}
-
 # 停止所有数据库容器
 stop_all() {
     log_info "停止所有开发数据库容器..."
     
-    local containers=("dev-postgres" "dev-mysql" "dev-redis" "dev-mongodb")
+    local containers=("dev-postgres" "dev-mysql" "dev-redis")
     
     for container in "${containers[@]}"; do
         if docker ps --format 'table {{.Names}}' | grep -q "^${container}$"; then
@@ -152,47 +114,12 @@ stop_all() {
     log_success "所有容器已停止"
 }
 
-# 清理所有数据库容器和数据
-cleanup_all() {
-    log_warn "这将删除所有开发数据库容器和数据，无法恢复！"
-    read -p "确认继续？ (y/N): " -n 1 -r
-    echo
-    
-    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-        log_info "操作已取消"
-        return
-    fi
-    
-    log_info "清理所有开发数据库容器和数据..."
-    
-    local containers=("dev-postgres" "dev-mysql" "dev-redis" "dev-mongodb")
-    local volumes=("postgres_dev_data" "mysql_dev_data" "redis_dev_data" "mongodb_dev_data")
-    
-    # 停止并删除容器
-    for container in "${containers[@]}"; do
-        if docker ps -a --format 'table {{.Names}}' | grep -q "^${container}$"; then
-            log_info "删除容器: ${container}"
-            docker rm -f "${container}"
-        fi
-    done
-    
-    # 删除数据卷
-    for volume in "${volumes[@]}"; do
-        if docker volume ls --format 'table {{.Name}}' | grep -q "^${volume}$"; then
-            log_info "删除数据卷: ${volume}"
-            docker volume rm "${volume}"
-        fi
-    done
-    
-    log_success "清理完成"
-}
-
 # 显示状态
 show_status() {
     log_info "数据库容器状态:"
     echo
     
-    local containers=("dev-postgres" "dev-mysql" "dev-redis" "dev-mongodb")
+    local containers=("dev-postgres" "dev-mysql" "dev-redis")
     
     for container in "${containers[@]}"; do
         if docker ps --format 'table {{.Names}}\t{{.Status}}\t{{.Ports}}' | grep -q "^${container}"; then
@@ -216,11 +143,9 @@ show_help() {
   postgres [port] [password]  启动 PostgreSQL (默认: 5432, password)
   mysql [port] [password]     启动 MySQL (默认: 3306, password)  
   redis [port]                启动 Redis (默认: 6379)
-  mongodb [port] [user] [pwd] 启动 MongoDB (默认: 27017, admin, password)
   all                         启动所有数据库
   stop                        停止所有数据库容器
   status                      显示容器状态
-  cleanup                     清理所有容器和数据（危险操作）
   help                        显示此帮助信息
 
 示例:
@@ -255,14 +180,10 @@ main() {
         redis)
             start_redis "${2:-6379}"
             ;;
-        mongodb)
-            start_mongodb "${2:-27017}" "${3:-admin}" "${4:-password}"
-            ;;
         all)
             start_postgres
             start_mysql
             start_redis
-            start_mongodb
             echo
             show_status
             ;;
@@ -271,9 +192,6 @@ main() {
             ;;
         status)
             show_status
-            ;;
-        cleanup)
-            cleanup_all
             ;;
         help|--help|-h)
             show_help
