@@ -51,7 +51,8 @@ class ToolsHealthCheck:
         
         for config_key, config_info in configs_to_check.items():
             try:
-                result = subprocess.run(["git", "config", "--global", config_key],
+                # 先尝试检查全局配置，如果失败则检查XDG配置
+                result = subprocess.run(["git", "config", config_key],
                                       capture_output=True, text=True, timeout=5)
                 
                 if result.returncode == 0:
@@ -228,6 +229,7 @@ class ToolsHealthCheck:
             ("gpg", ["--version"], "GPG 加密工具"),
             ("mkcert", ["-version"], "本地开发证书工具"),
             ("pass", ["version"], "密码管理器"),
+            ("op", ["--version"], "1Password CLI"),
             ("openssl", ["version"], "SSL/TLS 工具包"),
         ]
         

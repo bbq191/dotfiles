@@ -32,14 +32,12 @@ export LESSHISTFILE=-
 # =============================================================================
 #                               2. XDG 目录规范
 # =============================================================================
-{% if config.zsh_integration.xdg_directories.enabled %}
 # 遵循 XDG Base Directory 规范
 
 export XDG_CONFIG_HOME="{{ config.zsh_integration.xdg_directories.config_home }}"
 export XDG_DATA_HOME="{{ config.zsh_integration.xdg_directories.data_home }}"
 export XDG_STATE_HOME="{{ config.zsh_integration.xdg_directories.state_home }}"
 export XDG_CACHE_HOME="{{ config.zsh_integration.xdg_directories.cache_home }}"
-{% endif %}
 
 # =============================================================================
 #                               3. 版本管理器初始化
@@ -134,22 +132,6 @@ fi
 #                               5. 开发环境配置
 # =============================================================================
 
-# Android 开发环境
-{% for key, value in config.zsh_integration.development_environments.android.items() %}
-export {{ key }}="{{ value }}"
-{% endfor %}
-# Go 语言环境
-{% for key, value in config.zsh_integration.development_environments.go.items() %}
-export {{ key }}="{{ value }}"
-{% endfor %}
-# Java 环境
-{% for key, value in config.zsh_integration.development_environments.java.items() %}
-export {{ key }}="{{ value }}"
-{% endfor %}
-# Rust 环境
-{% for key, value in config.zsh_integration.development_environments.rust.items() %}
-export {{ key }}="{{ value }}"
-{% endfor %}
 # Python 环境
 {% for key, value in config.zsh_integration.development_environments.python.items() %}
 export {{ key }}="{{ value }}"
@@ -158,20 +140,8 @@ export {{ key }}="{{ value }}"
 {% for key, value in config.zsh_integration.development_environments.pipx.items() %}
 export {{ key }}="{{ value }}"
 {% endfor %}
-# Ruby 环境
-{% for key, value in config.zsh_integration.development_environments.ruby.items() %}
-export {{ key }}="{{ value }}"
-{% endfor %}
 # Node.js 环境
 {% for key, value in config.zsh_integration.development_environments.node.items() %}
-export {{ key }}="{{ value }}"
-{% endfor %}
-# Maven 环境
-{% for key, value in config.zsh_integration.development_environments.maven.items() %}
-export {{ key }}="{{ value }}"
-{% endfor %}
-# Gradle 环境
-{% for key, value in config.zsh_integration.development_environments.gradle.items() %}
 export {{ key }}="{{ value }}"
 {% endfor %}
 # vscode 环境
@@ -182,18 +152,8 @@ export {{ key }}="{{ value }}"
 {% for key, value in config.zsh_integration.development_environments.mysql.items() %}
 export {{ key }}="{{ value }}"
 {% endfor %}
-# pyenv 环境
-{% for key, value in config.zsh_integration.development_environments.pyenv.items() %}
-export {{ key }}="{{ value.bash }}"
-{% endfor %}
-# miller 环境  
-{% for key, value in config.zsh_integration.development_environments.miller.items() %}
-export {{ key }}="{{ value.bash }}"
-{% endfor %}
-# github cli 环境
-{% for key, value in config.zsh_integration.development_environments.github_cli.items() %}
-export {{ key }}="{{ value.bash }}"
-{% endfor %}
+# pyenv 环境 (已在版本管理器部分处理)
+# miller 和 github cli 环境变量已移除 (命令通过系统PATH可用)
 # claude code 环境
 {% for key, value in config.zsh_integration.development_environments.claude_code.items() %}
 export {{ key }}="{{ value }}"
@@ -203,7 +163,7 @@ export {{ key }}="{{ value }}"
 #                               4. PATH 环境变量构建
 # =============================================================================
 # 构建增强的 PATH（按优先级顺序）
-export PATH="PYTHONPATH":"PYTHONUSERBASE":"GOMODCACHE":"$GOPATH":"$NPM_HOME":"$EDITOR_HOME/bin":"$MYSQL_HOME/bin":"{{ config.zsh_integration.development_environments.pyenv.PYENV_PATH.bash }}/bin":"{{ config.zsh_integration.development_environments.miller.MILLER_PATH.bash }}":"{{ config.zsh_integration.development_environments.github_cli.GH_PATH.bash }}":"$PATH"
+export PATH="$PIPX_BIN_DIR:$EDITOR_HOME/bin:$MYSQL_HOME/bin:$PATH"
 
 # =============================================================================
 #                               5. Bash 历史记录增强配置
@@ -296,15 +256,15 @@ if command -v mycli &> /dev/null || [ -f "$XDG_DATA_HOME/mycli/mycli.exe" ] || [
 fi
 {% endif %}
 
-{% if config.phase2_integration.database_tools.redis-cli.enabled %}
+{% if config.phase2_integration.database_tools['redis-cli'].enabled %}
 # Redis CLI 工具
 if command -v redis-cli &> /dev/null || [ -f "C:\Applications\DevEnvironment\MemuraiDeveloper\memurai-cli.exe" ]; then
-    {% for alias_name, alias_command in config.phase2_integration.database_tools.redis-cli.aliases.items() %}
+    {% for alias_name, alias_command in config.phase2_integration.database_tools['redis-cli'].aliases.items() %}
     alias {{ alias_name }}='{{ alias_command }}'
     {% endfor %}
     
     # Redis 连接快捷方式
-    {% for shortcut_name, shortcut_command in config.phase2_integration.database_tools.redis-cli.connection_shortcuts.items() %}
+    {% for shortcut_name, shortcut_command in config.phase2_integration.database_tools['redis-cli'].connection_shortcuts.items() %}
     alias {{ shortcut_name }}='{{ shortcut_command }}'
     {% endfor %}
 fi

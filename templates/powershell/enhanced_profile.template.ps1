@@ -31,14 +31,12 @@ $env:LESSHISTFILE = "-"
 # =============================================================================
 #                               2. XDG 目录规范
 # =============================================================================
-{% if config.zsh_integration.xdg_directories.enabled %}
 # 遵循 XDG Base Directory 规范
 
 $env:XDG_CONFIG_HOME = "{{ config.zsh_integration.xdg_directories.config_home }}"
 $env:XDG_DATA_HOME = "{{ config.zsh_integration.xdg_directories.data_home }}"
 $env:XDG_STATE_HOME = "{{ config.zsh_integration.xdg_directories.state_home }}"
 $env:XDG_CACHE_HOME = "{{ config.zsh_integration.xdg_directories.cache_home }}"
-{% endif %}
 
 # =============================================================================
 #                               3. 版本管理器初始化
@@ -93,25 +91,9 @@ $env:{{ key }} = "{{ value }}"
 #                               4. 开发环境配置
 # =============================================================================
 
-# Android 开发环境
-{% for key, value in config.zsh_integration.development_environments.android.items() %}
-$env:{{ key }} = "{{ value.replace('$XDG_DATA_HOME', '$env:XDG_DATA_HOME').replace('$ANDROID_HOME', '$env:ANDROID_HOME') }}"
-{% endfor %}
 
-# Go 语言环境
-{% for key, value in config.zsh_integration.development_environments.go.items() %}
-$env:{{ key }} = "{{ value }}"
-{% endfor %}
 
-# Java 环境
-{% for key, value in config.zsh_integration.development_environments.java.items() %}
-$env:{{ key }} = "{{ value.replace('$XDG_CONFIG_HOME', '$env:XDG_CONFIG_HOME').replace('\"', '`"') }}"
-{% endfor %}
 
-# Rust 环境
-{% for key, value in config.zsh_integration.development_environments.rust.items() %}
-$env:{{ key }} = "{{ value.replace('$XDG_DATA_HOME', '$env:XDG_DATA_HOME') }}"
-{% endfor %}
 
 # Python 环境
 {% for key, value in config.zsh_integration.development_environments.python.items() %}
@@ -123,25 +105,13 @@ $env:{{ key }} = "{{ value.replace('$XDG_DATA_HOME', '$env:XDG_DATA_HOME') }}"
 $env:{{ key }} = "{{ value.replace('$XDG_DATA_HOME', '$env:XDG_DATA_HOME') }}"
 {% endfor %}
 
-# Ruby 环境
-{% for key, value in config.zsh_integration.development_environments.ruby.items() %}
-$env:{{ key }} = "{{ value.replace('$XDG_DATA_HOME', '$env:XDG_DATA_HOME').replace('$XDG_CACHE_HOME', '$env:XDG_CACHE_HOME') }}"
-{% endfor %}
 
 # Node.js 环境
 {% for key, value in config.zsh_integration.development_environments.node.items() %}
 $env:{{ key }} = "{{ value.replace('$XDG_DATA_HOME', '$env:XDG_DATA_HOME').replace('$XDG_CONFIG_HOME', '$env:XDG_CONFIG_HOME').replace('$XDG_CACHE_HOME', '$env:XDG_CACHE_HOME') }}"
 {% endfor %}
 
-# Maven 环境
-{% for key, value in config.zsh_integration.development_environments.maven.items() %}
-$env:{{ key }} = "{{ value.replace('$XDG_DATA_HOME', '$env:XDG_DATA_HOME') }}"
-{% endfor %}
 
-# Gradle 环境
-{% for key, value in config.zsh_integration.development_environments.gradle.items() %}
-$env:{{ key }} = "{{ value.replace('$XDG_DATA_HOME', '$env:XDG_DATA_HOME') }}"
-{% endfor %}
 
 # MySQL 环境
 {% for key, value in config.zsh_integration.development_environments.mysql.items() %}
@@ -153,20 +123,8 @@ $env:{{ key }} = "{{ value.replace('$XDG_DATA_HOME', '$env:XDG_DATA_HOME') }}"
 $env:{{ key }} = "{{ value.replace('$XDG_DATA_HOME', '$env:XDG_DATA_HOME') }}"
 {% endfor %}
 
-# pyenv 环境
-{% for key, value in config.zsh_integration.development_environments.pyenv.items() %}
-$env:{{ key }} = "{{ value.powershell }}"
-{% endfor %}
-
-# miller 环境
-{% for key, value in config.zsh_integration.development_environments.miller.items() %}
-$env:{{ key }} = "{{ value.powershell }}"
-{% endfor %}
-
-# github cli 环境
-{% for key, value in config.zsh_integration.development_environments.github_cli.items() %}
-$env:{{ key }} = "{{ value.powershell }}"
-{% endfor %}
+# pyenv 环境 (已在版本管理器部分处理)
+# miller 和 github cli 环境变量已移除 (命令通过系统PATH可用)
 
 # claude code 环境
 {% for key, value in config.zsh_integration.development_environments.claude_code.items() %}
@@ -200,6 +158,7 @@ $pathParts += "{{ path.replace('$G_HOME', '$env:G_HOME').replace('$GOROOT', '$en
 {% endif %}
 
 # 开发环境路径
+$pathParts += "$env:PIPX_BIN_DIR"
 $pathParts += "$env:EDITOR_HOME\bin"
 $pathParts += "$env:MYSQL_HOME\bin" 
 $pathParts += "C:\Applications\DevEnvironment\miller\miller-6.13.0-windows-amd64"
@@ -305,15 +264,15 @@ if ((Get-Command mycli -ErrorAction SilentlyContinue) -or (Test-Path "$env:XDG_D
 }
 {% endif %}
 
-{% if config.phase2_integration.database_tools.redis-cli.enabled %}
+{% if config.phase2_integration.database_tools['redis-cli'].enabled %}
 # Redis CLI 工具
 if ((Get-Command redis-cli -ErrorAction SilentlyContinue) -or (Test-Path "C:\Applications\DevEnvironment\MemuraiDeveloper\memurai-cli.exe")) {
-    {% for alias_name, alias_command in config.phase2_integration.database_tools.redis-cli.aliases.items() %}
+    {% for alias_name, alias_command in config.phase2_integration.database_tools['redis-cli'].aliases.items() %}
     Set-Alias {{ alias_name }} '{{ alias_command }}'
     {% endfor %}
     
     # Redis 连接快捷方式
-    {% for shortcut_name, shortcut_command in config.phase2_integration.database_tools.redis-cli.connection_shortcuts.items() %}
+    {% for shortcut_name, shortcut_command in config.phase2_integration.database_tools['redis-cli'].connection_shortcuts.items() %}
     function {{ shortcut_name }} { {{ shortcut_command }} }
     {% endfor %}
 }

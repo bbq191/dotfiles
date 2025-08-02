@@ -155,55 +155,12 @@
   },
 
   "development_environments": {
-    "android": {
-      "ANDROID_HOME": "$XDG_DATA_HOME/android",
-      "ANDROID_USER_HOME": "$XDG_DATA_HOME/android",
-      "ANDROID_SDK_ROOT": "$ANDROID_HOME"
-    },
-    "go": {
-      "GOROOT": {
-        "bash": "/C/Applications/DevEnvironment/golang",
-        "powershell": "C:\\Applications\\DevEnvironment\\golang",
-        "zsh": "/C/Applications/DevEnvironment/golang"
-      },
-      "GOPATH": {
-        "bash": "$XDG_DATA_HOME/go",
-        "powershell": "$env:XDG_DATA_HOME\\go",
-        "zsh": "$XDG_DATA_HOME/go"
-      },
-      "GOMODCACHE": {
-        "bash": "$XDG_CACHE_HOME/go/mod",
-        "powershell": "$env:XDG_CACHE_HOME\\go\\mod",
-        "zsh": "$XDG_CACHE_HOME/go/mod"
-      },
-      "GOPROXY": "https://goproxy.cn,direct",
-      "GOBIN": {
-        "bash": "$GOPATH/bin",
-        "powershell": "$env:GOPATH\\bin",
-        "zsh": "$GOPATH/bin"
-      }
-    },
-    "java": {
-      "_JAVA_OPTIONS": "-Djava.util.prefs.userRoot=\"$XDG_CONFIG_HOME\"/java"
-    },
-    "rust": {
-      "CARGO_HOME": "$XDG_DATA_HOME/cargo",
-      "RUSTUP_HOME": "$XDG_DATA_HOME/rustup"
-    },
     "python": {
-      "PYTHONPATH": "$XDG_DATA_HOME/python",
-      "PYTHONUSERBASE": "$XDG_DATA_HOME/python",
       "PIPENV_VENV_IN_PROJECT": "1"
     },
-    "ruby": {
-      "GEM_HOME": "$XDG_DATA_HOME/gem",
-      "GEM_SPEC_CACHE": "$XDG_CACHE_HOME/gem"
-    },
     "node": {
-      "NPM_HOME": "$XDG_DATA_HOME/npm",
       "NPM_CONFIG_USERCONFIG": "$XDG_CONFIG_HOME/npm/config",
       "NPM_CONFIG_CACHE": "$XDG_CACHE_HOME/npm",
-      "NPM_CONFIG_PREFIX": "$XDG_DATA_HOME/npm",
       "PNPM_HOME": "$XDG_DATA_HOME/pnpm",
       "YARN_CACHE_FOLDER": "$XDG_CACHE_HOME/yarn"
     },
@@ -211,12 +168,6 @@
       "PIPX_HOME": "$XDG_DATA_HOME/pipx",
       "PIPX_BIN_DIR": "$XDG_DATA_HOME/pipx/bin", 
       "PIPX_MAN_DIR": "$XDG_DATA_HOME/man"
-    },
-    "maven": {
-      "MAVEN_OPTS": "-Dmaven.repo.local=$XDG_DATA_HOME/maven/repository"
-    },
-    "gradle": {
-      "GRADLE_USER_HOME": "$XDG_DATA_HOME/gradle"
     },
     "vscode": {
       "EDITOR_HOME": {
@@ -230,27 +181,6 @@
         "bash": "/c/Program Files/MySQL/MySQL Server 8.0",
         "powershell": "C:\\Program Files\\MySQL\\MySQL Server 8.0",
         "zsh": "/c/Program Files/MySQL/MySQL Server 8.0"
-      }
-    },
-    "pyenv": {
-      "PYENV_PATH": {
-        "bash": "/c/Applications/DevEnvironment/pyenv/pyenv-win",
-        "powershell": "C:\\Applications\\DevEnvironment\\pyenv\\pyenv-win",
-        "zsh": "/c/Applications/DevEnvironment/pyenv/pyenv-win"
-      }
-    },
-    "miller": {
-      "MILLER_PATH": {
-        "bash": "/c/Applications/DevEnvironment/miller",
-        "powershell": "C:\\Applications\\DevEnvironment\\miller",
-        "zsh": "/c/Applications/DevEnvironment/miller"
-      }
-    },
-    "github_cli": {
-      "GH_PATH": {
-        "bash": "/c/Applications/DevEnvironment/github-cli",
-        "powershell": "C:\\Applications\\DevEnvironment\\github-cli",
-        "zsh": "/c/Applications/DevEnvironment/github-cli"
       }
     },
     "claude_code": {

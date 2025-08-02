@@ -50,7 +50,8 @@ class EnhancedDotfilesGenerator:
             'aliases.json', 
             'functions.json',
             'advanced_functions.json',
-            'zsh_integration.json'
+            'zsh_integration.json',
+            'phase2_integration.json'
         ]
     
     def resolve_path_for_shell(self, path_config, shell_type):
@@ -97,6 +98,42 @@ class EnhancedDotfilesGenerator:
             processed_envs[env_name] = processed_env
             
         return processed_envs
+    
+    def process_xdg_directories(self, config, shell_type):
+        """
+        处理 XDG 目录配置，解析平台特定路径
+        
+        Args:
+            config: 配置字典
+            shell_type: shell 类型 ('bash', 'powershell', 'zsh')
+            
+        Returns:
+            dict: 处理后的 XDG 目录配置
+        """
+        if 'zsh_integration' not in config or 'xdg_directories' not in config['zsh_integration']:
+            return {}
+            
+        xdg_config = config['zsh_integration']['xdg_directories']
+        processed_xdg = {}
+        
+        # 处理各个 XDG 目录
+        xdg_vars = ['config_home', 'data_home', 'state_home', 'cache_home', 'runtime_dir', 'user_bin']
+        
+        for var_name in xdg_vars:
+            if var_name in xdg_config:
+                var_value = xdg_config[var_name]
+                # 根据平台选择正确的路径，Windows优先使用windows配置
+                if isinstance(var_value, dict):
+                    if shell_type == 'powershell' or shell_type == 'bash':
+                        # Windows 平台的 Bash (Git Bash) 和 PowerShell 都使用 windows 配置
+                        processed_xdg[var_name] = var_value.get('windows', var_value.get('linux', ''))
+                    else:
+                        # 其他 shell 类型
+                        processed_xdg[var_name] = var_value.get(shell_type, var_value.get('linux', ''))
+                else:
+                    processed_xdg[var_name] = var_value
+                    
+        return processed_xdg
     
     def get_powershell_profile_path(self):
         """
@@ -228,11 +265,14 @@ class EnhancedDotfilesGenerator:
                 with open(template_file, 'r', encoding='utf-8') as f:
                     template = Template(f.read())
                 
-                # 处理开发环境路径
+                # 处理开发环境路径和 XDG 目录
                 import copy
                 processed_config = copy.deepcopy(config)
                 if 'zsh_integration' in processed_config:
                     processed_config['zsh_integration']['development_environments'] = self.process_development_environments(config, 'bash')
+                    # 更新 XDG 目录配置而不是完全替换
+                    processed_xdg = self.process_xdg_directories(config, 'bash')
+                    processed_config['zsh_integration']['xdg_directories'].update(processed_xdg)
                 
                 # 渲染模板
                 bashrc_content = template.render(
@@ -281,11 +321,14 @@ class EnhancedDotfilesGenerator:
                 with open(template_file, 'r', encoding='utf-8') as f:
                     template = Template(f.read())
                 
-                # 处理开发环境路径
+                # 处理开发环境路径和 XDG 目录
                 import copy
                 processed_config = copy.deepcopy(config)
                 if 'zsh_integration' in processed_config:
                     processed_config['zsh_integration']['development_environments'] = self.process_development_environments(config, 'powershell')
+                    # 更新 XDG 目录配置而不是完全替换
+                    processed_xdg = self.process_xdg_directories(config, 'powershell')
+                    processed_config['zsh_integration']['xdg_directories'].update(processed_xdg)
                 
                 # 渲染模板
                 profile_content = template.render(
