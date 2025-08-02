@@ -15,7 +15,17 @@ from datetime import datetime
 
 class SSHConfigManager:
     def __init__(self, config_path: Path = None):
-        self.config_path = config_path or Path.home() / ".ssh" / "config"
+        if config_path:
+            self.config_path = config_path
+        else:
+            # 优先使用 XDG 配置目录，回退到传统路径
+            xdg_config_home = os.environ.get('XDG_CONFIG_HOME')
+            if xdg_config_home and os.environ.get('SSH_USE_XDG', 'false').lower() == 'true':
+                self.config_path = Path(xdg_config_home) / "ssh" / "config"
+            else:
+                # 使用传统的 ~/.ssh 路径（SSH 的标准位置）
+                self.config_path = Path.home() / ".ssh" / "config"
+        
         self.config_path.parent.mkdir(mode=0o700, exist_ok=True)
         
         # 确保配置文件存在

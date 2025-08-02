@@ -118,6 +118,11 @@ $env:{{ key }} = "{{ value.replace('$XDG_DATA_HOME', '$env:XDG_DATA_HOME') }}"
 $env:{{ key }} = "{{ value.replace('$XDG_DATA_HOME', '$env:XDG_DATA_HOME') }}"
 {% endfor %}
 
+# pipx 环境
+{% for key, value in config.zsh_integration.development_environments.pipx.items() %}
+$env:{{ key }} = "{{ value.replace('$XDG_DATA_HOME', '$env:XDG_DATA_HOME') }}"
+{% endfor %}
+
 # Ruby 环境
 {% for key, value in config.zsh_integration.development_environments.ruby.items() %}
 $env:{{ key }} = "{{ value.replace('$XDG_DATA_HOME', '$env:XDG_DATA_HOME').replace('$XDG_CACHE_HOME', '$env:XDG_CACHE_HOME') }}"
@@ -274,7 +279,7 @@ if (Get-Command k9s -ErrorAction SilentlyContinue) {
 # 数据库工具集成
 {% if config.phase2_integration.database_tools.pgcli.enabled %}
 # PostgreSQL CLI 工具
-if ((Get-Command pgcli -ErrorAction SilentlyContinue) -or (Test-Path "C:\Users\afu\.local\bin\pgcli.exe")) {
+if ((Get-Command pgcli -ErrorAction SilentlyContinue) -or (Test-Path "$env:XDG_DATA_HOME\pgcli\pgcli.exe") -or (Test-Path "$env:USERPROFILE\.local\bin\pgcli.exe")) {
     {% for alias_name, alias_command in config.phase2_integration.database_tools.pgcli.aliases.items() %}
     Set-Alias {{ alias_name }} '{{ alias_command }}'
     {% endfor %}
@@ -288,7 +293,7 @@ if ((Get-Command pgcli -ErrorAction SilentlyContinue) -or (Test-Path "C:\Users\a
 
 {% if config.phase2_integration.database_tools.mycli.enabled %}
 # MySQL CLI 工具
-if ((Get-Command mycli -ErrorAction SilentlyContinue) -or (Test-Path "C:\Users\afu\.local\bin\mycli.exe")) {
+if ((Get-Command mycli -ErrorAction SilentlyContinue) -or (Test-Path "$env:XDG_DATA_HOME\mycli\mycli.exe") -or (Test-Path "$env:USERPROFILE\.local\bin\mycli.exe")) {
     {% for alias_name, alias_command in config.phase2_integration.database_tools.mycli.aliases.items() %}
     Set-Alias {{ alias_name }} '{{ alias_command }}'
     {% endfor %}

@@ -154,6 +154,10 @@ export {{ key }}="{{ value }}"
 {% for key, value in config.zsh_integration.development_environments.python.items() %}
 export {{ key }}="{{ value }}"
 {% endfor %}
+# pipx 环境
+{% for key, value in config.zsh_integration.development_environments.pipx.items() %}
+export {{ key }}="{{ value }}"
+{% endfor %}
 # Ruby 环境
 {% for key, value in config.zsh_integration.development_environments.ruby.items() %}
 export {{ key }}="{{ value }}"
@@ -266,7 +270,7 @@ fi
 # 数据库工具集成
 {% if config.phase2_integration.database_tools.pgcli.enabled %}
 # PostgreSQL CLI 工具
-if command -v pgcli &> /dev/null || [ -f "C:\Users\afu\.local\bin\pgcli.exe" ]; then
+if command -v pgcli &> /dev/null || [ -f "$XDG_DATA_HOME/pgcli/pgcli.exe" ] || [ -f "$HOME/.local/bin/pgcli.exe" ]; then
     {% for alias_name, alias_command in config.phase2_integration.database_tools.pgcli.aliases.items() %}
     alias {{ alias_name }}='{{ alias_command }}'
     {% endfor %}
@@ -280,7 +284,7 @@ fi
 
 {% if config.phase2_integration.database_tools.mycli.enabled %}
 # MySQL CLI 工具
-if command -v mycli &> /dev/null || [ -f "C:\Users\afu\.local\bin\mycli.exe" ]; then
+if command -v mycli &> /dev/null || [ -f "$XDG_DATA_HOME/mycli/mycli.exe" ] || [ -f "$HOME/.local/bin/mycli.exe" ]; then
     {% for alias_name, alias_command in config.phase2_integration.database_tools.mycli.aliases.items() %}
     alias {{ alias_name }}='{{ alias_command }}'
     {% endfor %}

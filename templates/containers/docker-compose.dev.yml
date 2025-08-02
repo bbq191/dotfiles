@@ -1,5 +1,11 @@
 # Docker Compose 开发环境模板
 # 适用于本地开发的多服务配置
+# 遵循 XDG Base Directory 规范的容器配置
+# 
+# XDG 路径映射建议:
+# - 配置文件: ${XDG_CONFIG_HOME}/docker-compose 或 ~/.config/docker-compose
+# - 数据文件: ${XDG_DATA_HOME}/docker-compose 或 ~/.local/share/docker-compose
+# - 日志文件: ${XDG_STATE_HOME}/docker-compose 或 ~/.local/state/docker-compose
 
 version: '3.8'
 

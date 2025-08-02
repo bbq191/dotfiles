@@ -5,6 +5,7 @@
 """
 
 import json
+import os
 import subprocess
 import sys
 import argparse
@@ -13,7 +14,15 @@ from pathlib import Path
 class DatabaseConnector:
     def __init__(self, config_file: Path = None):
         if config_file is None:
-            config_file = Path(__file__).parent / "database-connections.json"
+            # 优先查找 XDG 配置目录中的配置文件
+            xdg_config_home = os.environ.get('XDG_CONFIG_HOME', Path.home() / ".config")
+            xdg_config_file = Path(xdg_config_home) / "dotfiles" / "database-connections.json"
+            
+            if xdg_config_file.exists():
+                config_file = xdg_config_file
+            else:
+                # 回退到脚本同目录的配置文件
+                config_file = Path(__file__).parent / "database-connections.json"
         
         self.config_file = config_file
         self.config = self.load_config()

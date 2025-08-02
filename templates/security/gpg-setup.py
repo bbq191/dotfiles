@@ -12,7 +12,9 @@ from typing import Optional, Dict, List
 
 class GPGManager:
     def __init__(self):
-        self.gpg_dir = Path.home() / ".gnupg"
+        # 使用 XDG 规范的 GPG 目录
+        xdg_data_home = os.environ.get('XDG_DATA_HOME', Path.home() / ".local/share")
+        self.gpg_dir = Path(xdg_data_home) / "gnupg"
         
     def check_gpg_installed(self) -> bool:
         """检查 GPG 是否已安装"""
@@ -49,8 +51,9 @@ Expire-Date: 2y
         key_config += "%commit\n%echo done\n"
         
         try:
-            # 写入临时配置文件
-            config_file = Path.home() / "gpg_key_config.txt"
+            # 写入临时配置文件到 XDG 缓存目录
+            xdg_cache_home = os.environ.get('XDG_CACHE_HOME', Path.home() / ".cache")
+            config_file = Path(xdg_cache_home) / "gpg_key_config.txt"
             with open(config_file, 'w') as f:
                 f.write(key_config)
             
@@ -161,7 +164,9 @@ pinentry-program pinentry-qt
     def backup_keys(self, key_id: str, backup_dir: str = None):
         """备份 GPG 密钥"""
         if not backup_dir:
-            backup_dir = Path.home() / "gpg_backup"
+            # 使用 XDG 数据目录存储备份
+            xdg_data_home = os.environ.get('XDG_DATA_HOME', Path.home() / ".local/share")
+            backup_dir = Path(xdg_data_home) / "dotfiles" / "gpg_backup"
         else:
             backup_dir = Path(backup_dir)
         

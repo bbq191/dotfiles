@@ -15,6 +15,11 @@
       "functions": {
         "docker_cleanup": "docker system prune -af && docker volume prune -f",
         "docker_stats": "docker stats --format 'table {{.Container}}\\t{{.CPUPerc}}\\t{{.MemUsage}}\\t{{.NetIO}}'"
+      },
+      "xdg_config": {
+        "config_home": "$XDG_CONFIG_HOME/docker",
+        "data_home": "$XDG_DATA_HOME/docker",
+        "cache_home": "$XDG_CACHE_HOME/docker"
       }
     },
     "k9s": {
@@ -22,6 +27,11 @@
       "aliases": {
         "k": "kubectl",
         "k9": "k9s"
+      },
+      "xdg_config": {
+        "config_home": "$XDG_CONFIG_HOME/k9s",
+        "data_home": "$XDG_DATA_HOME/k9s",
+        "cache_home": "$XDG_CACHE_HOME/k9s"
       }
     },
     "podman": {
@@ -29,6 +39,11 @@
       "aliases": {
         "pm": "podman",
         "pps": "podman ps"
+      },
+      "xdg_config": {
+        "config_home": "$XDG_CONFIG_HOME/containers",
+        "data_home": "$XDG_DATA_HOME/containers",
+        "cache_home": "$XDG_CACHE_HOME/containers"
       }
     }
   },
@@ -133,7 +148,10 @@
   "environment_variables": {
     "container": {
       "DOCKER_BUILDKIT": "1",
-      "COMPOSE_DOCKER_CLI_BUILD": "1"
+      "COMPOSE_DOCKER_CLI_BUILD": "1",
+      "DOCKER_CONFIG": "$XDG_CONFIG_HOME/docker",
+      "K9SCONFIG": "$XDG_CONFIG_HOME/k9s",
+      "KUBECONFIG": "$XDG_CONFIG_HOME/kube/config"
     },
     "database": {
       "PGUSER": "postgres",
