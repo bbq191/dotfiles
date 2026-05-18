@@ -18,8 +18,7 @@ cd ~/Projects/dotfiles
 
 `install.sh` 会自动完成：
 1. 安装 paru（AUR helper）和 stow
-2. 安装所有官方源软件包（`packages/pacman.txt`）
-3. 安装所有 AUR 软件包（`packages/aur.txt`）
+2. 通过 paru 安装所有软件包（`packages/packages.txt`，含官方源和 AUR）
 4. 配置 fnm + Node LTS，安装 gemini-cli
 5. 通过 stow 将 `home/` 下所有配置符号链接到 `$HOME`
 6. 将系统配置复制到 `/etc/`（需要 sudo）
@@ -108,8 +107,7 @@ dotfiles/
 │       ├── resolved.conf.d/no-mdns.conf
 │       └── system/ollama.service.d/override.conf
 ├── packages/
-│   ├── pacman.txt           # 官方源软件包列表
-│   └── aur.txt              # AUR 软件包列表
+│   └── packages.txt         # 软件包列表（官方源 + AUR，由 paru 统一安装）
 ├── install.sh               # 一键部署脚本
 └── README.md
 ```

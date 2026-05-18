@@ -224,3 +224,14 @@ xorg-xwayland
 yazi
 yt-dlp
 zoxide
+fcitx5-theme-wechat
+hyprswitch
+matugen-bin
+mihomo-bin
+proton-ge-custom-bin
+rime-ice-git
+rime-wanxiang-gram-zh-hans
+visual-studio-code-insiders-bin
+vmware-keymaps
+vmware-workstation
+wechat-universal-bwrap

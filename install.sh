@@ -18,11 +18,8 @@ if ! command -v stow &>/dev/null; then
 fi
 
 # ── 2. 安装软件包 ─────────────────────────────────────────────────────────────
-echo "[+] 安装官方源软件包..."
-sudo pacman -S --needed - < "$DOTFILES/packages/pacman.txt"
-
-echo "[+] 安装 AUR 软件包..."
-paru -S --needed - < "$DOTFILES/packages/aur.txt"
+echo "[+] 安装软件包..."
+paru -S --needed - < "$DOTFILES/packages/packages.txt"
 
 # ── 3. 安装 Node（fnm）和全局 npm 包 ─────────────────────────────────────────
 echo "[+] 配置 fnm + Node..."
