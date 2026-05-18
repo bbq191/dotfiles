@@ -2,6 +2,7 @@
 home/.config/hypr/float_geometry.json
 home/.config/DankMaterialShell/.firstlaunch
 home/.config/DankMaterialShell/.changelog-*
+home/.config/DankMaterialShell/settings.json
 home/.config/fcitx5/conf/cached_layouts
 
 # fish 变量（含本机路径）
