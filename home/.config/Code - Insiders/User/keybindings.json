@@ -1,0 +1,175 @@
+// VS Code Insiders — Neovim 风格快捷键
+// 所有 leader 键以 Space 开头，仅在 vscode-neovim normal 模式下生效
+// C-h/j/k/l 窗口跳转已由 vscode-neovim 的 ctrlKeysForNormalMode 处理，无需重复定义
+[
+  // ── 窗口（编辑器分组）跳转 ────────────────────────────────────────────
+  // 由 ctrlKeysForNormalMode 中的 h/j/k/l + keymaps.lua <C-w>h/j/k/l 处理
+  // vscode-neovim 原生翻译 <C-w> 系列为 focusGroup 命令，无需在此重复定义
+
+  // ── Buffer 导航（对应 neovim 的 <S-h> / <S-l>）────────────────────────
+  {
+    "key": "shift+h",
+    "command": "workbench.action.previousEditor",
+    "when": "editorTextFocus && neovim.mode == 'normal'"
+  },
+  {
+    "key": "shift+l",
+    "command": "workbench.action.nextEditor",
+    "when": "editorTextFocus && neovim.mode == 'normal'"
+  },
+
+  // ── 诊断跳转（对应 [d / ]d）────────────────────────────────────────────
+  {
+    "key": "] d",
+    "command": "editor.action.marker.nextInFiles",
+    "when": "editorTextFocus && neovim.mode == 'normal'"
+  },
+  {
+    "key": "[ d",
+    "command": "editor.action.marker.prevInFiles",
+    "when": "editorTextFocus && neovim.mode == 'normal'"
+  },
+
+  // ── Git hunk 跳转（对应 ]h / [h）───────────────────────────────────────
+  {
+    "key": "] h",
+    "command": "workbench.action.editor.nextChange",
+    "when": "editorTextFocus && neovim.mode == 'normal'"
+  },
+  {
+    "key": "[ h",
+    "command": "workbench.action.editor.previousChange",
+    "when": "editorTextFocus && neovim.mode == 'normal'"
+  },
+
+  // ── <leader>e  文件浏览器 ───────────────────────────────────────────────
+  {
+    "key": "space e",
+    "command": "workbench.action.toggleSidebarVisibility",
+    "when": "editorTextFocus && neovim.mode == 'normal'"
+  },
+
+  // ── <leader>w / q / Q  保存 / 关闭 ────────────────────────────────────
+  {
+    "key": "space w",
+    "command": "workbench.action.files.save",
+    "when": "editorTextFocus && neovim.mode == 'normal'"
+  },
+  {
+    "key": "space q",
+    "command": "workbench.action.closeActiveEditor",
+    "when": "editorTextFocus && neovim.mode == 'normal'"
+  },
+  {
+    "key": "space shift+q",
+    "command": "workbench.action.closeAllEditors",
+    "when": "editorTextFocus && neovim.mode == 'normal'"
+  },
+
+  // ── <leader>bd / bo  Buffer ────────────────────────────────────────────
+  {
+    "key": "space b d",
+    "command": "workbench.action.closeActiveEditor",
+    "when": "editorTextFocus && neovim.mode == 'normal'"
+  },
+  {
+    "key": "space b o",
+    "command": "workbench.action.closeOtherEditors",
+    "when": "editorTextFocus && neovim.mode == 'normal'"
+  },
+
+  // ── <leader>ff/fg/fb/fr/fs/fd  Telescope 对应 ─────────────────────────
+  {
+    "key": "space f f",
+    "command": "workbench.action.quickOpen",
+    "when": "editorTextFocus && neovim.mode == 'normal'"
+  },
+  {
+    "key": "space f g",
+    "command": "workbench.action.findInFiles",
+    "when": "editorTextFocus && neovim.mode == 'normal'"
+  },
+  {
+    "key": "space f b",
+    "command": "workbench.action.showAllEditorsByMostRecentlyUsed",
+    "when": "editorTextFocus && neovim.mode == 'normal'"
+  },
+  {
+    "key": "space f r",
+    "command": "workbench.action.openRecent",
+    "when": "editorTextFocus && neovim.mode == 'normal'"
+  },
+  {
+    "key": "space f s",
+    "command": "workbench.action.gotoSymbol",
+    "when": "editorTextFocus && neovim.mode == 'normal'"
+  },
+  {
+    "key": "space f d",
+    "command": "workbench.panel.markers.view.focus",
+    "when": "editorTextFocus && neovim.mode == 'normal'"
+  },
+
+  // ── <leader>ca / rn / fm / de  LSP ────────────────────────────────────
+  {
+    "key": "space c a",
+    "command": "editor.action.quickFix",
+    "when": "editorTextFocus && neovim.mode == 'normal'"
+  },
+  {
+    "key": "space r n",
+    "command": "editor.action.rename",
+    "when": "editorTextFocus && neovim.mode == 'normal'"
+  },
+  {
+    "key": "space f m",
+    "command": "editor.action.formatDocument",
+    "when": "editorTextFocus && neovim.mode == 'normal'"
+  },
+  {
+    "key": "space d e",
+    "command": "editor.action.showHover",
+    "when": "editorTextFocus && neovim.mode == 'normal'"
+  },
+
+  // ── <leader>tt / tg  终端 / Git ────────────────────────────────────────
+  {
+    "key": "space t t",
+    "command": "workbench.action.terminal.toggleTerminal",
+    "when": "editorTextFocus && neovim.mode == 'normal'"
+  },
+  {
+    "key": "space t g",
+    "command": "workbench.view.scm",
+    "when": "editorTextFocus && neovim.mode == 'normal'"
+  },
+
+  // ── <leader>hs / hr  Git hunk stage / reset ────────────────────────────
+  {
+    "key": "space h s",
+    "command": "git.stageSelectedRanges",
+    "when": "editorTextFocus && neovim.mode == 'normal'"
+  },
+  {
+    "key": "space h r",
+    "command": "git.revertSelectedRanges",
+    "when": "editorTextFocus && neovim.mode == 'normal'"
+  },
+  {
+    "key": "space h d",
+    "command": "editor.action.dirtydiff.next",
+    "when": "editorTextFocus && neovim.mode == 'normal'"
+  },
+  {
+    "key": "space h b",
+    "command": "gitlens.toggleLineBlame",
+    "when": "editorTextFocus && neovim.mode == 'normal'"
+  },
+
+  // ── Zen 模式 ────────────────────────────────────────────────────────────
+  {
+    "key": "space z z",
+    "command": "workbench.action.toggleZenMode",
+    "when": "editorTextFocus && neovim.mode == 'normal'"
+  }
+]

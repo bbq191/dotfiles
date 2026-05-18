@@ -1,0 +1,30 @@
+# 使用 prepend_keymap 在默认键位基础上追加，不破坏内置绑定
+[manager]
+prepend_keymap = [
+  # ── 编辑器 ────────────────────────────────────────────────────────────────
+  # e — 在 Neovim 中编辑（阻塞，nvim 退出后回到 yazi）
+  { on = ["e"], run = "shell 'nvim \"$@\"' --block", desc = "Edit in Neovim" },
+
+  # ── Git ───────────────────────────────────────────────────────────────────
+  # <C-g> — 在当前目录打开 lazygit（接管终端，退出后回到 yazi）
+  { on = ["<C-g>"], run = "shell 'lazygit' --block", desc = "LazyGit" },
+
+  # ── 系统剪贴板（wl-clipboard）────────────────────────────────────────────
+  # Yazi 的 copy 命令在 Wayland 下会自动调用 wl-copy
+  { on = ["Y"],            run = "copy path",     desc = "Copy full path" },
+  { on = ["y", "n"],       run = "copy filename", desc = "Copy filename" },
+  { on = ["y", "d"],       run = "copy dirname",  desc = "Copy directory path" },
+
+  # ── 新 Kitty 窗口 ─────────────────────────────────────────────────────────
+  # <C-t> — 在当前目录打开新 kitty 窗口（非阻塞，后台运行）
+  { on = ["<C-t>"], run = "shell 'kitty --detach --directory \"$PWD\"' --orphan", desc = "Open new Kitty window here" },
+
+  # ── 快速跳转 ─────────────────────────────────────────────────────────────
+  # gz — 交互式 zoxide 跳转（Yazi 内置 z 为非交互跳转，Z 为交互）
+  # 默认 z/Z 已处理 zoxide，此处无需重复定义
+]
+
+[tasks]
+prepend_keymap = [
+  { on = ["<Esc>"], run = "close", desc = "Close task panel" },
+]

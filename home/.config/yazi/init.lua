@@ -1,0 +1,3 @@
+-- yazi init.lua — 当前为最小配置
+-- 如需安装插件，使用：ya pack -a <author/plugin>
+-- 数据目录（XDG）：~/.local/share/yazi/

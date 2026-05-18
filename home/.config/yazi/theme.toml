@@ -1,0 +1,112 @@
+# Tokyo Night — 色值精确对齐 kitty.conf
+# bg:#1a1b26  fg:#c0caf5  blue:#7aa2f7  cyan:#7dcfff
+# green:#9ece6a  yellow:#e0af68  red:#f7768e  magenta:#bb9af7
+# orange:#ff9e64  comment:#565f89  gutter:#3b4261  sel:#283457
+
+[manager]
+cwd = { fg = "#7aa2f7" }
+
+hovered         = { bg = "#283457", bold = true }
+preview_hovered = { underline = true }
+
+find_keyword  = { fg = "#e0af68", bold = true, italic = true, underline = true }
+find_position = { fg = "#bb9af7", bg = "reset", bold = true, italic = true }
+
+marker_selected = { fg = "#9ece6a", bg = "#9ece6a" }
+marker_copied   = { fg = "#e0af68", bg = "#e0af68" }
+marker_cut      = { fg = "#f7768e", bg = "#f7768e" }
+
+tab_active   = { fg = "#c0caf5", bg = "#3d4f7c", bold = true }
+tab_inactive = { fg = "#565f89", bg = "#1e2030" }
+
+count_selected = { fg = "#1a1b26", bg = "#9ece6a" }
+count_copied   = { fg = "#1a1b26", bg = "#e0af68" }
+count_cut      = { fg = "#1a1b26", bg = "#f7768e" }
+
+border_symbol = "│"
+border_style  = { fg = "#3b4261" }
+
+[status]
+separator_open  = ""
+separator_close = ""
+separator_style = { fg = "#3b4261", bg = "#3b4261" }
+
+mode_normal = { fg = "#1a1b26", bg = "#7aa2f7", bold = true }
+mode_select = { fg = "#1a1b26", bg = "#9ece6a", bold = true }
+mode_unset  = { fg = "#1a1b26", bg = "#ff9e64", bold = true }
+
+progress_label  = { fg = "#c0caf5", bold = true }
+progress_normal = { fg = "#7aa2f7", bg = "#3b4261" }
+progress_error  = { fg = "#f7768e", bg = "#3b4261" }
+
+permissions_t = { fg = "#9ece6a" }
+permissions_r = { fg = "#e0af68" }
+permissions_w = { fg = "#f7768e" }
+permissions_x = { fg = "#9ece6a" }
+permissions_s = { fg = "#7aa2f7" }
+
+[input]
+border   = { fg = "#7aa2f7" }
+title    = { fg = "#7aa2f7" }
+value    = { fg = "#c0caf5" }
+selected = { reversed = true }
+
+[completion]
+border   = { fg = "#7aa2f7" }
+active   = { bg = "#283457" }
+inactive = {}
+
+[tasks]
+border  = { fg = "#7aa2f7" }
+title   = { fg = "#7aa2f7" }
+hovered = { underline = true }
+
+[select]
+border   = { fg = "#7aa2f7" }
+active   = { fg = "#bb9af7" }
+inactive = {}
+
+[filetype]
+rules = [
+  # 图片
+  { mime = "image/*",  fg = "#bb9af7" },
+  # 视频
+  { mime = "video/*",  fg = "#f7768e" },
+  # 音频
+  { mime = "audio/*",  fg = "#e0af68" },
+  # PDF
+  { mime = "application/pdf", fg = "#f7768e" },
+  # 压缩包
+  { mime = "application/zip",               fg = "#ff9e64" },
+  { mime = "application/x-tar",            fg = "#ff9e64" },
+  { mime = "application/gzip",             fg = "#ff9e64" },
+  { mime = "application/x-bzip*",          fg = "#ff9e64" },
+  { mime = "application/x-7z*",            fg = "#ff9e64" },
+  { mime = "application/x-rar",            fg = "#ff9e64" },
+  # 可执行文件
+  { mime = "application/x-executable",   fg = "#9ece6a", bold = true },
+  { mime = "application/x-shellscript",  fg = "#9ece6a" },
+  # 代码
+  { url = "*.lua",   fg = "#7dcfff" },
+  { url = "*.py",    fg = "#7aa2f7" },
+  { url = "*.js",    fg = "#e0af68" },
+  { url = "*.jsx",   fg = "#e0af68" },
+  { url = "*.ts",    fg = "#7aa2f7" },
+  { url = "*.tsx",   fg = "#7aa2f7" },
+  { url = "*.rs",    fg = "#f7768e" },
+  { url = "*.go",    fg = "#7dcfff" },
+  { url = "*.c",     fg = "#7aa2f7" },
+  { url = "*.cpp",   fg = "#7aa2f7" },
+  { url = "*.sh",    fg = "#9ece6a" },
+  { url = "*.fish",  fg = "#9ece6a" },
+  # 配置
+  { url = "*.toml",  fg = "#9ece6a" },
+  { url = "*.yaml",  fg = "#9ece6a" },
+  { url = "*.yml",   fg = "#9ece6a" },
+  { url = "*.json",  fg = "#e0af68" },
+  { url = "*.conf",  fg = "#a9b1d6" },
+  { url = "*.ini",   fg = "#a9b1d6" },
+  # 文档
+  { url = "*.md",    fg = "#a9b1d6" },
+  { url = "*.txt",   fg = "#a9b1d6" },
+]

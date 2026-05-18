@@ -1,0 +1,12 @@
+# 运行时状态
+home/.config/hypr/float_geometry.json
+home/.config/DankMaterialShell/.firstlaunch
+home/.config/DankMaterialShell/.changelog-*
+home/.config/fcitx5/conf/cached_layouts
+
+# fish 变量（含本机路径）
+home/.config/fish/fish_variables
+
+# mpv uosc 二进制（按平台区分，不入库）
+home/.config/mpv/scripts/uosc/bin/ziggy-darwin
+home/.config/mpv/scripts/uosc/bin/ziggy-windows.exe

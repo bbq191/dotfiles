@@ -1,0 +1,43 @@
+format = """
+$directory\
+$git_branch\
+$git_status\
+$python\
+$rust\
+$nodejs\
+$line_break\
+$character"""
+
+[directory]
+style           = "bold #7aa2f7"
+truncation_length = 3
+truncate_to_repo  = true
+
+[git_branch]
+symbol = " "
+style  = "#9ece6a"
+format = "[$symbol$branch]($style) "
+
+[git_status]
+style  = "#f7768e"
+format = '([$all_status$ahead_behind]($style) )'
+
+[character]
+success_symbol = "[❯](bold #7aa2f7)"
+error_symbol   = "[❯](bold #f7768e)"
+vimcmd_symbol  = "[❮](bold #bb9af7)"
+
+[python]
+symbol = " "
+style  = "#7aa2f7"
+format = "[$symbol$version]($style) "
+
+[rust]
+symbol = " "
+style  = "#f7768e"
+format = "[$symbol$version]($style) "
+
+[nodejs]
+symbol = " "
+style  = "#9ece6a"
+format = "[$symbol$version]($style) "
