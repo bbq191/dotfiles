@@ -70,3 +70,35 @@ end, { desc = "Format" })
 
 -- 终端
 map("t", "<Esc><Esc>", "<C-\\><C-n>", { desc = "Exit terminal mode" })
+
+-- Markdown → PDF（pandoc + xelatex）
+map("n", "<leader>mp", function()
+  if vim.bo.filetype ~= "markdown" then
+    vim.notify("Not a markdown file", vim.log.levels.WARN)
+    return
+  end
+  local src = vim.fn.expand("%:p")
+  local out = vim.fn.expand("%:p:r") .. ".pdf"
+  vim.notify("Exporting: " .. out, vim.log.levels.INFO)
+  vim.fn.jobstart({
+    "pandoc", src, "-o", out,
+    "--pdf-engine=xelatex",
+    "-V", "CJKmainfont=Noto Serif CJK SC",
+    "-V", "CJKsansfont=Noto Sans CJK SC",
+    "-V", "CJKmonofont=Noto Sans Mono CJK SC",
+    "-V", "geometry:margin=2.5cm",
+    "-V", "fontsize=12pt",
+  }, {
+    on_exit = function(_, code)
+      if code == 0 then
+        vim.schedule(function()
+          vim.notify("PDF exported: " .. out, vim.log.levels.INFO)
+        end)
+      else
+        vim.schedule(function()
+          vim.notify("Export failed (exit " .. code .. ")", vim.log.levels.ERROR)
+        end)
+      end
+    end,
+  })
+end, { desc = "Export MD to PDF" })
