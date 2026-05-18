@@ -11,7 +11,7 @@ CachyOS · Hyprland · Wayland 个人配置。
 ### 一键部署
 
 ```bash
-git clone https://github.com/afu/dotfiles.git ~/Projects/dotfiles
+git clone https://github.com/bbq191/dotfiles.git ~/Projects/dotfiles
 cd ~/Projects/dotfiles
 ./install.sh
 ```
