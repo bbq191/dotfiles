@@ -2,7 +2,6 @@
 set -euo pipefail
 
 DOTFILES="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-CONFIG_TARGET="$HOME/.config"
 
 # ── 1. 依赖检查 ───────────────────────────────────────────────────────────────
 if ! command -v paru &>/dev/null; then
@@ -35,7 +34,7 @@ npm install -g @google/gemini-cli
 
 # ── 4. 应用配置文件（stow） ───────────────────────────────────────────────────
 echo "[+] 应用 dotfiles..."
-# 若目标已有同名非链接文件，先备份
+
 backup_if_exists() {
     local target="$HOME/$1"
     if [[ -e "$target" && ! -L "$target" ]]; then
@@ -44,22 +43,36 @@ backup_if_exists() {
     fi
 }
 
-backup_if_exists .config/fish
-backup_if_exists .config/hypr
-backup_if_exists .config/kitty
-backup_if_exists .config/nvim
-backup_if_exists .config/yazi
-backup_if_exists .config/starship.toml
-backup_if_exists .config/lazygit
-backup_if_exists .config/mpv
-backup_if_exists .config/satty
-backup_if_exists .config/fcitx5
-backup_if_exists .config/environment.d
-backup_if_exists .config/git
-backup_if_exists ".config/Code - Insiders/User/settings.json"
-backup_if_exists ".config/Code - Insiders/User/keybindings.json"
+# 手动备份已知冲突目标
+for item in \
+    .config/fish \
+    .config/hypr \
+    .config/kitty \
+    .config/nvim \
+    .config/yazi \
+    .config/starship.toml \
+    .config/lazygit \
+    .config/mpv \
+    .config/satty \
+    .config/fcitx5 \
+    .config/environment.d \
+    .config/git \
+    .config/fontconfig \
+    .config/qt5ct \
+    .config/qt6ct \
+    .config/mimeapps.list \
+    .config/user-dirs.dirs \
+    .config/DankMaterialShell \
+    ".config/Code - Insiders/User/settings.json" \
+    ".config/Code - Insiders/User/keybindings.json"
+do
+    backup_if_exists "$item"
+done
 
-stow --target="$HOME" home
+# --adopt 处理运行中进程（如 Hyprland）在 stow 执行期间重建的文件
+# git restore 将被 --adopt 吸入的系统文件还原为仓库版本
+stow --adopt --target="$HOME" home
+git -C "$DOTFILES" restore home/
 
 # ── 5. 应用系统配置（需要 sudo）────────────────────────────────────────────────
 echo "[+] 应用系统配置..."
@@ -76,10 +89,8 @@ sudo systemctl daemon-reload
 sudo systemctl enable --now ollama
 systemctl --user enable --now dms.service 2>/dev/null || true
 
-# ── 7. Wine prefix ────────────────────────────────────────────────────────────
+# ── 7. 目录初始化 ─────────────────────────────────────────────────────────────
 mkdir -p "$HOME/.local/share/wine"
-
-# ── 8. Ollama 模型目录 ────────────────────────────────────────────────────────
 mkdir -p "$HOME/.local/share/ollama/models"
 
 echo ""

@@ -11,8 +11,8 @@ CachyOS · Hyprland · Wayland 个人配置。
 ### 一键部署
 
 ```bash
-git clone https://github.com/<你的用户名>/dotfiles.git ~/dotfiles
-cd ~/dotfiles
+git clone https://github.com/afu/dotfiles.git ~/Projects/dotfiles
+cd ~/Projects/dotfiles
 ./install.sh
 ```
 
@@ -65,7 +65,7 @@ sudo systemctl daemon-reload && sudo systemctl enable --now ollama
 
 ### NVIDIA 必要配置
 
-在 `/etc/environment` 或 `~/.config/environment.d/` 中确认以下变量（已包含在 dotfiles 中）：
+在 `~/.config/environment.d/`（已包含在 dotfiles 中）中包含以下变量：
 
 ```
 LIBVA_DRIVER_NAME=nvidia
@@ -82,7 +82,7 @@ NVIDIA 已知问题：必须在 `hyprland.conf` 中设置 `no_hardware_cursors =
 
 ```
 dotfiles/
-├── home/                    # stow target = $HOME
+├── home/                    # stow --target=$HOME home
 │   └── .config/
 │       ├── fish/            # shell 配置
 │       ├── hypr/            # Hyprland + DMS + hyprpaper
@@ -94,8 +94,13 @@ dotfiles/
 │       ├── mpv/             # 视频播放器
 │       ├── satty/           # 截图标注
 │       ├── fcitx5/          # 输入法
-│       ├── environment.d/   # 系统环境变量
-│       ├── git/             # git 全局配置
+│       ├── fontconfig/      # 字体配置（Maple Mono 为默认字体）
+│       ├── environment.d/   # 用户级环境变量（NVIDIA、XDG 路径等）
+│       ├── git/             # git 全局配置（含代理设置）
+│       ├── qt5ct/           # Qt5 图标主题
+│       ├── qt6ct/           # Qt6 图标主题
+│       ├── mimeapps.list    # 默认应用关联
+│       ├── user-dirs.dirs   # XDG 用户目录（含 Projects）
 │       ├── DankMaterialShell/
 │       └── Code - Insiders/User/  # VSCode 设置和快捷键
 ├── system/                  # 需要 sudo 应用的系统配置
@@ -114,8 +119,8 @@ dotfiles/
 | 内容 | 原因 |
 |------|------|
 | `~/.config/mihomo/` | 含代理订阅链接（敏感） |
+| `~/.config/rbw/` | 含邮箱地址；新机器需重新 `rbw register` 自动生成 |
 | `~/.ssh/` | 私钥 |
 | `~/.claude/` / `.claude.json` | Claude Code 认证，硬编码路径 |
 | `~/.gemini/` | Gemini CLI OAuth token，硬编码路径 |
 | `~/.ollama/` | Ollama 设备密钥，硬编码路径 |
-| `~/.config/rbw/` | Bitwarden 本地缓存 |
