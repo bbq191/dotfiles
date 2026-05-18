@@ -83,9 +83,9 @@ map("n", "<leader>mp", function()
   vim.fn.jobstart({
     "pandoc", src, "-o", out,
     "--pdf-engine=xelatex",
-    "-V", "CJKmainfont=Noto Serif CJK SC",
-    "-V", "CJKsansfont=Noto Sans CJK SC",
-    "-V", "CJKmonofont=Noto Sans Mono CJK SC",
+    "-V", "CJKmainfont=Maple Mono NF CN",
+    "-V", "CJKsansfont=Maple Mono NF CN",
+    "-V", "CJKmonofont=Maple Mono NF CN",
     "-V", "geometry:margin=2.5cm",
     "-V", "fontsize=12pt",
   }, {
