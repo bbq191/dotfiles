@@ -1,0 +1,10 @@
+[Default Applications]
+x-scheme-handler/claude-cli=claude-code-url-handler.desktop
+text/plain=org.neovim.nvim.desktop
+text/x-shellscript=org.neovim.nvim.desktop
+text/x-python=org.neovim.nvim.desktop
+inode/directory=thunar.desktop
+application/x-gnome-saved-search=thunar.desktop
+
+[Added Associations]
+application/json=org.neovim.nvim.desktop;
