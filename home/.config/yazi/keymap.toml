@@ -29,13 +29,13 @@ prepend_keymap = [
   { on = ["g", "S"], run = "cd --interactive", desc = "跳转到 SFTP 服务（输入 sftp://...）" },
 
   # ── FTP / 其他远程挂载（gvfs.yazi）──────────────────────────────────────
-  # M m — 选择并挂载，挂载后自动跳入目录
-  { on = ["M", "m"], run = "plugin gvfs -- select-then-mount --jump", desc = "挂载远程（FTP/SMB/…）并跳转" },
-  # M u — 选择并卸载（eject）
-  { on = ["M", "u"], run = "plugin gvfs -- select-then-unmount --eject", desc = "卸载远程设备" },
-  # M a — 输入 URL 添加新挂载（ftp://host, smb://host/share 等）
-  { on = ["M", "a"], run = "plugin gvfs -- add-mount", desc = "添加新远程挂载（输入 URL）" },
-  # g m — 快速跳转到已挂载的 gvfs 设备
+  # g r — 选择已保存挂载并挂载，自动跳入（r = remote）
+  { on = ["g", "r"], run = "plugin gvfs -- select-then-mount --jump", desc = "挂载远程（FTP/SMB/…）并跳转" },
+  # g u — 选择已挂载设备并卸载（u = unmount）
+  { on = ["g", "u"], run = "plugin gvfs -- select-then-unmount --eject", desc = "卸载远程设备" },
+  # g n — 输入 URL 添加新挂载（n = new；格式 ftp://user@host）
+  { on = ["g", "n"], run = "plugin gvfs -- add-mount", desc = "添加新远程挂载（输入 URL）" },
+  # g m — 快速跳转到已挂载的 gvfs 设备（m = mounted）
   { on = ["g", "m"], run = "plugin gvfs -- jump-to-device", desc = "跳转到已挂载的远程设备" },
 ]
 
