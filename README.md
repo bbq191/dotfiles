@@ -133,7 +133,7 @@ dotfiles/
 │       ├── fish/            # shell 配置
 │       ├── hypr/            # Hyprland + DMS + hyprpaper
 │       ├── kitty/           # 终端
-│       ├── nvim/            # Neovim（Lazy.nvim）
+│       ├── nvim/            # Neovim（Lazy.nvim，含 DMS matugen 主题）
 │       ├── yazi/            # 文件管理器
 │       ├── starship.toml    # prompt
 │       ├── lazygit/         # Git TUI
