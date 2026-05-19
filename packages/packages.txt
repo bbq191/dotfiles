@@ -148,6 +148,8 @@ opencl-nvidia
 openssh
 os-prober
 pacman-contrib
+papirus-folders
+papirus-icon-theme
 paru
 pavucontrol
 perl

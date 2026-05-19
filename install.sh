@@ -60,6 +60,7 @@ for item in \
     .config/mimeapps.list \
     .config/user-dirs.dirs \
     .config/DankMaterialShell \
+    .config/matugen \
     ".config/Code - Insiders/User/settings.json" \
     ".config/Code - Insiders/User/keybindings.json"
 do
@@ -88,6 +89,10 @@ sudo cp "$DOTFILES/system/etc/tmpfiles.d/thp.conf" \
 sudo cp "$DOTFILES/system/etc/tmpfiles.d/howdy-permissions.conf" \
         /etc/tmpfiles.d/
 sudo systemd-tmpfiles --create /etc/tmpfiles.d/howdy-permissions.conf
+sudo mkdir -p /etc/sudoers.d
+sudo cp "$DOTFILES/system/etc/sudoers.d/papirus-folders" \
+        /etc/sudoers.d/
+sudo chmod 0440 /etc/sudoers.d/papirus-folders
 sudo systemctl mask NetworkManager-wait-online.service
 
 # ── 6. systemd 服务 ───────────────────────────────────────────────────────────
