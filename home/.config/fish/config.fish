@@ -30,7 +30,7 @@ fzf --fish | source
 starship init fish | source
 
 # ── SSH 密钥（按需加载）──────────────────────────────────────────────────────
-# rbw 已解锁时静默加载密钥；未解锁不打扰——git push 时 functions/git.fish 会提示
+# rbw 已解锁时静默加载密钥；未解锁不打扰——git push/pull/fetch 时 functions/git.fish 会提示
 if status is-interactive
     set -l _key_fp "SHA256:DdedK/2nU9yFpNCZOiM1De0J+Gdhr6TwS4bs1wxM2dA"
     if not ssh-add -l 2>/dev/null | grep -qF $_key_fp
