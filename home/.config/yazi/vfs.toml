@@ -1,0 +1,24 @@
+# Yazi VFS 配置 — SFTP 远程服务
+# 文档：https://yazi-rs.github.io/docs/configuration/vfs/
+#
+# 认证说明：
+#   默认使用 SSH agent（$SSH_AUTH_SOCK）。使用前确保已通过
+#   rbw 解锁并执行 ssh-add 将密钥加入 agent。
+#
+# 在 yazi 中访问：按 g S 跳转，或 :cd sftp://<service-name>/
+#
+# ── 添加新服务器示例 ──────────────────────────────────────────
+# [services.my-server]
+# type = "sftp"
+# host = "192.168.1.100"
+# user = "alice"
+# port = 22
+#
+# # 指定私钥文件（可选，默认走 SSH agent）：
+# # key_file = "~/.ssh/id_ed25519"
+#
+# # 使用非标准 SSH agent socket（可选）：
+# # identity_agent = "/run/user/1000/ssh-agent.socket"
+# ─────────────────────────────────────────────────────────────
+
+# 在此添加你的 SFTP 服务器，格式参考上方示例：

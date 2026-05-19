@@ -22,6 +22,21 @@ prepend_keymap = [
   # ── 快速跳转 ─────────────────────────────────────────────────────────────
   # gz — 交互式 zoxide 跳转（Yazi 内置 z 为非交互跳转，Z 为交互）
   # 默认 z/Z 已处理 zoxide，此处无需重复定义
+
+  # ── SFTP VFS（内置）──────────────────────────────────────────────────────
+  # g S — 弹出输入框，输入 sftp://<service-name>/ 跳转
+  # service-name 在 vfs.toml 中定义；确保 SSH agent 已加载密钥
+  { on = ["g", "S"], run = "cd --interactive", desc = "跳转到 SFTP 服务（输入 sftp://...）" },
+
+  # ── FTP / 其他远程挂载（gvfs.yazi）──────────────────────────────────────
+  # M m — 选择并挂载，挂载后自动跳入目录
+  { on = ["M", "m"], run = "plugin gvfs -- select-then-mount --jump", desc = "挂载远程（FTP/SMB/…）并跳转" },
+  # M u — 选择并卸载（eject）
+  { on = ["M", "u"], run = "plugin gvfs -- select-then-unmount --eject", desc = "卸载远程设备" },
+  # M a — 输入 URL 添加新挂载（ftp://host, smb://host/share 等）
+  { on = ["M", "a"], run = "plugin gvfs -- add-mount", desc = "添加新远程挂载（输入 URL）" },
+  # g m — 快速跳转到已挂载的 gvfs 设备
+  { on = ["g", "m"], run = "plugin gvfs -- jump-to-device", desc = "跳转到已挂载的远程设备" },
 ]
 
 [tasks]
