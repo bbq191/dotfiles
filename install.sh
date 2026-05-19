@@ -85,6 +85,9 @@ sudo cp "$DOTFILES/system/etc/modprobe.d/nvidia-local.conf" \
 sudo mkdir -p /etc/tmpfiles.d
 sudo cp "$DOTFILES/system/etc/tmpfiles.d/thp.conf" \
         /etc/tmpfiles.d/
+sudo cp "$DOTFILES/system/etc/tmpfiles.d/howdy-permissions.conf" \
+        /etc/tmpfiles.d/
+sudo systemd-tmpfiles --create /etc/tmpfiles.d/howdy-permissions.conf
 sudo systemctl mask NetworkManager-wait-online.service
 
 # ── 6. systemd 服务 ───────────────────────────────────────────────────────────
