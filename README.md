@@ -23,6 +23,7 @@ cd ~/Projects/dotfiles
 4. 通过 stow 将 `home/` 下所有配置符号链接到 `$HOME`
 5. 将系统配置复制到 `/etc/`（需要 sudo）
 6. 启用 ollama、dms systemd 服务
+7. 迁移 GnuPG 到 XDG 路径（`~/.local/share/gnupg`），生成 gpg-agent socket 单元 drop-in
 
 ---
 
@@ -115,6 +116,12 @@ __GLX_VENDOR_LIBRARY_NAME=nvidia
 ELECTRON_OZONE_PLATFORM_HINT=auto
 ```
 
+### GnuPG XDG
+
+`GNUPGHOME` 已通过 `environment.d/gnupg.conf` 和 fish config 设置为 `~/.local/share/gnupg`。
+
+`install.sh` 会自动迁移原有的 `~/.gnupg` 数据，并动态生成 gpg-agent socket 单元 drop-in（socket 路径含 GNUPGHOME 的哈希，因此无法静态跟踪在仓库中，每台机器单独生成到 `~/.config/systemd/user/gpg-agent*.socket.d/`）。
+
 ---
 
 ## 目录结构
@@ -134,13 +141,14 @@ dotfiles/
 │       ├── satty/           # 截图标注
 │       ├── fcitx5/          # 输入法（wechat 主题）
 │       ├── fontconfig/      # 字体配置（Maple Mono 为默认字体）
-│       ├── environment.d/   # 用户级环境变量（NVIDIA、XDG 路径等）
 │       ├── git/             # git 全局配置（含代理设置）
 │       ├── qt5ct/ qt6ct/    # Qt 图标主题
 │       ├── mimeapps.list    # 默认应用关联
 │       ├── user-dirs.dirs   # XDG 用户目录（含 Projects）
 │       ├── DankMaterialShell/  # DMS 设置 + matugen 用户配置
+│       ├── environment.d/   # 用户级环境变量（NVIDIA、GnuPG XDG 等）
 │       ├── matugen/         # matugen 用户模板（Papirus 自动换色）
+│       ├── systemd/user/    # gpg-agent.service drop-in（GNUPGHOME 传递）
 │       └── Code - Insiders/User/  # VSCode 设置和快捷键
 ├── system/                  # 需要 sudo 应用的系统配置
 │   └── etc/
