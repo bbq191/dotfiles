@@ -79,6 +79,13 @@ sudo cp "$DOTFILES/system/etc/systemd/resolved.conf.d/no-mdns.conf" \
 sudo mkdir -p /etc/systemd/system/ollama.service.d
 sudo cp "$DOTFILES/system/etc/systemd/system/ollama.service.d/override.conf" \
         /etc/systemd/system/ollama.service.d/
+sudo mkdir -p /etc/modprobe.d
+sudo cp "$DOTFILES/system/etc/modprobe.d/nvidia-local.conf" \
+        /etc/modprobe.d/
+sudo mkdir -p /etc/tmpfiles.d
+sudo cp "$DOTFILES/system/etc/tmpfiles.d/thp.conf" \
+        /etc/tmpfiles.d/
+sudo systemctl mask NetworkManager-wait-online.service
 
 # ── 6. systemd 服务 ───────────────────────────────────────────────────────────
 echo "[+] 启用 systemd 服务..."
