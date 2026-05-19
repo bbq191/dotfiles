@@ -105,6 +105,38 @@ systemctl --user enable --now dms.service 2>/dev/null || true
 mkdir -p "$HOME/.local/share/wine"
 mkdir -p "$HOME/.local/share/ollama/models"
 
+# ── 8. GnuPG XDG 迁移 ────────────────────────────────────────────────────────
+echo "[+] 配置 GnuPG XDG 路径..."
+GNUPGHOME_NEW="$HOME/.local/share/gnupg"
+mkdir -p "$GNUPGHOME_NEW"
+chmod 700 "$GNUPGHOME_NEW"
+
+if [[ -d "$HOME/.gnupg" && ! -L "$HOME/.gnupg" ]]; then
+    cp -rn "$HOME/.gnupg/." "$GNUPGHOME_NEW/"
+    mv "$HOME/.gnupg" "$HOME/.gnupg.bak-$(date +%s)"
+    echo "    已迁移 ~/.gnupg → $GNUPGHOME_NEW"
+fi
+
+# socket 路径由 GNUPGHOME 的哈希决定，需动态生成 drop-in
+SOCKETDIR=$(GNUPGHOME="$GNUPGHOME_NEW" gpgconf --list-dirs socketdir)
+declare -A _SOCKET_MAP=(
+    [gpg-agent.socket]="S.gpg-agent"
+    [gpg-agent-ssh.socket]="S.gpg-agent.ssh"
+    [gpg-agent-browser.socket]="S.gpg-agent.browser"
+    [gpg-agent-extra.socket]="S.gpg-agent.extra"
+)
+for unit in "${!_SOCKET_MAP[@]}"; do
+    dropin_dir="$HOME/.config/systemd/user/${unit}.d"
+    mkdir -p "$dropin_dir"
+    cat > "$dropin_dir/socket-path.conf" << EOF
+[Socket]
+ListenStream=
+ListenStream=${SOCKETDIR}/${_SOCKET_MAP[$unit]}
+EOF
+done
+systemctl --user daemon-reload
+systemctl --user restart gpg-agent.service 2>/dev/null || true
+
 echo ""
 echo "完成。手动步骤："
 echo "  - mihomo：将代理配置放入 ~/.config/mihomo/config.yaml"
