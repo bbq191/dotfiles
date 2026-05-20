@@ -57,10 +57,30 @@ return {
     event = "VeryLazy",
     opts = {
       spec = {
-        { "<leader>f", group = "Find" },
-        { "<leader>h", group = "Git hunk" },
-        { "<leader>t", group = "Terminal" },
         { "<leader>b", group = "Buffer" },
+        { "<leader>c", group = "Code" },
+        { "<leader>d", group = "Diagnostic" },
+        { "<leader>f", group = "Find/Format" },
+        { "<leader>h", group = "Git hunk" },
+        { "<leader>m", group = "Markdown" },
+        { "<leader>t", group = "Terminal" },
+        { "<leader>y", group = "Yazi" },
+      },
+    },
+  },
+
+  -- Yazi 文件管理器集成
+  {
+    "mikavilpas/yazi.nvim",
+    event = "VeryLazy",
+    keys = {
+      { "<leader>yy", "<cmd>Yazi<CR>",     desc = "Open yazi (file)" },
+      { "<leader>yw", "<cmd>Yazi cwd<CR>", desc = "Open yazi (workspace)" },
+    },
+    opts = {
+      open_for_directories = false,
+      keymaps = {
+        show_help = "<F1>",
       },
     },
   },
