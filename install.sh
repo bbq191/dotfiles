@@ -105,6 +105,23 @@ systemctl --user enable --now dms.service 2>/dev/null || true
 mkdir -p "$HOME/.local/share/wine"
 mkdir -p "$HOME/.local/share/ollama/models"
 
+# VSCode Insiders：VSCODE_PORTABLE 路径下的 user-data 软链接
+# settings/keybindings 源文件由 stow 管理在 ~/.config/Code - Insiders/User/
+VSCODE_USER="$HOME/.local/share/vscode-insiders/user-data/User"
+mkdir -p "$VSCODE_USER"
+for f in settings.json keybindings.json; do
+    src="$HOME/.config/Code - Insiders/User/$f"
+    dst="$VSCODE_USER/$f"
+    if [[ -f "$src" && ! -L "$dst" ]]; then
+        [[ -e "$dst" ]] && mv "$dst" "${dst}.bak-$(date +%s)"
+        ln -sf "$src" "$dst"
+        echo "    VSCode: 链接 $f → VSCODE_PORTABLE/user-data/User/"
+    elif [[ ! -e "$dst" ]]; then
+        ln -sf "$src" "$dst"
+        echo "    VSCode: 链接 $f → VSCODE_PORTABLE/user-data/User/"
+    fi
+done
+
 # ── 8. GnuPG XDG 迁移 ────────────────────────────────────────────────────────
 echo "[+] 配置 GnuPG XDG 路径..."
 GNUPGHOME_NEW="$HOME/.local/share/gnupg"
