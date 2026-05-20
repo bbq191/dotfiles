@@ -99,6 +99,7 @@ sudo systemctl mask NetworkManager-wait-online.service
 echo "[+] 启用 systemd 服务..."
 sudo systemctl daemon-reload
 sudo systemctl enable --now ollama
+systemctl --user enable --now ssh-agent.socket
 systemctl --user enable --now dms.service 2>/dev/null || true
 
 # ── 7. 目录初始化 ─────────────────────────────────────────────────────────────
