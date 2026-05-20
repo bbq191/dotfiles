@@ -22,7 +22,7 @@ cd ~/Projects/dotfiles
 3. 配置 fnm + Node LTS，安装 gemini-cli
 4. 通过 stow 将 `home/` 下所有配置符号链接到 `$HOME`
 5. 将系统配置复制到 `/etc/`（需要 sudo）
-6. 启用 ollama、dms systemd 服务
+6. 启用 ollama、dms、ssh-agent.socket systemd 服务
 7. 迁移 GnuPG 到 XDG 路径（`~/.local/share/gnupg`），生成 gpg-agent socket 单元 drop-in
 
 ---
@@ -34,8 +34,8 @@ cd ~/Projects/dotfiles
 | 步骤 | 命令/操作 |
 |------|-----------|
 | 代理配置 | 将配置文件放入 `~/.config/mihomo/config.yaml` |
-| Bitwarden | `rbw register` |
-| SSH 密钥 | 将私钥放入 `~/.ssh/`，`chmod 600 ~/.ssh/id_*` |
+| Bitwarden | `rbw register`，然后 `rbw unlock` |
+| SSH 密钥 | 在 Bitwarden 中存入 SSH Key 类型条目；`rbw unlock` 后执行 `rbw-ssh-load` 加载到 ssh-agent。后续 `git push/pull/fetch/clone` 会按需自动解锁并加载，无需手动操作 |
 | 壁纸 | 将图片放入 `~/Pictures/`，在 DMS 设置中选择壁纸 |
 | 人脸识别 | 见下方"人脸识别（howdy）"章节 |
 
@@ -133,8 +133,8 @@ dotfiles/
 │       ├── fish/            # shell 配置
 │       ├── hypr/            # Hyprland + DMS + hyprpaper
 │       ├── kitty/           # 终端
-│       ├── nvim/            # Neovim（Lazy.nvim，含 DMS matugen 主题）
-│       ├── yazi/            # 文件管理器
+│       ├── nvim/            # Neovim（Lazy.nvim，LSP/which-key/yazi.nvim，含 DMS matugen 主题）
+│       ├── yazi/            # 文件管理器（e 键打开 nvim，C-g 打开 lazygit）
 │       ├── starship.toml    # prompt
 │       ├── lazygit/         # Git TUI
 │       ├── mpv/             # 视频播放器
