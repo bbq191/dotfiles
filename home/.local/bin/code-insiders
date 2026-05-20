@@ -1,0 +1,4 @@
+#!/bin/bash
+export VSCODE_PORTABLE="$HOME/.local/share/vscode-insiders"
+export VSCODE_CLI_DATA_DIR="$HOME/.local/share/vscode-insiders/cli"
+exec /usr/bin/code-insiders "$@"
