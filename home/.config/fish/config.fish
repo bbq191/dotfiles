@@ -20,7 +20,7 @@ set -gx GNUPGHOME        $XDG_DATA_HOME/gnupg
 set -gx EDITOR nvim
 set -gx VISUAL nvim
 set -gx OLLAMA_MODELS $HOME/.local/share/ollama/models
-# 对接 hyprland.conf exec-once 启动的 ssh-agent
+# systemd socket 激活的 ssh-agent（ssh-agent.socket）
 set -gx SSH_AUTH_SOCK $XDG_RUNTIME_DIR/ssh-agent.socket
 
 # ── 工具集成 ──────────────────────────────────────────────────────────────────
@@ -37,13 +37,10 @@ fzf --fish | source
 starship init fish | source
 
 # ── SSH 密钥（按需加载）──────────────────────────────────────────────────────
-# rbw 已解锁时静默加载密钥；未解锁不打扰——git push/pull/fetch 时 functions/git.fish 会提示
+# rbw 已解锁时静默加载所有 Bitwarden SSH Key 条目；未解锁不打扰
+# git push/pull/fetch 时 functions/git.fish 会交互提示解锁
 if status is-interactive
-    set -l _key_fp "SHA256:DdedK/2nU9yFpNCZOiM1De0J+Gdhr6TwS4bs1wxM2dA"
-    if not ssh-add -l 2>/dev/null | grep -qF $_key_fp
-        if rbw unlocked 2>/dev/null
-            rbw get "3f921d39-38e5-47cb-bba0-b3920045d37a" --field "private_key" 2>/dev/null \
-                | ssh-add - 2>/dev/null
-        end
+    if not ssh-add -l &>/dev/null
+        rbw unlocked &>/dev/null && rbw-ssh-load &>/dev/null
     end
 end

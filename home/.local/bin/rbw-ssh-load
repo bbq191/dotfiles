@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+# Load all SSH keys stored in Bitwarden (rbw) into ssh-agent
+set -euo pipefail
+
+if ! rbw unlocked &>/dev/null; then
+    rbw unlock
+fi
+
+loaded=0
+while IFS= read -r entry; do
+    raw=$(rbw get --raw "$entry" 2>/dev/null) || continue
+    privkey=$(python3 -c "
+import json, sys
+d = json.load(sys.stdin)
+pk = d.get('data', {}).get('private_key', '')
+if pk:
+    print(pk, end='')
+" <<< "$raw" 2>/dev/null) || continue
+    [[ -z "$privkey" ]] && continue
+    if printf '%s\n' "$privkey" | ssh-add - &>/dev/null; then
+        loaded=$(( loaded + 1 ))
+        echo "loaded: $entry"
+    fi
+done < <(rbw list 2>/dev/null)
+
+echo "$loaded key(s) added to ssh-agent"

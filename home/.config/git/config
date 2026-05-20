@@ -1,3 +1,5 @@
+[credential]
+	helper = rbw
 [http]
 	proxy = http://127.0.0.1:6153
 [https]
