@@ -1,0 +1,6 @@
+[Unit]
+Description=Apply user matugen templates when DMS theme changes
+
+[Service]
+Type=oneshot
+ExecStart=%h/.config/matugen/apply-user-templates.sh
