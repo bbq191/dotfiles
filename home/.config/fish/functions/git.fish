@@ -1,5 +1,5 @@
 function git
-    if contains -- push pull fetch $argv
+    if contains -- $argv[1] push pull fetch clone
         if not ssh-add -l &>/dev/null
             if not rbw unlocked &>/dev/null
                 echo "🔐 rbw vault 已锁定，请解锁以继续："
