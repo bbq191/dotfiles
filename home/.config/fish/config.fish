@@ -12,8 +12,6 @@ set -gx GEMINI_CLI_HOME  $XDG_CONFIG_HOME/gemini
 set -gx TEXMFHOME        $XDG_DATA_HOME/texmf
 set -gx TEXMFVAR         $XDG_CACHE_HOME/texlive/texmf-var
 set -gx TEXMFCONFIG      $XDG_CONFIG_HOME/texlive/texmf-config
-set -gx VSCODE_PORTABLE  $XDG_DATA_HOME/vscode-insiders
-set -gx VSCODE_CLI_DATA_DIR $XDG_DATA_HOME/vscode-insiders/cli
 set -gx GNUPGHOME        $XDG_DATA_HOME/gnupg
 
 # ── 环境变量 ──────────────────────────────────────────────────────────────────
