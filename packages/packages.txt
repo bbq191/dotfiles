@@ -209,7 +209,6 @@ vpl-gpu-rt
 vulkan-icd-loader
 vulkan-intel
 vulkan-tools
-waydroid
 wget
 which
 wine-gecko
