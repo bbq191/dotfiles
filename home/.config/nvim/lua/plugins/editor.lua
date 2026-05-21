@@ -18,13 +18,6 @@ return {
     opts = {},
   },
 
-  -- 注释 gcc / gc<motion>
-  {
-    "numToStr/Comment.nvim",
-    event = { "BufReadPost", "BufNewFile" },
-    opts = {},
-  },
-
   -- 文件树
   {
     "nvim-neo-tree/neo-tree.nvim",
@@ -133,7 +126,7 @@ return {
     opts = {},
     keys = {
       { "s",     function() require("flash").jump() end,       mode = { "n", "x", "o" }, desc = "Flash" },
-      { "S",     function() require("flash").treesitter() end, mode = { "n", "x", "o" }, desc = "Flash treesitter" },
+      { "S",     function() require("flash").treesitter() end, mode = { "n", "o" },       desc = "Flash treesitter" },
     },
   },
 }
