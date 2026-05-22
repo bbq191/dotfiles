@@ -8,18 +8,18 @@ return {
 				base01 = '#121318',
 				base02 = '#999ba5',
 				base03 = '#999ba5',
-				base04 = '#eff1ff',
+				base04 = '#eff2ff',
 				base05 = '#f8f9ff',
 				base06 = '#f8f9ff',
 				base07 = '#f8f9ff',
-				base08 = '#ff9fb7',
-				base09 = '#ff9fb7',
-				base0A = '#c3cbff',
+				base08 = '#ff9fb8',
+				base09 = '#ff9fb8',
+				base0A = '#c1ccff',
 				base0B = '#a5ffb4',
-				base0C = '#dfe3ff',
-				base0D = '#c3cbff',
-				base0E = '#ced4ff',
-				base0F = '#ced4ff',
+				base0C = '#dee4ff',
+				base0D = '#c1ccff',
+				base0E = '#ccd5ff',
+				base0F = '#ccd5ff',
 			})
 
 			vim.api.nvim_set_hl(0, 'Visual', {
@@ -28,14 +28,14 @@ return {
 				bold = true
 			})
 			vim.api.nvim_set_hl(0, 'Statusline', {
-				bg = '#c3cbff',
+				bg = '#c1ccff',
 				fg = '#121318',
 			})
 			vim.api.nvim_set_hl(0, 'LineNr', { fg = '#999ba5' })
-			vim.api.nvim_set_hl(0, 'CursorLineNr', { fg = '#dfe3ff', bold = true })
+			vim.api.nvim_set_hl(0, 'CursorLineNr', { fg = '#dee4ff', bold = true })
 
 			vim.api.nvim_set_hl(0, 'Statement', {
-				fg = '#ced4ff',
+				fg = '#ccd5ff',
 				bold = true
 			})
 			vim.api.nvim_set_hl(0, 'Keyword', { link = 'Statement' })
@@ -43,17 +43,17 @@ return {
 			vim.api.nvim_set_hl(0, 'Conditional', { link = 'Statement' })
 
 			vim.api.nvim_set_hl(0, 'Function', {
-				fg = '#c3cbff',
+				fg = '#c1ccff',
 				bold = true
 			})
 			vim.api.nvim_set_hl(0, 'Macro', {
-				fg = '#c3cbff',
+				fg = '#c1ccff',
 				italic = true
 			})
 			vim.api.nvim_set_hl(0, '@function.macro', { link = 'Macro' })
 
 			vim.api.nvim_set_hl(0, 'Type', {
-				fg = '#dfe3ff',
+				fg = '#dee4ff',
 				bold = true,
 				italic = true
 			})
@@ -64,8 +64,8 @@ return {
 				italic = true
 			})
 
-			vim.api.nvim_set_hl(0, 'Operator', { fg = '#eff1ff' })
-			vim.api.nvim_set_hl(0, 'Delimiter', { fg = '#eff1ff' })
+			vim.api.nvim_set_hl(0, 'Operator', { fg = '#eff2ff' })
+			vim.api.nvim_set_hl(0, 'Delimiter', { fg = '#eff2ff' })
 			vim.api.nvim_set_hl(0, '@punctuation.bracket', { link = 'Delimiter' })
 			vim.api.nvim_set_hl(0, '@punctuation.delimiter', { link = 'Delimiter' })
 

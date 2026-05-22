@@ -1,0 +1,16 @@
+[Desktop Entry]
+Version=1.0
+Encoding=UTF-8
+Type=Application
+Terminal=false
+GenericName=人保e办
+GenericName[zh_CN]=人保e办
+Comment=SafeWorkingPlatform
+Comment[zh_CN]=安全工作平台
+Name=人保e办
+Name[zh_CN]=人保e办
+Categories=Utility;GNOME;GTK;NetWork;
+StartupWMClass=com.picc.lanxin
+Icon=/opt/apps/com.picc.lanxin/files/icons/logo.png
+MimeType=x-scheme-handler/lanxinplus;x-scheme-handler/com.picc.lanxin
+Exec=env QT_IM_MODULE=fcitx GTK_IM_MODULE=xim WAYLAND_DISPLAY= XDG_SESSION_TYPE=x11 /opt/apps/com.picc.lanxin/files/bin/lanxin %u
