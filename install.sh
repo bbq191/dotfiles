@@ -155,9 +155,24 @@ done
 systemctl --user daemon-reload
 systemctl --user restart gpg-agent.service 2>/dev/null || true
 
+# ── 9. mihomo 配置 ───────────────────────────────────────────────────────────
+echo "[+] 生成 mihomo 配置..."
+mkdir -p "$HOME/.config/mihomo"
+if rbw get mihomo-proxy-token &>/dev/null && rbw get mihomo-secret &>/dev/null; then
+    MIHOMO_TOKEN=$(rbw get mihomo-proxy-token)
+    MIHOMO_SECRET=$(rbw get mihomo-secret)
+    sed -e "s/__MIHOMO_TOKEN__/${MIHOMO_TOKEN}/" \
+        -e "s/__MIHOMO_SECRET__/${MIHOMO_SECRET}/" \
+        "$DOTFILES/home/.config/mihomo/config.template.yaml" \
+        > "$HOME/.config/mihomo/config.yaml"
+    echo "    mihomo config.yaml 已生成"
+else
+    echo "    跳过：rbw 中未找到 mihomo-proxy-token 或 mihomo-secret，请手动添加后重新运行"
+fi
+
 echo ""
 echo "完成。手动步骤："
-echo "  - mihomo：将代理配置放入 ~/.config/mihomo/config.yaml"
+echo "  - mihomo：rbw add mihomo-proxy-token（订阅 token）和 rbw add mihomo-secret（面板密码）"
 echo "  - rbw：执行 'rbw register' 登录 Bitwarden"
 echo "  - SSH：将 SSH 私钥存入 Bitwarden（SSH Key 类型），rbw 解锁后执行 rbw-ssh-load 加载"
 echo "  - 壁纸：将图片放入 ~/Pictures/ 并更新 hyprpaper.conf 路径"
