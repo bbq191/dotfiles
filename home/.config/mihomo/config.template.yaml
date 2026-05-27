@@ -230,6 +230,7 @@ rules:
   - PROCESS-NAME,Echoes of Vision.exe,国内
   - DOMAIN-SUFFIX,astral-vector.com,国内
 
+  - DOMAIN-SUFFIX,local,DIRECT
   - RULE-SET,private_ip,DIRECT,no-resolve
   - RULE-SET,private_domain,DIRECT
   - RULE-SET,ai_domain,AI
@@ -239,7 +240,6 @@ rules:
   - RULE-SET,apple_domain,Apple
   - RULE-SET,microsoft_domain,Microsoft
   - RULE-SET,telegram_domain,Telegram
-  - RULE-SET,bilibili_domain,哔哩哔哩
   - RULE-SET,category-games_domain,Games
   - RULE-SET,category-game-platforms-download_domain,Games
   - RULE-SET,playstation_domain,Games
@@ -300,9 +300,6 @@ rule-providers:
   telegram_domain:
     <<: *domain
     url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/telegram.mrs"
-  bilibili_domain:
-    <<: *domain
-    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/bilibili.mrs"
   bahamut_domain:
     <<: *domain
     url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/bahamut.mrs"
