@@ -62,7 +62,9 @@ for item in \
     .config/DankMaterialShell \
     .config/matugen \
     ".config/Code - Insiders/User/settings.json" \
-    ".config/Code - Insiders/User/keybindings.json"
+    ".config/Code - Insiders/User/keybindings.json" \
+    ".config/gtk-3.0/settings.ini" \
+    ".config/gtk-4.0/settings.ini"
 do
     backup_if_exists "$item"
 done

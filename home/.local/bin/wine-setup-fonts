@@ -1,0 +1,66 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# 为 Wine prefix 配置系统字体路径和 CJK 字体替换
+# 用法: wine-setup-fonts [WINEPREFIX]
+#       WINE=/path/to/wine wine-setup-fonts ~/Games/GameName
+
+WINEPREFIX="${1:-$HOME/.wine}"
+export WINEPREFIX
+WINE="${WINE:-wine}"
+
+if ! command -v "$WINE" &>/dev/null; then
+    echo "错误：找不到 wine，请安装 wine 或通过 WINE=/path/to/wine 指定" >&2
+    exit 1
+fi
+
+if [[ ! -d "$WINEPREFIX" ]]; then
+    echo "错误：prefix 不存在：$WINEPREFIX" >&2
+    echo "提示：在 Lutris 中启动一次游戏后再运行此脚本" >&2
+    exit 1
+fi
+
+echo "[wine-setup-fonts] prefix: $WINEPREFIX"
+
+# 将系统字体目录编码为 REG_MULTI_SZ（UTF-16LE）
+FONT_HEX=$(python3 -c "
+paths = ['/usr/share/fonts', '/usr/local/share/fonts']
+encoded = b''.join(p.encode('utf-16-le') + b'\x00\x00' for p in paths) + b'\x00\x00'
+print(','.join(f'{b:02x}' for b in encoded))
+")
+
+REG_FILE=$(mktemp --suffix=.reg)
+trap 'rm -f "$REG_FILE"' EXIT
+
+{
+    printf 'Windows Registry Editor Version 5.00\n\n'
+
+    # 系统字体目录：Wine 启动时直接扫描这些路径，无需复制字体文件
+    printf '[HKEY_LOCAL_MACHINE\\Software\\Wine\\Fonts]\n'
+    printf '"Path"=hex(7):%s\n\n' "$FONT_HEX"
+
+    # 字体替换：将游戏硬编码的 Windows 字体名映射到系统实际存在的字体
+    printf '[HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows NT\\CurrentVersion\\FontSubstitutes]\n'
+
+    # 无衬线（黑体系）→ Noto Sans CJK SC
+    printf '"SimHei"="Noto Sans CJK SC"\n'
+    printf '"Microsoft YaHei"="Noto Sans CJK SC"\n'
+    printf '"Microsoft YaHei UI"="Noto Sans CJK SC"\n'
+    printf '"NSimSun"="Noto Sans CJK SC"\n'
+    printf '"\xe9\xbb\x91\xe4\xbd\x93"="Noto Sans CJK SC"\n'       # 黑体
+    printf '"\xe5\xae\x8b\xe4\xbd\x93"="Noto Sans CJK SC"\n'       # 宋体（无衬线回退）
+    printf '"\xe6\x96\xb0\xe5\xae\x8b\xe4\xbd\x93"="Noto Sans CJK SC"\n'  # 新宋体
+    printf '"\xe5\xbe\xae\xe8\xbd\xaf\xe9\x9b\x85\xe9\xbb\x91"="Noto Sans CJK SC"\n'  # 微软雅黑
+
+    # 衬线（宋体/仿宋/楷体系）→ Noto Serif CJK SC
+    printf '"SimSun"="Noto Serif CJK SC"\n'
+    printf '"SimSun-ExtB"="Noto Serif CJK SC"\n'
+    printf '"FangSong"="Noto Serif CJK SC"\n'
+    printf '"KaiTi"="Noto Serif CJK SC"\n'
+    printf '"\xe4\xbb\xbf\xe5\xae\x8b"="Noto Serif CJK SC"\n'      # 仿宋
+    printf '"\xe6\xa5\xb7\xe4\xbd\x93"="Noto Serif CJK SC"\n'      # 楷体
+} > "$REG_FILE"
+
+"$WINE" regedit "$REG_FILE" 2>/dev/null
+
+echo "[wine-setup-fonts] 完成，重启游戏后生效"
