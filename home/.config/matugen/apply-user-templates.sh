@@ -8,11 +8,11 @@ SHELL_DIR="/usr/share/quickshell/dms"
 CONFIG_DIR="$HOME/.config/DankMaterialShell"
 
 wallpaper=$(python3 -c "
-import json
-with open('$SESSION_FILE') as f:
+import json, sys
+with open(sys.argv[1]) as f:
     d = json.load(f)
 print(d.get('wallpaperPath', ''))
-" 2>/dev/null)
+" "$SESSION_FILE" 2>/dev/null)
 
 [[ -z "$wallpaper" || ! -f "$wallpaper" ]] && exit 1
 
@@ -29,11 +29,11 @@ dms matugen generate \
 
 # 读取提取出的 source_color 执行用户模板（papirus-folders 等）
 source_color=$(python3 -c "
-import json
-with open('$STATE_DIR/dms-colors.json') as f:
+import json, sys
+with open(sys.argv[1]) as f:
     d = json.load(f)
 print(d['colors']['dark']['source_color'])
-" 2>/dev/null)
+" "$STATE_DIR/dms-colors.json" 2>/dev/null)
 
 [[ -z "$source_color" ]] && exit 1
 

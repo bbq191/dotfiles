@@ -64,7 +64,9 @@ for item in \
     ".config/Code - Insiders/User/settings.json" \
     ".config/Code - Insiders/User/keybindings.json" \
     ".config/gtk-3.0/settings.ini" \
-    ".config/gtk-4.0/settings.ini"
+    ".config/gtk-4.0/settings.ini" \
+    .ssh/config \
+    .config/btop/btop.conf
 do
     backup_if_exists "$item"
 done
@@ -163,10 +165,13 @@ mkdir -p "$HOME/.config/mihomo"
 if rbw get mihomo-proxy-token &>/dev/null && rbw get mihomo-secret &>/dev/null; then
     MIHOMO_TOKEN=$(rbw get mihomo-proxy-token)
     MIHOMO_SECRET=$(rbw get mihomo-secret)
-    sed -e "s/__MIHOMO_TOKEN__/${MIHOMO_TOKEN}/" \
-        -e "s/__MIHOMO_SECRET__/${MIHOMO_SECRET}/" \
+    TOKEN_ESC=$(printf '%s\n' "$MIHOMO_TOKEN" | sed 's/[\/&]/\\&/g')
+    SECRET_ESC=$(printf '%s\n' "$MIHOMO_SECRET" | sed 's/[\/&]/\\&/g')
+    sed -e "s/__MIHOMO_TOKEN__/${TOKEN_ESC}/" \
+        -e "s/__MIHOMO_SECRET__/${SECRET_ESC}/" \
         "$DOTFILES/home/.config/mihomo/config.template.yaml" \
         > "$HOME/.config/mihomo/config.yaml"
+    chmod 600 "$HOME/.config/mihomo/config.yaml"
     echo "    mihomo config.yaml 已生成"
 else
     echo "    跳过：rbw 中未找到 mihomo-proxy-token 或 mihomo-secret，请手动添加后重新运行"
