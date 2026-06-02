@@ -66,7 +66,10 @@ for item in \
     ".config/gtk-3.0/settings.ini" \
     ".config/gtk-4.0/settings.ini" \
     .ssh/config \
-    .config/btop/btop.conf
+    .config/btop/btop.conf \
+    .config/fastfetch/config.jsonc \
+    .config/gemini/GEMINI.md \
+    .local/share/rustup/settings.toml
 do
     backup_if_exists "$item"
 done
