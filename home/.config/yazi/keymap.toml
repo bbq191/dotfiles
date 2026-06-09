@@ -10,36 +10,44 @@ prepend_keymap = [
   { on = ["<C-g>"], run = "shell 'lazygit' --block", desc = "LazyGit" },
 
   # ── 系统剪贴板（wl-clipboard）────────────────────────────────────────────
-  # Yazi 的 copy 命令在 Wayland 下会自动调用 wl-copy
-  { on = ["Y"],            run = "copy path",     desc = "Copy full path" },
-  { on = ["y", "n"],       run = "copy filename", desc = "Copy filename" },
-  { on = ["y", "d"],       run = "copy dirname",  desc = "Copy directory path" },
+  # y n / y d chord 绑定会让 y 进入等待模式，需显式绑定 y y 来触发 yank
+  # x（剪切）无 chord 冲突，仍由默认绑定处理
+  { on = ["Y"],      run = "copy path",     desc = "复制完整路径到剪贴板" },
+  { on = ["y", "y"], run = "yank",          desc = "Yank（复制到 yazi 剪贴板）" },
+  { on = ["y", "n"], run = "copy filename", desc = "复制文件名到剪贴板" },
+  { on = ["y", "d"], run = "copy dirname",  desc = "复制目录路径到剪贴板" },
 
   # ── 新 Kitty 窗口 ─────────────────────────────────────────────────────────
   # <C-t> — 在当前目录打开新 kitty 窗口（非阻塞，后台运行）
   { on = ["<C-t>"], run = "shell 'kitty --detach --directory \"$PWD\"' --orphan", desc = "Open new Kitty window here" },
 
-  # ── 快速跳转 ─────────────────────────────────────────────────────────────
-  # gz — 交互式 zoxide 跳转（Yazi 内置 z 为非交互跳转，Z 为交互）
-  # 默认 z/Z 已处理 zoxide，此处无需重复定义
+  # ── 快速跳转常用目录（g 前缀）────────────────────────────────────────────
+  { on = ["g", "h"], run = "cd ~",           desc = "跳转：~（Home）" },
+  { on = ["g", "/"], run = "cd /",           desc = "跳转：/（根目录）" },
+  { on = ["g", "c"], run = "cd ~/.config",   desc = "跳转：~/.config" },
+  { on = ["g", "d"], run = "cd ~/Downloads", desc = "跳转：~/Downloads" },
+  { on = ["g", "D"], run = "cd ~/Documents", desc = "跳转：~/Documents" },
+  { on = ["g", "p"], run = "cd ~/Projects",  desc = "跳转：~/Projects" },
 
   # ── SFTP VFS（内置）──────────────────────────────────────────────────────
   # g S — 弹出输入框，输入 sftp://<service-name>/ 跳转
-  # service-name 在 vfs.toml 中定义；确保 SSH agent 已加载密钥
   { on = ["g", "S"], run = "cd --interactive", desc = "跳转到 SFTP 服务（输入 sftp://...）" },
 
   # ── FTP / 其他远程挂载（gvfs.yazi）──────────────────────────────────────
   # g r — 选择已保存挂载并挂载，自动跳入（r = remote）
-  { on = ["g", "r"], run = "plugin gvfs -- select-then-mount --jump", desc = "挂载远程（FTP/SMB/…）并跳转" },
+  { on = ["g", "r"], run = "plugin gvfs -- select-then-mount --jump",  desc = "挂载远程（FTP/SMB/…）并跳转" },
   # g u — 选择已挂载设备并卸载（u = unmount）
   { on = ["g", "u"], run = "plugin gvfs -- select-then-unmount --eject", desc = "卸载远程设备" },
   # g n — 输入 URL 添加新挂载（n = new；格式 ftp://user@host）
-  { on = ["g", "n"], run = "plugin gvfs -- add-mount", desc = "添加新远程挂载（输入 URL）" },
+  { on = ["g", "n"], run = "plugin gvfs -- add-mount",                  desc = "添加新远程挂载（输入 URL）" },
   # g m — 快速跳转到已挂载的 gvfs 设备（m = mounted）
-  { on = ["g", "m"], run = "plugin gvfs -- jump-to-device", desc = "跳转到已挂载的远程设备" },
+  { on = ["g", "m"], run = "plugin gvfs -- jump-to-device",             desc = "跳转到已挂载的远程设备" },
+  # `` — 跳回挂载前所在目录（再次按 `` 可来回切换）
+  { on = ["`", "`"], run = "plugin gvfs -- jump-back-prev-cwd",         desc = "跳回挂载前目录" },
 ]
 
 [tasks]
 prepend_keymap = [
-  { on = ["<Esc>"], run = "close", desc = "Close task panel" },
+  { on = ["<Esc>"], run = "close",  desc = "关闭任务面板" },
+  { on = ["x"],     run = "cancel", desc = "取消任务" },
 ]
