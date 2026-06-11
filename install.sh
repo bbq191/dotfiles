@@ -69,7 +69,8 @@ for item in \
     .config/btop/btop.conf \
     .config/fastfetch/config.jsonc \
     .config/gemini/GEMINI.md \
-    .local/share/rustup/settings.toml
+    .local/share/rustup/settings.toml \
+    .config/maven/settings.xml
 do
     backup_if_exists "$item"
 done
@@ -162,7 +163,22 @@ done
 systemctl --user daemon-reload
 systemctl --user restart gpg-agent.service 2>/dev/null || true
 
-# ── 9. mihomo 配置 ───────────────────────────────────────────────────────────
+# ── 9. Maven XDG 迁移 ────────────────────────────────────────────────────────
+echo "[+] 配置 Maven XDG 路径..."
+MAVEN_CACHE="$HOME/.cache/maven"
+mkdir -p "$MAVEN_CACHE"
+
+if [[ -d "$HOME/.m2/repository" && ! -L "$HOME/.m2/repository" ]]; then
+    mv "$HOME/.m2/repository" "$MAVEN_CACHE/repository"
+    echo "    已迁移 ~/.m2/repository → $MAVEN_CACHE/repository"
+fi
+
+if [[ -d "$HOME/.m2" && ! -L "$HOME/.m2" ]]; then
+    rmdir "$HOME/.m2" 2>/dev/null \
+        || mv "$HOME/.m2" "$HOME/.m2.bak-$(date +%s)"
+fi
+
+# ── 10. mihomo 配置 ───────────────────────────────────────────────────────────
 echo "[+] 生成 mihomo 配置..."
 mkdir -p "$HOME/.config/mihomo"
 if rbw get mihomo-proxy-token &>/dev/null && rbw get mihomo-secret &>/dev/null; then
