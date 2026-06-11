@@ -3,7 +3,7 @@ proxy-providers:
     url: "https://yours?token2=__MIHOMO_TOKEN__&sip002=1"
     type: http
     interval: 0
-    icon: "https://raw.githubusercontent.com/bbq191/my-rules/main/icons/Policy-Provider/Flowercloud.png"
+    icon: "https://cdn.jsdelivr.net/gh/bbq191/my-rules/main/icons/Policy-Provider/Flowercloud.png"
     health-check:
       enable: true
       url: https://www.gstatic.com/generate_204
@@ -99,55 +99,55 @@ proxy-groups:
   - name: Telegram
     type: select
     proxies: [新加坡, 香港, 日本]
-    icon: "https://raw.githubusercontent.com/bbq191/my-rules/main/icons/Policy-Filter/Telegram.png"
+    icon: "https://cdn.jsdelivr.net/gh/bbq191/my-rules/main/icons/Policy-Filter/Telegram.png"
 
   - name: 巴哈姆特
     type: select
     proxies: [台湾, 香港]
-    icon: "https://raw.githubusercontent.com/bbq191/my-rules/main/icons/Policy-Filter/Bahamut.png"
+    icon: "https://cdn.jsdelivr.net/gh/bbq191/my-rules/main/icons/Policy-Filter/Bahamut.png"
 
   - name: Games
     type: select
     proxies: [香港, 日本, 新加坡]
-    icon: "https://raw.githubusercontent.com/bbq191/my-rules/main/icons/Policy-Filter/Games.png"
+    icon: "https://cdn.jsdelivr.net/gh/bbq191/my-rules/main/icons/Policy-Filter/Games.png"
 
   # 流媒体
   - name: YouTube
     type: select
     proxies: [美国, 香港, 日本, 新加坡]
-    icon: "https://raw.githubusercontent.com/bbq191/my-rules/main/icons/Policy-Filter/YouTube.png"
+    icon: "https://cdn.jsdelivr.net/gh/bbq191/my-rules/main/icons/Policy-Filter/YouTube.png"
 
   # 厂商
   - name: AI
     type: select
     proxies: [美国, 香港]
-    icon: "https://raw.githubusercontent.com/bbq191/my-rules/main/icons/Policy-Filter/AI.png"
+    icon: "https://cdn.jsdelivr.net/gh/bbq191/my-rules/main/icons/Policy-Filter/AI.png"
 
   - name: Github
     type: select
     proxies: [香港, 美国, DIRECT]
-    icon: "https://raw.githubusercontent.com/bbq191/my-rules/main/icons/Policy-Filter/Github.png"
+    icon: "https://cdn.jsdelivr.net/gh/bbq191/my-rules/main/icons/Policy-Filter/Github.png"
 
   - name: Apple
     type: select
     proxies: [美国, 香港, DIRECT]
-    icon: "https://raw.githubusercontent.com/bbq191/my-rules/main/icons/Policy-Filter/Apple.png"
+    icon: "https://cdn.jsdelivr.net/gh/bbq191/my-rules/main/icons/Policy-Filter/Apple.png"
 
   - name: Microsoft
     type: select
     proxies: [美国, 香港, DIRECT]
-    icon: "https://raw.githubusercontent.com/bbq191/my-rules/main/icons/Policy-Filter/Microsoft.png"
+    icon: "https://cdn.jsdelivr.net/gh/bbq191/my-rules/main/icons/Policy-Filter/Microsoft.png"
 
   - name: Google
     type: select
     proxies: [美国, 香港, 日本, 台湾]
-    icon: "https://raw.githubusercontent.com/bbq191/my-rules/main/icons/Policy-Filter/Google.png"
+    icon: "https://cdn.jsdelivr.net/gh/bbq191/my-rules/main/icons/Policy-Filter/Google.png"
 
   #------- 分隔,下面是地区分组（url-test 自动选最低延迟）
   - name: 国内
     type: select
     proxies: [DIRECT, 全部节点]
-    icon: "https://raw.githubusercontent.com/bbq191/my-rules/main/icons/Policy-Country/CN.png"
+    icon: "https://cdn.jsdelivr.net/gh/bbq191/my-rules/main/icons/Policy-Country/CN.png"
 
   - name: 香港
     type: url-test
@@ -157,7 +157,7 @@ proxy-groups:
     url: https://www.gstatic.com/generate_204
     interval: 180
     tolerance: 50
-    icon: "https://raw.githubusercontent.com/bbq191/my-rules/main/icons/Policy-Country/HK.png"
+    icon: "https://cdn.jsdelivr.net/gh/bbq191/my-rules/main/icons/Policy-Country/HK.png"
 
   - name: 台湾
     type: url-test
@@ -167,7 +167,7 @@ proxy-groups:
     url: https://www.gstatic.com/generate_204
     interval: 180
     tolerance: 50
-    icon: "https://raw.githubusercontent.com/bbq191/my-rules/main/icons/Policy-Country/TW.png"
+    icon: "https://cdn.jsdelivr.net/gh/bbq191/my-rules/main/icons/Policy-Country/TW.png"
 
   - name: 日本
     type: url-test
@@ -177,7 +177,7 @@ proxy-groups:
     url: https://www.gstatic.com/generate_204
     interval: 180
     tolerance: 50
-    icon: "https://raw.githubusercontent.com/bbq191/my-rules/main/icons/Policy-Country/JP.png"
+    icon: "https://cdn.jsdelivr.net/gh/bbq191/my-rules/main/icons/Policy-Country/JP.png"
 
   - name: 美国
     type: url-test
@@ -187,7 +187,7 @@ proxy-groups:
     url: https://www.gstatic.com/generate_204
     interval: 180
     tolerance: 50
-    icon: "https://raw.githubusercontent.com/bbq191/my-rules/main/icons/Policy-Country/US.png"
+    icon: "https://cdn.jsdelivr.net/gh/bbq191/my-rules/main/icons/Policy-Country/US.png"
 
   - name: 新加坡
     type: url-test
@@ -197,21 +197,21 @@ proxy-groups:
     url: https://www.gstatic.com/generate_204
     interval: 180
     tolerance: 50
-    icon: "https://raw.githubusercontent.com/bbq191/my-rules/main/icons/Policy-Country/SG.png"
+    icon: "https://cdn.jsdelivr.net/gh/bbq191/my-rules/main/icons/Policy-Country/SG.png"
 
   - name: 其它地区
     type: select
     include-all: true
     exclude-type: direct
     filter: "(?i)^(?!.*(?:Expire|Traffic|失联|自动|最优|网站|地址|剩余|过期|时间|有效|🇭🇰|🇯🇵|🇺🇸|🇸🇬|🇨🇳|香港|hk|hongkong|台湾|tw|taiwan|日本|jp|japan|新|sg|singapore|美|us|unitedstates)).*"
-    icon: "https://raw.githubusercontent.com/bbq191/my-rules/main/icons/Policy-Country/Other.png"
+    icon: "https://cdn.jsdelivr.net/gh/bbq191/my-rules/main/icons/Policy-Country/Other.png"
 
   - name: 全部节点
     type: select
     include-all: true
     exclude-type: direct
     filter: "(?i)^(?!.*(?:失联|自动|最优|网站|地址|剩余|过期|时间|有效)).*"
-    icon: "https://raw.githubusercontent.com/bbq191/my-rules/main/icons/Policy-Country/All.png"
+    icon: "https://cdn.jsdelivr.net/gh/bbq191/my-rules/main/icons/Policy-Country/All.png"
 
 rules:
   # 工作内网 IP
@@ -261,69 +261,69 @@ rule-anchor:
 rule-providers:
   fakeipfilter_domain:
     <<: *domain
-    url: "https://raw.githubusercontent.com/wwqgtxx/clash-rules/release/fakeip-filter.mrs"
+    url: "https://cdn.jsdelivr.net/gh/wwqgtxx/clash-rules/release/fakeip-filter.mrs"
   ads_domain:
     <<: *domain
-    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/category-ads.mrs"
+    url: "https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat/meta/geo/geosite/category-ads.mrs"
   ads@ads_domain:
     <<: *domain
-    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/category-ads@ads.mrs"
+    url: "https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat/meta/geo/geosite/category-ads@ads.mrs"
   private_domain:
     <<: *domain
-    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/private.mrs"
+    url: "https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat/meta/geo/geosite/private.mrs"
   category-games_domain:
     <<: *domain
-    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/category-games.mrs"
+    url: "https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat/meta/geo/geosite/category-games.mrs"
   category-game-platforms-download_domain:
     <<: *domain
-    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/category-game-platforms-download.mrs"
+    url: "https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat/meta/geo/geosite/category-game-platforms-download.mrs"
   playstation_domain:
     <<: *domain
-    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/playstation.mrs"
+    url: "https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat/meta/geo/geosite/playstation.mrs"
   ai_domain:
     <<: *domain
-    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/category-ai-!cn.mrs"
+    url: "https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat/meta/geo/geosite/category-ai-!cn.mrs"
   github_domain:
     <<: *domain
-    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/github.mrs"
+    url: "https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat/meta/geo/geosite/github.mrs"
   youtube_domain:
     <<: *domain
-    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/youtube.mrs"
+    url: "https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat/meta/geo/geosite/youtube.mrs"
   google_domain:
     <<: *domain
-    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/google.mrs"
+    url: "https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat/meta/geo/geosite/google.mrs"
   apple_domain:
     <<: *domain
-    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/apple.mrs"
+    url: "https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat/meta/geo/geosite/apple.mrs"
   microsoft_domain:
     <<: *domain
-    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/microsoft.mrs"
+    url: "https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat/meta/geo/geosite/microsoft.mrs"
   telegram_domain:
     <<: *domain
-    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/telegram.mrs"
+    url: "https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat/meta/geo/geosite/telegram.mrs"
   bahamut_domain:
     <<: *domain
-    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/bahamut.mrs"
+    url: "https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat/meta/geo/geosite/bahamut.mrs"
   geolocation-!cn:
     <<: *domain
-    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/geolocation-!cn.mrs"
+    url: "https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat/meta/geo/geosite/geolocation-!cn.mrs"
   cn_domain:
     <<: *domain
-    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/cn.mrs"
+    url: "https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat/meta/geo/geosite/cn.mrs"
 
   # IP 规则
   private_ip:
     <<: *ip
-    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/private.mrs"
+    url: "https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat/meta/geo/geoip/private.mrs"
   cn_ip:
     <<: *ip
-    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/cn.mrs"
+    url: "https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat/meta/geo/geoip/cn.mrs"
   google_ip:
     <<: *ip
-    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/google.mrs"
+    url: "https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat/meta/geo/geoip/google.mrs"
   telegram_ip:
     <<: *ip
-    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/telegram.mrs"
+    url: "https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat/meta/geo/geoip/telegram.mrs"
   apple_ip:
     <<: *ip
-    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo-lite/geoip/apple.mrs"
+    url: "https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat/meta/geo-lite/geoip/apple.mrs"
