@@ -5,6 +5,11 @@ text/x-shellscript=org.neovim.nvim.desktop
 text/x-python=org.neovim.nvim.desktop
 inode/directory=thunar.desktop
 application/x-gnome-saved-search=thunar.desktop
+text/html=microsoft-edge-canary.desktop
+x-scheme-handler/http=microsoft-edge-canary.desktop
+x-scheme-handler/https=microsoft-edge-canary.desktop
+x-scheme-handler/about=microsoft-edge-canary.desktop
+x-scheme-handler/unknown=microsoft-edge-canary.desktop
 
 [Added Associations]
 application/json=org.neovim.nvim.desktop;
