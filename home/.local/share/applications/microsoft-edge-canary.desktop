@@ -3,7 +3,7 @@ Version=1.0
 Name=Microsoft Edge (canary)
 GenericName=Web Browser
 Comment=Access the Internet
-Exec=/usr/bin/microsoft-edge-canary --ozone-platform=wayland %U
+Exec=/usr/bin/microsoft-edge-canary --ozone-platform=wayland --use-angle=vulkan %U
 StartupNotify=true
 Terminal=false
 Icon=microsoft-edge-canary
@@ -14,8 +14,8 @@ Actions=new-window;new-private-window;
 
 [Desktop Action new-window]
 Name=New Window
-Exec=/usr/bin/microsoft-edge-canary --ozone-platform=wayland
+Exec=/usr/bin/microsoft-edge-canary --ozone-platform=wayland --use-angle=vulkan
 
 [Desktop Action new-private-window]
 Name=New InPrivate Window
-Exec=/usr/bin/microsoft-edge-canary --ozone-platform=wayland --inprivate
+Exec=/usr/bin/microsoft-edge-canary --ozone-platform=wayland --use-angle=vulkan --inprivate
