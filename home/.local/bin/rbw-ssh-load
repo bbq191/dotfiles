@@ -17,7 +17,7 @@ if pk:
     print(pk, end='')
 " <<< "$raw" 2>/dev/null) || continue
     [[ -z "$privkey" ]] && continue
-    if printf '%s\n' "$privkey" | ssh-add - &>/dev/null; then
+    if printf '%s\n' "$privkey" | ssh-add -t 8h - &>/dev/null; then
         loaded=$(( loaded + 1 ))
         echo "loaded: $entry"
     fi
