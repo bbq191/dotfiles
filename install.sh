@@ -19,7 +19,7 @@ fi
 
 # ── 2. 安装软件包 ─────────────────────────────────────────────────────────────
 echo "[+] 安装软件包..."
-paru -S --needed - < "$DOTFILES/packages/packages.txt"
+grep -v '^\s*#' "$DOTFILES/packages/packages.txt" | grep -v '^\s*$' | paru -S --needed -
 
 # ── 3. 安装 Node（fnm）和全局 npm 包 ─────────────────────────────────────────
 echo "[+] 配置 fnm + Node..."
@@ -101,18 +101,36 @@ sudo mkdir -p /etc/sudoers.d
 sudo cp "$DOTFILES/system/etc/sudoers.d/papirus-folders" \
         /etc/sudoers.d/
 sudo chmod 0440 /etc/sudoers.d/papirus-folders
+sudo mkdir -p /etc/NetworkManager/conf.d
+sudo cp "$DOTFILES/system/etc/NetworkManager/conf.d/wifi-backend.conf" \
+        /etc/NetworkManager/conf.d/
+sudo mkdir -p /etc/sddm.conf.d
+sudo cp "$DOTFILES/system/etc/sddm.conf.d/autologin.conf" \
+        /etc/sddm.conf.d/
+sudo mkdir -p /etc/keyd
+sudo cp "$DOTFILES/system/etc/keyd/default.conf" \
+        /etc/keyd/
+sudo mkdir -p /etc/snapper/configs
+sudo cp "$DOTFILES/system/etc/snapper/configs/root" \
+        /etc/snapper/configs/
 sudo systemctl mask NetworkManager-wait-online.service
 
 # ── 6. systemd 服务 ───────────────────────────────────────────────────────────
 echo "[+] 启用 systemd 服务..."
 sudo systemctl daemon-reload
 sudo systemctl enable --now ollama
+sudo systemctl disable --now wpa_supplicant 2>/dev/null || true
+sudo systemctl enable --now iwd
+sudo systemctl enable --now keyd
+sudo systemctl restart NetworkManager
 systemctl --user enable --now ssh-agent.socket
 systemctl --user enable --now dms.service 2>/dev/null || true
 
 # ── 7. 目录初始化 ─────────────────────────────────────────────────────────────
 mkdir -p "$HOME/.local/share/wine"
 mkdir -p "$HOME/.local/share/ollama/models"
+mkdir -p "$HOME/.cache/ssh"
+chmod 700 "$HOME/.cache/ssh"
 
 # VSCode Insiders：VSCODE_PORTABLE 路径下的 user-data 软链接
 # settings/keybindings 源文件由 stow 管理在 ~/.config/Code - Insiders/User/

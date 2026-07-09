@@ -2,7 +2,7 @@ accountsservice
 alsa-firmware
 alsa-plugins
 alsa-utils
-auto-cpufreq
+# auto-cpufreq  # 与 power-profiles-daemon 冲突，二选一；当前使用 power-profiles-daemon
 base
 base-devel
 bash-completion
@@ -81,6 +81,7 @@ hdparm
 hwdetect
 hwinfo
 hyprland
+hypridle
 hyprlauncher
 hyprpaper
 hyprpolkitagent
@@ -217,7 +218,7 @@ wine-staging
 winetricks
 wireplumber
 wl-clipboard
-wpa_supplicant
+# wpa_supplicant  # 与 iwd 冲突，二选一；当前使用 iwd
 xdg-desktop-portal-hyprland
 xdg-user-dirs
 xfsprogs

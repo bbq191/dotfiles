@@ -1,1 +1,1 @@
-%wheel ALL=(ALL) SETENV: NOPASSWD: /usr/bin/papirus-folders
+%wheel ALL=(ALL) NOPASSWD: /usr/bin/papirus-folders
