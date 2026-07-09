@@ -5,8 +5,12 @@ $git_status\
 $python\
 $rust\
 $nodejs\
+$java\
+$cmd_duration\
 $line_break\
 $character"""
+
+right_format = "$time"
 
 [directory]
 style           = "bold #7aa2f7"
@@ -41,3 +45,19 @@ format = "[$symbol$version]($style) "
 symbol = " "
 style  = "#9ece6a"
 format = "[$symbol$version]($style) "
+
+[java]
+symbol = " "
+style  = "#f7768e"
+format = "[$symbol$version]($style) "
+
+[cmd_duration]
+min_time = 2000
+style    = "#e0af68"
+format   = "[󱦟 $duration]($style) "
+
+[time]
+disabled     = false
+style        = "#565f89"
+format       = "[$time]($style)"
+time_format  = "%H:%M"
