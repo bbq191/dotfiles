@@ -75,6 +75,15 @@ do
     backup_if_exists "$item"
 done
 
+# 清理指向仓库的旧绝对路径符号链接：stow 只认自己创建的相对链接，
+# 绝对链接会被判定为冲突导致中止（链接目标不变，stow 会原地重建为相对链接）
+while IFS= read -r -d '' src; do
+    tgt="$HOME/${src#"$DOTFILES/home/"}"
+    if [[ -L "$tgt" && "$(readlink "$tgt")" == "$src" ]]; then
+        rm "$tgt"
+    fi
+done < <(find "$DOTFILES/home" -mindepth 1 -print0)
+
 # --adopt 处理运行中进程（如 Hyprland）在 stow 执行期间重建的文件
 # git restore 将被 --adopt 吸入的系统文件还原为仓库版本
 stow --adopt --target="$HOME" home
@@ -97,6 +106,11 @@ sudo cp "$DOTFILES/system/etc/tmpfiles.d/thp.conf" \
 sudo cp "$DOTFILES/system/etc/tmpfiles.d/howdy-permissions.conf" \
         /etc/tmpfiles.d/
 sudo systemd-tmpfiles --create /etc/tmpfiles.d/howdy-permissions.conf
+# PAM：howdy 人脸识别接入 DMS 锁屏/sudo/sddm。
+# sudo 与 sddm 归 pambase/sddm 包管理，覆盖后上游更新会生成 .pacnew，需留意合并
+sudo cp "$DOTFILES/system/etc/pam.d/dankshell" /etc/pam.d/
+sudo cp "$DOTFILES/system/etc/pam.d/sudo" /etc/pam.d/
+sudo cp "$DOTFILES/system/etc/pam.d/sddm" /etc/pam.d/
 sudo mkdir -p /etc/sudoers.d
 sudo cp "$DOTFILES/system/etc/sudoers.d/papirus-folders" \
         /etc/sudoers.d/
@@ -122,6 +136,8 @@ sudo systemctl enable --now ollama
 sudo systemctl disable --now wpa_supplicant 2>/dev/null || true
 sudo systemctl enable --now iwd
 sudo systemctl enable --now keyd
+# IR 补光服务（howdy 人脸识别依赖）；新机器需先 sudo linux-enable-ir-emitter configure
+sudo systemctl enable linux-enable-ir-emitter.service
 sudo systemctl restart NetworkManager
 systemctl --user enable --now ssh-agent.socket
 systemctl --user enable --now dms.service 2>/dev/null || true

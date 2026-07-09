@@ -227,7 +227,9 @@ yazi
 yt-dlp
 zoxide
 fcitx5-theme-wechat
+howdy-next
 hyprswitch
+linux-enable-ir-emitter
 matugen-bin
 mihomo-bin
 proton-ge-custom-bin

@@ -58,7 +58,16 @@ cd ~/Projects/dotfiles
 
 `install.sh` 已自动完成：
 - 授予 `video` 组对 `/etc/howdy/` 的读权限（允许用户空间 PAM 调用）
-- 配置 PAM 服务 `/etc/pam.d/dankshell`（DMS 锁屏）
+- 部署 PAM 配置 `system/etc/pam.d/`：`dankshell`（DMS 锁屏）、`sudo`、`sddm`
+- 启用 `linux-enable-ir-emitter.service`（开机/唤醒时点亮 IR 补光）
+
+### 新机器：配置 IR 补光
+
+IR 摄像头的补光参数是机器专属的（存于 `/etc/linux-enable-ir-emitter/`，不在仓库中），新机器需先交互式生成一次，否则摄像头画面全黑：
+
+```bash
+sudo linux-enable-ir-emitter configure
+```
 
 ### 录入人脸
 
@@ -144,11 +153,16 @@ sudo systemctl restart linux-enable-ir-emitter.service
 | 文件 | 作用 |
 |------|------|
 | `etc/systemd/resolved.conf.d/no-mdns.conf` | 禁用 systemd-resolved 的 mDNS（避免与 avahi 冲突） |
-| `etc/systemd/system/ollama.service.d/override.conf` | ollama 以当前用户运行，模型存储在 `~/.local/share/ollama/models` |
+| `etc/systemd/system/ollama.service.d/override.conf` | ollama 以 afu 用户运行，模型存储在 `~/.local/share/ollama/models` |
 | `etc/modprobe.d/nvidia-local.conf` | NVIDIA 内核模块参数 |
 | `etc/tmpfiles.d/thp.conf` | 禁用 Transparent Huge Pages（降低延迟） |
 | `etc/tmpfiles.d/howdy-permissions.conf` | 授予 video 组读取 howdy 配置/模型的权限 |
 | `etc/sudoers.d/papirus-folders` | 允许 wheel 组免密码执行 papirus-folders（matugen 主题同步所需） |
+| `etc/pam.d/dankshell` `sudo` `sddm` | howdy 人脸识别接入 DMS 锁屏 / sudo / SDDM 登录 |
+| `etc/keyd/default.conf` | capslock ↔ ctrl 互换 |
+| `etc/sddm.conf.d/autologin.conf` | SDDM 默认会话为 hyprland（未配置 `User=`，不会真正自动登录） |
+| `etc/snapper/configs/root` | Btrfs 根分区快照策略 |
+| `etc/NetworkManager/conf.d/wifi-backend.conf` | Wi-Fi 后端切换为 iwd |
 
 ### NVIDIA
 
@@ -197,7 +211,12 @@ dotfiles/
 │       └── Code - Insiders/User/  # VSCode 设置和快捷键
 ├── system/                  # 需要 sudo 应用的系统配置
 │   └── etc/
+│       ├── keyd/default.conf
 │       ├── modprobe.d/nvidia-local.conf
+│       ├── NetworkManager/conf.d/wifi-backend.conf
+│       ├── pam.d/           # howdy 人脸识别 PAM（dankshell / sudo / sddm）
+│       ├── sddm.conf.d/autologin.conf
+│       ├── snapper/configs/root
 │       ├── sudoers.d/papirus-folders
 │       ├── systemd/resolved.conf.d/no-mdns.conf
 │       ├── systemd/system/ollama.service.d/override.conf
@@ -221,3 +240,4 @@ dotfiles/
 | `~/.gemini/` | Gemini CLI OAuth token，硬编码路径 |
 | `~/.ollama/` | Ollama 设备密钥，硬编码路径 |
 | `/etc/howdy/` | 人脸模型（`models/*.dat`）；新机器需重新 `sudo howdy add` 录入 |
+| `/etc/linux-enable-ir-emitter/` | IR 摄像头补光参数（机器专属）；新机器需 `sudo linux-enable-ir-emitter configure` 生成 |
