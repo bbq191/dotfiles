@@ -71,7 +71,7 @@ tun:
 dns:
   enable: true
   cache-algorithm: arc
-  listen: 0.0.0.0:1053
+  listen: 127.0.0.1:1053
   ipv6: false
   enhanced-mode: fake-ip
   respect-rules: true
