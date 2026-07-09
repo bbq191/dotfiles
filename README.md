@@ -64,9 +64,12 @@ cd ~/Projects/dotfiles
 
 ```bash
 sudo howdy add
+sudo systemd-tmpfiles --create /etc/tmpfiles.d/howdy-permissions.conf
 ```
 
 建议录入 2–3 个模型，分别覆盖不同角度（正脸、略低头看屏幕的姿势）。
+
+`howdy add`/`howdy clear` 每次都会把模型文件重建为 `600 root:root`，DMS 锁屏（`dankshell` PAM 服务）是以普通用户身份读取该文件的，权限不对会导致锁屏识别失效（但 `sudo`/`sddm` 不受影响，因为它们在 PAM 认证阶段已经是 root）。**每次重新录入后都必须重新执行上面的 `systemd-tmpfiles --create`**，让 `howdy-permissions.conf` 里的规则把权限改回 `640 root:video`。
 
 ### 关键配置项
 
@@ -80,6 +83,48 @@ device_path = /dev/video2    # IR 摄像头设备路径，按实际修改
 yunet_score_threshold = 0.75  # 人脸检测置信度（降低可提升角度容忍性）
 sface_threshold = 0.6942      # 人脸识别相似度阈值（cosine）
 ```
+
+### 故障排查：升级后识别失效（`Failure, general abort`）
+
+`howdy-next` 若跨 OpenCV 大版本升级（如 4.x → 5.x），内置的 ONNX 检测/识别模型与已录入的人脸数据会失效，`journalctl` 中表现为持续的 `Failure, general abort`。升级后按包自带的 `post_upgrade` 提示手动执行：
+
+```bash
+sudo -i   # 认证若彻底失效，保留一个 root shell 防止锁死自己
+
+# 删除过期内置模型，下载与新版 OpenCV 兼容的模型
+rm -f /usr/share/howdy/face_detection_yunet_2023mar_int8bq.onnx
+rm -f /usr/share/howdy/face_recognition_sface_2021dec_int8bq.onnx
+howdy download-models
+
+# 旧人脸数据是用旧模型算的 embedding，必须重新录入
+howdy clear
+howdy add
+
+# 重新录入后模型文件权限会变成 600 root:root，DMS 锁屏读不到，必须修回去
+systemd-tmpfiles --create /etc/tmpfiles.d/howdy-permissions.conf
+
+howdy test
+exit
+```
+
+若 `pacman`/`paru` 生成了 `/etc/howdy/config.ini.pacnew`，先 `diff` 确认没有丢失自定义项（摄像头路径、阈值等）再删除。
+
+`opencv` 是系统级依赖，大版本升级（如 4.x → 5.x）不止影响 `howdy-next`，还会连带砸掉其他链接 OpenCV 的 AUR 包——本机遇到过 `linux-enable-ir-emitter`（负责开机/唤醒时点亮 IR 补光）随 opencv 一起崩掉：
+
+```bash
+systemctl status linux-enable-ir-emitter.service   # Active: failed 且报 error while loading shared libraries: libopencv_*.so.4xx
+```
+
+IR 补光服务挂掉的表现是 `howdy add` 一直报 `All frames were too dark`（摄像头拍到的画面全黑，因为红外灯没点亮），容易被误判为 howdy 本身的问题。若该包的上游还没适配新版 OpenCV 的 pkg-config 包名（如 `opencv5` 而非 `opencv4`），重建会在 meson 阶段报 `Dependency "opencv4" not found`，可临时建一个别名骗过依赖检测（上游适配后记得删掉）：
+
+```bash
+sudo ln -sf /usr/lib/pkgconfig/opencv5.pc /usr/lib/pkgconfig/opencv4.pc
+paru -S linux-enable-ir-emitter --rebuild
+sudo systemctl daemon-reload
+sudo systemctl restart linux-enable-ir-emitter.service
+```
+
+排查思路：`opencv` 升级后但凡人脸识别异常，先用 `ldd $(which howdy) $(which linux-enable-ir-emitter) | grep opencv` 逐个检查依赖 OpenCV 的二进制是否还挂着旧版本的 `.so`，凡是显示 `not found` 的都需要 `paru -S <pkg> --rebuild`。
 
 ---
 
