@@ -77,14 +77,22 @@ return {
 			local current_file_path = vim.fn.stdpath("config") .. "/lua/plugins/dankcolors.lua"
 			if not _G._matugen_theme_watcher then
 				local uv = vim.uv or vim.loop
-				_G._matugen_theme_watcher = uv.new_fs_event()
-				_G._matugen_theme_watcher:start(current_file_path, {}, vim.schedule_wrap(function()
-					local new_spec = dofile(current_file_path)
-					if new_spec and new_spec[1] and new_spec[1].config then
-						new_spec[1].config()
-						print("Theme reload")
-					end
-				end))
+				local function arm()
+					local watcher = uv.new_fs_event()
+					_G._matugen_theme_watcher = watcher
+					watcher:start(current_file_path, {}, vim.schedule_wrap(function()
+						-- matugen 原子写入（rename）会让旧 watcher 失效，每次触发后重新挂载
+						watcher:stop()
+						arm()
+						-- pcall 兜底：文件写到一半触发时 dofile 会语法报错，跳过等下一次事件
+						local ok, new_spec = pcall(dofile, current_file_path)
+						if ok and new_spec and new_spec[1] and new_spec[1].config then
+							new_spec[1].config()
+							print("Theme reload")
+						end
+					end))
+				end
+				arm()
 			end
 		end
 	}

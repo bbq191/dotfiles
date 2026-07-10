@@ -9,7 +9,7 @@ return {
     dependencies = { "nvim-tree/nvim-web-devicons" },
     opts = {
       options = {
-        theme             = "tokyonight",
+        theme             = "auto",   -- 自动跟随当前配色（dankcolors base16）
         globalstatus      = true,
         component_separators = "|",
         section_separators  = { left = "", right = "" },
@@ -59,7 +59,11 @@ return {
       timeout  = 2500,
       max_width = 50,
       render   = "compact",
-      background_colour = "#1a1b26",   -- 与 Tokyo Night 背景一致
+      -- Normal 背景透明时 notify 需要实色兜底；动态取当前 base16 的 base00，matugen 换主题后自动跟随
+      background_colour = function()
+        local ok, base16 = pcall(require, "base16-colorscheme")
+        return ok and base16.colors and base16.colors.base00 or "#15130f"
+      end,
     },
     config = function(_, opts)
       require("notify").setup(opts)
