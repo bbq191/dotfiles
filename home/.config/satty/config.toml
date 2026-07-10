@@ -1,4 +1,6 @@
 [general]
 copy-command = "wl-copy"
+# Alt+方向键平移的单次步长（px），看长图时默认 50 太慢
+pan-step-size = 200.0
 focus-toggles-toolbars= true
 actions-on-right-click = ["save-to-clipboard"]
