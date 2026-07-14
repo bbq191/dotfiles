@@ -3,3 +3,5 @@ auth            sufficient      pam_howdy.so
 auth		include		system-auth
 account		include		system-auth
 session		include		system-auth
+# pambase 261 起新增（见 sudo.pacnew）：sudo 会话不注册 systemd 登录类
+session		optional	pam_systemd.so class=none

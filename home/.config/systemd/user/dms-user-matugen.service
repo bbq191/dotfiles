@@ -1,5 +1,7 @@
 [Unit]
 Description=Apply user matugen templates when DMS theme changes
+# 换主题时 session.json 会连写多次，path 单元密集触发；关闭启动频率限制防 start-limit-hit
+StartLimitIntervalSec=0
 
 [Service]
 Type=oneshot
