@@ -1,6 +1,6 @@
 # dotfiles
 
-CachyOS · Hyprland · DankMaterialShell · Wayland 个人配置。
+CachyOS · niri · DankMaterialShell · Wayland 个人配置。
 
 ## 新机器部署
 
@@ -158,15 +158,15 @@ sudo systemctl restart linux-enable-ir-emitter.service
 | `etc/tmpfiles.d/thp.conf` | 禁用 Transparent Huge Pages（降低延迟） |
 | `etc/tmpfiles.d/howdy-permissions.conf` | 授予 video 组读取 howdy 配置/模型的权限 |
 | `etc/sudoers.d/papirus-folders` | 允许 wheel 组免密码执行 papirus-folders（matugen 主题同步所需） |
-| `etc/pam.d/dankshell` `sudo` `sddm` | howdy 人脸识别接入 DMS 锁屏 / sudo / SDDM 登录 |
+| `etc/pam.d/dankshell` `sudo` `sddm` `greetd` | howdy 人脸识别接入 DMS 锁屏 / sudo / 登录界面（greetd 为主，sddm 回退） |
 | `etc/keyd/default.conf` | capslock ↔ ctrl 互换 |
-| `etc/sddm.conf.d/autologin.conf` | SDDM 默认会话为 hyprland（未配置 `User=`，不会真正自动登录） |
+| `etc/sddm.conf.d/autologin.conf` | SDDM 默认会话为 niri（未配置 `User=`，不会真正自动登录） |
 | `etc/snapper/configs/root` | Btrfs 根分区快照策略 |
 | `etc/NetworkManager/conf.d/wifi-backend.conf` | Wi-Fi 后端切换为 iwd |
 
 ### NVIDIA
 
-`~/.config/environment.d/` 中包含必要的环境变量：
+必要的环境变量在 `niri/config.kdl` 的 `environment {}` 中设置：
 
 ```
 LIBVA_DRIVER_NAME=nvidia
@@ -190,7 +190,7 @@ dotfiles/
 ├── home/                    # stow --target=$HOME home
 │   └── .config/
 │       ├── fish/            # shell 配置
-│       ├── hypr/            # Hyprland + DMS + hyprpaper
+│       ├── niri/            # niri 合成器 + DMS 托管配置（dms/*.kdl）
 │       ├── kitty/           # 终端
 │       ├── nvim/            # Neovim（Lazy.nvim，LSP/which-key/yazi.nvim，含 DMS matugen 主题）
 │       ├── yazi/            # 文件管理器（e 键打开 nvim，C-g 打开 lazygit）

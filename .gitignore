@@ -2,7 +2,8 @@
 1.png
 
 # 运行时状态
-home/.config/hypr/float_geometry.json
+# DMS 修改 niri 托管配置前自动创建的备份
+home/.config/niri/config.kdl.backup*
 home/.config/DankMaterialShell/.firstlaunch
 home/.config/DankMaterialShell/.changelog-*
 home/.config/DankMaterialShell/settings.json

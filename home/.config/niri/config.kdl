@@ -1,0 +1,272 @@
+// niri 主配置 — DMS 全面接管桌面组件：
+// 壁纸 / 锁屏 / 空闲管理 / polkit / Alt+Tab 均由 DMS 提供（dms.service 随会话自启），
+// 托管配置在文件末尾 include 的 dms/*.kdl 中
+
+///////////////
+//  输出显示  //
+///////////////
+
+output "eDP-1" {
+    mode "2560x1600@300.000"
+    scale 1.0
+    // 按需 VRR：仅当匹配 variable-refresh-rate 窗口规则的窗口（mpv、Steam 游戏）
+    // 显示时启用，避免桌面场景 VRR 降刷新率导致光标卡顿（NVIDIA 已知问题）
+    variable-refresh-rate on-demand=true
+}
+
+///////////////
+//  环境变量  //
+///////////////
+// fcitx5 的 XMODIFIERS/QT_IM_MODULE/SDL_IM_MODULE 已在 environment.d，无需重复
+
+environment {
+    // ── NVIDIA ──
+    LIBVA_DRIVER_NAME "nvidia"
+    GBM_BACKEND "nvidia-drm"
+    __GLX_VENDOR_LIBRARY_NAME "nvidia"
+    // ── Electron（VS Code 等）──
+    ELECTRON_OZONE_PLATFORM_HINT "auto"
+}
+
+///////////
+//  输入  //
+///////////
+
+input {
+    keyboard {
+        xkb {
+            layout "us"
+        }
+    }
+
+    touchpad {
+        tap
+        natural-scroll
+        accel-profile "flat"
+        // 外接鼠标插入时自动禁用触摸板（替代 touchpad-auto.sh + udev 监听）
+        disabled-on-external-mouse
+    }
+
+    mouse {
+        natural-scroll
+        accel-profile "flat"
+    }
+
+    // 点击才聚焦（niri 默认不启用 focus-follows-mouse）
+
+    // Mod+S 再按一次返回上个工作区（模拟 special workspace 切换手感）
+    workspace-auto-back-and-forth
+}
+
+///////////
+//  布局  //
+///////////
+
+layout {
+    // 窗口间距/边框/焦点环/圆角由 DMS 托管（dms/layout.kdl，
+    // 在 DMS Settings → Compositor & Layout 中调整），此处只保留 DMS 不管理的项
+
+    // 屏幕边缘留白
+    struts {
+        left 10
+        right 10
+        top 10
+        bottom 10
+    }
+
+    // DMS 壁纸绘制在 backdrop 层，桌面背景需透明
+    background-color "transparent"
+
+    preset-column-widths {
+        proportion 0.33333
+        proportion 0.5
+        proportion 0.66667
+    }
+    default-column-width { proportion 0.5; }
+}
+
+// 便签工作区（scratchpad）
+workspace "scratch"
+
+///////////////
+//  启动项    //
+///////////////
+// DMS 由 systemd 用户服务 dms.service（WantedBy=graphical-session.target）自动拉起
+
+spawn-at-startup "fcitx5" "-d" "--replace"
+// DMS 剪贴板历史后端
+spawn-at-startup "sh" "-c" "wl-paste --watch cliphist store"
+
+///////////
+//  杂项  //
+///////////
+
+// 客户端不画标题栏/阴影（等效 suppress maximize 的观感诉求：状态由合成器管理）
+prefer-no-csd
+
+// niri 内置截图动作（screenshot-window / screenshot-screen）的保存位置
+screenshot-path "~/Pictures/Screenshots/screenshot-%Y%m%d-%H%M%S.png"
+
+hotkey-overlay {
+    skip-at-startup
+}
+
+///////////
+//  键位  //
+///////////
+
+binds {
+    Mod+Shift+Slash { show-hotkey-overlay; }
+
+    // ── 应用启动 ──
+    Mod+Q { spawn "kitty"; }
+    Mod+E { spawn "thunar"; }
+    Mod+R { spawn "dms" "ipc" "call" "launcher" "toggle"; }
+
+    // ── 窗口管理 ──
+    Mod+C { close-window; }
+    Mod+V { toggle-window-floating; }
+    Mod+Shift+V { switch-focus-between-floating-and-tiling; }
+    Mod+P { switch-preset-column-width; }   // 循环列宽（1/3、1/2、2/3），近似 pseudo
+    // 窗口大小微调（也可 Mod+右键拖动任意调整）
+    Mod+Minus       { set-column-width "-10%"; }
+    Mod+Equal       { set-column-width "+10%"; }
+    Mod+Shift+Minus { set-window-height "-10%"; }
+    Mod+Shift+Equal { set-window-height "+10%"; }
+    Mod+F { maximize-column; }
+    Mod+Shift+F { fullscreen-window; }
+    // 滚动平铺特有：把窗口并入/移出当前列（替代 dwindle togglesplit）
+    Mod+Comma { consume-window-into-column; }
+    Mod+Period { expel-window-from-column; }
+
+    // ── 焦点移动（hjkl）──
+    Mod+H { focus-column-left; }
+    Mod+L { focus-column-right; }
+    Mod+K { focus-window-or-workspace-up; }
+    Mod+J { focus-window-or-workspace-down; }
+
+    // ── 移动窗口/列（niri 默认习惯 Mod+Ctrl，避开 Mod+Shift+L 锁屏）──
+    Mod+Ctrl+H { move-column-left; }
+    Mod+Ctrl+L { move-column-right; }
+    Mod+Ctrl+K { move-window-up-or-to-workspace-up; }
+    Mod+Ctrl+J { move-window-down-or-to-workspace-down; }
+
+    // ── 总览（DMS 深度集成 niri overview）──
+    Mod+O { toggle-overview; }
+
+    // ── Alt+Tab 在最近两个窗口间切换（跨工作区，样式由 dms/alttab.kdl 托管）──
+    Alt+Tab { focus-window-previous; }
+
+    // ── 工作区切换 ──
+    Mod+1 { focus-workspace 1; }
+    Mod+2 { focus-workspace 2; }
+    Mod+3 { focus-workspace 3; }
+    Mod+4 { focus-workspace 4; }
+    Mod+5 { focus-workspace 5; }
+    Mod+6 { focus-workspace 6; }
+    Mod+7 { focus-workspace 7; }
+    Mod+8 { focus-workspace 8; }
+    Mod+9 { focus-workspace 9; }
+    Mod+0 { focus-workspace 10; }
+
+    // ── 移动窗口到工作区 ──
+    Mod+Shift+1 { move-column-to-workspace 1; }
+    Mod+Shift+2 { move-column-to-workspace 2; }
+    Mod+Shift+3 { move-column-to-workspace 3; }
+    Mod+Shift+4 { move-column-to-workspace 4; }
+    Mod+Shift+5 { move-column-to-workspace 5; }
+    Mod+Shift+6 { move-column-to-workspace 6; }
+    Mod+Shift+7 { move-column-to-workspace 7; }
+    Mod+Shift+8 { move-column-to-workspace 8; }
+    Mod+Shift+9 { move-column-to-workspace 9; }
+    Mod+Shift+0 { move-column-to-workspace 10; }
+
+    // ── 便签工作区（配合 workspace-auto-back-and-forth 再按返回）──
+    Mod+S { focus-workspace "scratch"; }
+    Mod+Shift+S { move-column-to-workspace "scratch"; }
+
+    // ── 鼠标滚轮切换工作区 ──
+    Mod+WheelScrollDown cooldown-ms=150 { focus-workspace-down; }
+    Mod+WheelScrollUp   cooldown-ms=150 { focus-workspace-up; }
+    // 鼠标拖拽移动/缩放窗口为 niri 内置：Mod+左键拖动、Mod+右键拖动缩放
+
+    // ── 截图 / 录屏 ──
+    // Super+A 自由区域截图（框选 → 剪贴板 + satty 标注）
+    Mod+A { spawn "sh" "-c" "f=$(mktemp \"$XDG_RUNTIME_DIR/niri-ss-XXXXXX.png\") && grim -g \"$(slurp)\" \"$f\" && wl-copy < \"$f\" && satty --fullscreen -f \"$f\""; }
+    // Super+Shift+A 当前窗口截图（niri 内置：保存到 screenshot-path 并复制剪贴板）
+    Mod+Shift+A { screenshot-window; }
+    // Super+Ctrl+A 全屏截图
+    Mod+Ctrl+A { spawn "sh" "-c" "f=$(mktemp \"$XDG_RUNTIME_DIR/niri-ss-XXXXXX.png\") && grim \"$f\" && wl-copy < \"$f\" && satty --fullscreen -f \"$f\""; }
+    // Super+Alt+A 区域录屏（再按停止，保存到 ~/Downloads）
+    Mod+Alt+A { spawn "sh" "-c" "pgrep -x wf-recorder && pkill -INT wf-recorder || wf-recorder -g \"$(slurp)\" -f \"$HOME/Downloads/recording-$(date +%Y%m%d-%H%M%S).mp4\""; }
+    // Print 键：niri 内置交互式截图 UI
+    Print { screenshot; }
+
+    // ── 锁屏（DMS）──
+    Mod+Shift+L { spawn "dms" "ipc" "call" "lock" "lock"; }
+
+    // ── 多媒体键 ──
+    XF86AudioRaiseVolume allow-when-locked=true { spawn "wpctl" "set-volume" "-l" "1" "@DEFAULT_AUDIO_SINK@" "5%+"; }
+    XF86AudioLowerVolume allow-when-locked=true { spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "5%-"; }
+    XF86AudioMute        allow-when-locked=true { spawn "wpctl" "set-mute" "@DEFAULT_AUDIO_SINK@" "toggle"; }
+    XF86AudioMicMute     allow-when-locked=true { spawn "wpctl" "set-mute" "@DEFAULT_AUDIO_SOURCE@" "toggle"; }
+    XF86MonBrightnessUp   allow-when-locked=true { spawn "brightnessctl" "-e4" "-n2" "set" "5%+"; }
+    XF86MonBrightnessDown allow-when-locked=true { spawn "brightnessctl" "-e4" "-n2" "set" "5%-"; }
+    XF86AudioNext  allow-when-locked=true { spawn "playerctl" "next"; }
+    XF86AudioPause allow-when-locked=true { spawn "playerctl" "play-pause"; }
+    XF86AudioPlay  allow-when-locked=true { spawn "playerctl" "play-pause"; }
+    XF86AudioPrev  allow-when-locked=true { spawn "playerctl" "previous"; }
+
+    // ── 会话 ──
+    Mod+Shift+E { quit; }
+}
+
+///////////////
+//  窗口规则  //
+///////////////
+// 文件对话框居中：niri 浮窗默认居中打开，无需单独规则
+
+window-rule {
+    match app-id="^(thunar|blueman-manager|blueberry|nm-connection-editor|wechat|com\\.picc\\.lanxin|org\\.telegram\\.desktop|com\\.gabm\\.satty|org\\.quickshell|steam_app_default)$"
+    open-floating true
+}
+
+window-rule {
+    match app-id="^mpv$"
+    open-floating true
+    default-column-width { fixed 800; }
+    default-window-height { fixed 450; }
+}
+
+window-rule {
+    // VS Code Insiders — 与 kitty background_opacity 0.85 保持一致
+    match app-id="^code-insiders$"
+    opacity 0.85
+}
+
+window-rule {
+    // VRR 按需触发窗口（配合输出 variable-refresh-rate on-demand）
+    match app-id="^mpv$"
+    match app-id="^steam_app_.*$"
+    variable-refresh-rate true
+}
+
+/////////////////
+//  层规则/DMS  //
+/////////////////
+
+// DMS 壁纸置于 backdrop 层（overview 缩放时壁纸留在底层）
+layer-rule {
+    match namespace="^quickshell$"
+    place-within-backdrop true
+}
+
+// DMS 托管配置（由 DMS Settings 自动写入，勿手动编辑）
+include "dms/colors.kdl"
+include "dms/layout.kdl"
+include "dms/alttab.kdl"
+include "dms/binds.kdl"
+include "dms/windowrules.kdl"
+include "dms/cursor.kdl"
+include "dms/outputs.kdl"
+include "dms/wpblur.kdl"

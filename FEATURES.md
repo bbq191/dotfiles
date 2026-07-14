@@ -1,13 +1,13 @@
 # 系统功能说明
 
-> CachyOS · linux-cachyos · Hyprland · DankMaterialShell · Wayland · NVIDIA
+> CachyOS · linux-cachyos · niri · DankMaterialShell · Wayland · NVIDIA
 
 ---
 
 ## 目录
 
 - [系统基础](#系统基础)
-- [桌面环境（Hyprland）](#桌面环境hyprland)
+- [桌面环境（niri）](#桌面环境niri)
 - [状态栏与 Shell（DankMaterialShell）](#状态栏与-shelldankmaterialshell)
 - [动态主题系统（Matugen）](#动态主题系统matugen)
 - [终端（Kitty）](#终端kitty)
@@ -43,58 +43,55 @@
 
 ---
 
-## 桌面环境（Hyprland）
+## 桌面环境（niri）
 
 ### 窗口管理
 
-- 布局：**Dwindle**（螺旋式自动分割，`preserve_split = true` 保持分割方向）
-- 圆角 10px，边框 2px，窗口间距 `gaps_in=5` / `gaps_out=20`
-- 背景模糊（blur size=3，vibrancy=0.1696）+ 阴影
-- 流畅动画：多套贝塞尔曲线，窗口/工作区/图层/淡入淡出分别调优
+- 布局：**滚动平铺**（列式无限横向画布），边框 2px，窗口间距 `gaps 10` + 屏幕边缘 `struts 10`
+- 壁纸 / 锁屏 / 空闲管理 / polkit / Alt+Tab 全部由 DMS 接管（壁纸绘制在 backdrop 层，overview 联动）
+- 外接鼠标插入自动禁用触摸板（niri 内置 `disabled-on-external-mouse`，替代原 udev 脚本）
+- VRR 按需启用（仅 mpv / Steam 游戏窗口触发，防桌面光标卡顿）
+- XWayland 应用由 xwayland-satellite 透明支持（niri 自动拉起）
 
-### 浮动窗口位置记忆
-
-`float-persist.py` 常驻后台，监听 Hyprland socket2 事件：
-
-- **自动恢复**：浮动窗口打开时，无动画地还原上次的位置和大小（最多等待 360ms 等 windowrule 生效）
-- **自动保存**：窗口关闭时快照当前位置；另有每秒一次的定期快照保底
-- **防越界**：坐标恢复前自动 clamp 到显示器可见范围，分辨率变化不会导致窗口跑出屏幕
-- **XWayland 偏移校正**：回读实际坐标并写回，消除 XWayland 坐标系的逐次漂移
-- **智能过滤**：跳过弹窗（< 300×200）、无效 class、离屏坐标；windowrule 中有 `size=` 的窗口只恢复位置不覆盖尺寸
-
-### 键位（`$mainMod = Super`）
+### 键位（`Mod = Super`）
 
 | 快捷键 | 功能 |
 |--------|------|
 | `Super + Q` | 打开终端（Kitty） |
 | `Super + E` | 打开文件管理器（Thunar） |
 | `Super + R` | 打开应用启动器（DMS Launcher） |
-| `Super + W` | 启动 Waydroid（Android） |
 | `Super + C` | 关闭当前窗口 |
-| `Super + V` | 切换浮动/平铺 |
-| `Super + P` | 伪平铺（Dwindle pseudo） |
-| `Super + Shift + J` | 切换分割方向 |
-| `Super + M` | 电源菜单（hyprshutdown / DMS） |
+| `Super + V` | 切换浮动/平铺（`Shift` 在浮动/平铺层间切焦点） |
+| `Super + P` | 循环预设列宽（1/3 → 1/2 → 2/3） |
+| `Super + -/=` | 列宽微调 ±10%（加 `Shift` 调窗口高度） |
+| `Super + F` | 列最大化；`Super + Shift + F` 全屏 |
+| `Super + ,/.` | 窗口并入当前列 / 移出成独立列 |
 | `Super + A` | 框选截图 → 复制到剪贴板 → 在 Satty 中标注 |
+| `Super + Shift + A` | 当前窗口截图（存 `~/Pictures/Screenshots` + 剪贴板） |
+| `Super + Ctrl + A` | 全屏截图 → Satty 标注 |
+| `Super + Alt + A` | 区域录屏（再按停止，存 `~/Downloads`） |
+| `Print` | niri 内置交互式截图 UI |
 | `Super + Shift + L` | 锁屏（DMS lock） |
 | `Super + H/J/K/L` | 焦点移动（Vim 方向） |
+| `Super + Ctrl + H/J/K/L` | 移动窗口/列 |
+| `Super + O` | 总览（overview，DMS 集成） |
 | `Super + 1–0` | 切换工作区 1–10 |
 | `Super + Shift + 1–0` | 移动窗口到工作区 |
-| `Super + S` | 特殊工作区（scratchpad）切换 |
+| `Super + S` | scratch 便签工作区（再按返回） |
 | `Super + 鼠标滚轮` | 切换工作区 |
 | `Super + 左键拖拽` | 移动窗口 |
 | `Super + 右键拖拽` | 缩放窗口 |
-| `Alt + Tab` | 窗口切换（hyprswitch，跨 workspace） |
+| `Alt + Tab` | 窗口切换（DMS，`dms/alttab.kdl` 托管） |
+| `Super + Shift + E` | 退出 niri 会话 |
 | 多媒体键 | 音量、亮度、播放控制（playerctl） |
-| 三指横扫 | 切换工作区 |
+| 三指纵扫 | 切换工作区（niri 工作区为纵向排列） |
 
 ### 窗口规则（自动应用）
 
-- GTK 文件对话框、"打开/另存为"等弹窗 → 居中浮动
-- satty、mpv、thunar、Telegram、WeChat、nm-connection-editor、Bluetooth 管理器 → 自动浮动
-- VS Code Insiders → 透明度 0.75；LibreWolf → 透明度 0.80
-- XWayland 拖拽 bug 修复（无名浮动窗口不抢焦点）
-- 所有应用的最大化请求被 Hyprland 接管
+- 浮动窗口默认居中打开（niri 原生行为，文件对话框无需单独规则）
+- satty、mpv、thunar、Telegram、WeChat、蓝信、nm-connection-editor、蓝牙管理器、DMS 设置窗口 → 自动浮动
+- VS Code Insiders → 透明度 0.85（与 Kitty 一致）
+- mpv 浮动默认 800×450
 
 ### NVIDIA Wayland 适配
 
@@ -103,7 +100,6 @@ LIBVA_DRIVER_NAME=nvidia       # VA-API 视频硬解
 GBM_BACKEND=nvidia-drm         # Wayland 渲染后端
 __GLX_VENDOR_LIBRARY_NAME=nvidia
 ELECTRON_OZONE_PLATFORM_HINT=auto  # Electron 应用防闪烁
-cursor.use_cpu_buffer=true     # 光标纹理防撕裂
 ```
 
 ---
@@ -155,7 +151,7 @@ cursor.use_cpu_buffer=true     # 光标纹理防撕裂
 | 覆盖目标 | 说明 |
 |----------|------|
 | DMS（状态栏/锁屏/通知） | 主题核心 |
-| Hyprland | 边框色 |
+| niri | 边框色（`niri/dms/colors.kdl` 托管） |
 | GTK 3/4 | 所有 GTK 应用 |
 | Qt5ct / Qt6ct | Qt 应用 |
 | Kitty | 终端配色 |
@@ -192,7 +188,7 @@ cursor.use_cpu_buffer=true     # 光标纹理防撕裂
 - 多分屏（Alt+Enter 水平分屏，Alt+]/[ 切换）
 - 布局循环（Alt+Space）：splits → stack → tall → fat
 
-### 键位（修饰键分工：Hyprland=Super / Neovim=Ctrl,Leader / Kitty=Alt）
+### 键位（修饰键分工：niri=Super / Neovim=Ctrl,Leader / Kitty=Alt）
 
 | 快捷键 | 功能 |
 |--------|------|
@@ -210,7 +206,7 @@ cursor.use_cpu_buffer=true     # 光标纹理防撕裂
 
 ### 配色
 
-Tokyo Night（与 Hyprland 边框色 `#33ccff` / `#00ff99` 风格统一）。
+Tokyo Night（与合成器边框色 `#33ccff` / `#00ff99` 风格统一）。
 
 ---
 
@@ -415,7 +411,7 @@ ssh-agent（systemd socket 激活：$XDG_RUNTIME_DIR/ssh-agent.socket）
 
 ### Polkit
 
-`hyprpolkitagent` 提供图形认证弹窗（sudo 提权场景）。
+DMS 内置 polkit 代理提供图形认证弹窗（sudo 提权场景）。
 
 ---
 
@@ -448,7 +444,7 @@ ssh-agent（systemd socket 激活：$XDG_RUNTIME_DIR/ssh-agent.socket）
 slurp（框选区域）
     │
     ▼
-grim（截取 Wayland 帧）→ 保存到 /tmp/hypr-ss.png
+grim（截取 Wayland 帧）→ 保存到 $XDG_RUNTIME_DIR/niri-ss-*.png
     │
     ├── wl-copy（复制到剪贴板）
     │
@@ -515,7 +511,7 @@ Satty 支持：箭头、矩形、圆形、文本、马赛克、荧光笔标注�
 
 ## Android 虚拟化
 
-**Waydroid**：基于 LXC 的 Android 容器，Hyprland 下以 1280×720 浮动窗口运行。`Super + W` 快速启动。
+**Waydroid**：基于 LXC 的 Android 容器，以 1280×720 浮动窗口运行，从启动器（`Super + R`）启动。
 
 ---
 
