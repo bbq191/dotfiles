@@ -43,7 +43,7 @@ backup_if_exists() {
 # 手动备份已知冲突目标
 for item in \
     .config/fish \
-    .config/hypr \
+    .config/niri \
     .config/kitty \
     .config/nvim \
     .config/yazi \
@@ -59,6 +59,12 @@ for item in \
     .config/qt6ct \
     .config/mimeapps.list \
     .config/user-dirs.dirs \
+    .config/user-dirs.locale \
+    .config/xdg-terminals.list \
+    .config/danksearch \
+    .config/dankcal \
+    .config/rbw \
+    .config/Thunar/uca.xml \
     .config/DankMaterialShell \
     .config/matugen \
     ".config/Code - Insiders/User/settings.json" \
@@ -84,7 +90,7 @@ while IFS= read -r -d '' src; do
     fi
 done < <(find "$DOTFILES/home" -mindepth 1 -print0)
 
-# --adopt 处理运行中进程（如 Hyprland）在 stow 执行期间重建的文件
+# --adopt 处理运行中进程（如 niri/DMS）在 stow 执行期间重建的文件
 # git restore 将被 --adopt 吸入的系统文件还原为仓库版本
 stow --adopt --target="$HOME" home
 git -C "$DOTFILES" restore home/
@@ -111,6 +117,8 @@ sudo systemd-tmpfiles --create /etc/tmpfiles.d/howdy-permissions.conf
 sudo cp "$DOTFILES/system/etc/pam.d/dankshell" /etc/pam.d/
 sudo cp "$DOTFILES/system/etc/pam.d/sudo" /etc/pam.d/
 sudo cp "$DOTFILES/system/etc/pam.d/sddm" /etc/pam.d/
+# greetd 归 greetd 包管理，覆盖后上游更新会生成 .pacnew，需留意合并
+sudo cp "$DOTFILES/system/etc/pam.d/greetd" /etc/pam.d/
 sudo mkdir -p /etc/sudoers.d
 sudo cp "$DOTFILES/system/etc/sudoers.d/papirus-folders" \
         /etc/sudoers.d/
@@ -235,5 +243,5 @@ echo "完成。手动步骤："
 echo "  - mihomo：rbw add mihomo-proxy-token（订阅 token）和 rbw add mihomo-secret（面板密码）"
 echo "  - rbw：执行 'rbw register' 登录 Bitwarden"
 echo "  - SSH：将 SSH 私钥存入 Bitwarden（SSH Key 类型），rbw 解锁后执行 rbw-ssh-load 加载"
-echo "  - 壁纸：将图片放入 ~/Pictures/ 并更新 hyprpaper.conf 路径"
+echo "  - 壁纸：DMS Settings → Wallpaper 中设置（或 dms ipc call wallpaper set <路径>）"
 echo "  - NVIDIA：参考 README 中的已知问题"

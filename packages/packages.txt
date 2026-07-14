@@ -68,6 +68,8 @@ fwupd
 gamemode
 git
 git-delta
+# DMS greeter 登录界面（greetd 后端；sddm 保留作回退）
+greetd
 git-lfs
 gnome-keyring
 grim
@@ -80,11 +82,10 @@ gvfs-smb
 hdparm
 hwdetect
 hwinfo
-hyprland
-hypridle
-hyprlauncher
-hyprpaper
-hyprpolkitagent
+# niri + DMS 桌面（壁纸/锁屏/idle/polkit/Alt+Tab 均由 DMS 接管）
+niri
+xwayland-satellite
+xdg-desktop-portal-gnome
 inetutils
 intel-media-driver
 intel-ucode
@@ -122,7 +123,6 @@ lsb-release
 lsscsi
 lutris
 lvm2
-mako
 man-db
 man-pages
 mdadm
@@ -204,7 +204,6 @@ unzip
 upower
 usb_modeswitch
 usbutils
-uwsm
 vlc-plugins-all
 vpl-gpu-rt
 vulkan-icd-loader
@@ -219,16 +218,19 @@ winetricks
 wireplumber
 wl-clipboard
 # wpa_supplicant  # 与 iwd 冲突，二选一；当前使用 iwd
-xdg-desktop-portal-hyprland
 xdg-user-dirs
 xfsprogs
 xorg-xwayland
 yazi
 yt-dlp
 zoxide
+# DMS 可选后端：Spotlight 文件搜索 + 日历集成（dms doctor 建议）
+dsearch-bin
+dankcalendar-bin
+# DMS greeter 界面（配合 greetd，dms greeter install 自动配置）
+greetd-dms-greeter-bin
 fcitx5-theme-wechat
 howdy-next
-hyprswitch
 linux-enable-ir-emitter
 matugen-bin
 mihomo-bin
