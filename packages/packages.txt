@@ -68,7 +68,7 @@ fwupd
 gamemode
 git
 git-delta
-# DMS greeter 登录界面（greetd 后端；sddm 保留作回退）
+# DMS greeter 登录界面（greetd 后端）
 greetd
 git-lfs
 gnome-keyring
@@ -174,7 +174,6 @@ reflector
 ripgrep
 rsync
 satty
-sddm
 sg3_utils
 shelly
 slurp

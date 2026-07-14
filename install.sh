@@ -112,11 +112,10 @@ sudo cp "$DOTFILES/system/etc/tmpfiles.d/thp.conf" \
 sudo cp "$DOTFILES/system/etc/tmpfiles.d/howdy-permissions.conf" \
         /etc/tmpfiles.d/
 sudo systemd-tmpfiles --create /etc/tmpfiles.d/howdy-permissions.conf
-# PAM：howdy 人脸识别接入 DMS 锁屏/sudo/sddm。
-# sudo 与 sddm 归 pambase/sddm 包管理，覆盖后上游更新会生成 .pacnew，需留意合并
+# PAM：howdy 人脸识别接入 DMS 锁屏/sudo/greetd 登录。
+# sudo 归 pambase 包管理，覆盖后上游更新会生成 .pacnew，需留意合并
 sudo cp "$DOTFILES/system/etc/pam.d/dankshell" /etc/pam.d/
 sudo cp "$DOTFILES/system/etc/pam.d/sudo" /etc/pam.d/
-sudo cp "$DOTFILES/system/etc/pam.d/sddm" /etc/pam.d/
 # greetd 归 greetd 包管理，覆盖后上游更新会生成 .pacnew，需留意合并
 sudo cp "$DOTFILES/system/etc/pam.d/greetd" /etc/pam.d/
 sudo mkdir -p /etc/sudoers.d
@@ -126,9 +125,6 @@ sudo chmod 0440 /etc/sudoers.d/papirus-folders
 sudo mkdir -p /etc/NetworkManager/conf.d
 sudo cp "$DOTFILES/system/etc/NetworkManager/conf.d/wifi-backend.conf" \
         /etc/NetworkManager/conf.d/
-sudo mkdir -p /etc/sddm.conf.d
-sudo cp "$DOTFILES/system/etc/sddm.conf.d/autologin.conf" \
-        /etc/sddm.conf.d/
 sudo mkdir -p /etc/keyd
 sudo cp "$DOTFILES/system/etc/keyd/default.conf" \
         /etc/keyd/

@@ -58,7 +58,7 @@ cd ~/Projects/dotfiles
 
 `install.sh` 已自动完成：
 - 授予 `video` 组对 `/etc/howdy/` 的读权限（允许用户空间 PAM 调用）
-- 部署 PAM 配置 `system/etc/pam.d/`：`dankshell`（DMS 锁屏）、`sudo`、`sddm`
+- 部署 PAM 配置 `system/etc/pam.d/`：`dankshell`（DMS 锁屏）、`sudo`、`greetd`（登录）
 - 启用 `linux-enable-ir-emitter.service`（开机/唤醒时点亮 IR 补光）
 
 ### 新机器：配置 IR 补光
@@ -78,7 +78,7 @@ sudo systemd-tmpfiles --create /etc/tmpfiles.d/howdy-permissions.conf
 
 建议录入 2–3 个模型，分别覆盖不同角度（正脸、略低头看屏幕的姿势）。
 
-`howdy add`/`howdy clear` 每次都会把模型文件重建为 `600 root:root`，DMS 锁屏（`dankshell` PAM 服务）是以普通用户身份读取该文件的，权限不对会导致锁屏识别失效（但 `sudo`/`sddm` 不受影响，因为它们在 PAM 认证阶段已经是 root）。**每次重新录入后都必须重新执行上面的 `systemd-tmpfiles --create`**，让 `howdy-permissions.conf` 里的规则把权限改回 `640 root:video`。
+`howdy add`/`howdy clear` 每次都会把模型文件重建为 `600 root:root`，DMS 锁屏（`dankshell` PAM 服务）是以普通用户身份读取该文件的，权限不对会导致锁屏识别失效（但 `sudo`/`greetd` 不受影响，因为它们在 PAM 认证阶段已经是 root）。**每次重新录入后都必须重新执行上面的 `systemd-tmpfiles --create`**，让 `howdy-permissions.conf` 里的规则把权限改回 `640 root:video`。
 
 ### 关键配置项
 
@@ -158,9 +158,8 @@ sudo systemctl restart linux-enable-ir-emitter.service
 | `etc/tmpfiles.d/thp.conf` | 禁用 Transparent Huge Pages（降低延迟） |
 | `etc/tmpfiles.d/howdy-permissions.conf` | 授予 video 组读取 howdy 配置/模型的权限 |
 | `etc/sudoers.d/papirus-folders` | 允许 wheel 组免密码执行 papirus-folders（matugen 主题同步所需） |
-| `etc/pam.d/dankshell` `sudo` `sddm` `greetd` | howdy 人脸识别接入 DMS 锁屏 / sudo / 登录界面（greetd 为主，sddm 回退） |
+| `etc/pam.d/dankshell` `sudo` `greetd` | howdy 人脸识别接入 DMS 锁屏 / sudo / greetd 登录界面 |
 | `etc/keyd/default.conf` | capslock ↔ ctrl 互换 |
-| `etc/sddm.conf.d/autologin.conf` | SDDM 默认会话为 niri（未配置 `User=`，不会真正自动登录） |
 | `etc/snapper/configs/root` | Btrfs 根分区快照策略 |
 | `etc/NetworkManager/conf.d/wifi-backend.conf` | Wi-Fi 后端切换为 iwd |
 
@@ -214,8 +213,7 @@ dotfiles/
 │       ├── keyd/default.conf
 │       ├── modprobe.d/nvidia-local.conf
 │       ├── NetworkManager/conf.d/wifi-backend.conf
-│       ├── pam.d/           # howdy 人脸识别 PAM（dankshell / sudo / sddm）
-│       ├── sddm.conf.d/autologin.conf
+│       ├── pam.d/           # howdy 人脸识别 PAM（dankshell / sudo / greetd）
 │       ├── snapper/configs/root
 │       ├── sudoers.d/papirus-folders
 │       ├── systemd/resolved.conf.d/no-mdns.conf

@@ -1,6 +1,5 @@
 #%PAM-1.0
 # DMS greeter（greetd）登录认证：howdy 人脸识别优先，失败回退密码
-# 结构与 pam.d/sddm 保持一致（sddm 保留作回退显示管理器）
 
 auth        sufficient  pam_howdy.so
 auth        include     system-login
