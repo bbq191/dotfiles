@@ -1,0 +1,12 @@
+{
+  "niriWindows": {
+    "enabled": true
+  },
+  "calculator": {
+    "enabled": true,
+    "trigger": "="
+  },
+  "emojiLauncher": {
+    "enabled": true
+  }
+}

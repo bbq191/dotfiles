@@ -22,3 +22,5 @@ home/.config/mihomo/cache.db
 home/.config/mihomo/proxies/
 home/.config/mihomo/rules/
 home/.config/mihomo/ui/
+# DMS 插件由 dms plugins CLI 管理（内含独立 git 仓库），不入库
+home/.config/DankMaterialShell/plugins/

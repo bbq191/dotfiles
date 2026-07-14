@@ -1,1 +1,39 @@
-// 由 DMS 托管生成（Settings → 启用 niri 配置管理）
+// ! Auto-generated file. Do not edit directly.
+// Remove `include "dms/colors.kdl"` from your config to override.
+
+layout {
+    background-color "transparent"
+
+    focus-ring {
+        active-color   "#84d2e5"
+        inactive-color "#899295"
+        urgent-color   "#ffb4ab"
+    }
+
+    border {
+        active-color   "#84d2e5"
+        inactive-color "#899295"
+        urgent-color   "#ffb4ab"
+    }
+
+    shadow {
+        color "#00000070"
+    }
+
+    tab-indicator {
+        active-color   "#84d2e5"
+        inactive-color "#899295"
+        urgent-color   "#ffb4ab"
+    }
+
+    insert-hint {
+        color "#84d2e580"
+    }
+}
+
+recent-windows {
+    highlight {
+        active-color   "#004e5b"
+        urgent-color   "#ffb4ab"
+    }
+}
