@@ -7,6 +7,7 @@ home/.config/niri/config.kdl.backup*
 home/.config/DankMaterialShell/.firstlaunch
 home/.config/DankMaterialShell/.changelog-*
 home/.config/DankMaterialShell/settings.json
+home/.config/DankMaterialShell/clsettings.json
 home/.config/fcitx5/conf/cached_layouts
 
 # fish 变量（含本机路径）
