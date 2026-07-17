@@ -1,0 +1,37 @@
+# zathura 配色 — matugen 模板（.default = 跟随 DMS 明暗模式）
+set default-bg "{{colors.background.default.hex}}"
+set default-fg "{{colors.on_background.default.hex}}"
+
+set statusbar-bg "{{colors.surface_container.default.hex}}"
+set statusbar-fg "{{colors.on_surface.default.hex}}"
+set inputbar-bg "{{colors.surface_container.default.hex}}"
+set inputbar-fg "{{colors.on_surface.default.hex}}"
+
+set completion-bg "{{colors.surface_container.default.hex}}"
+set completion-fg "{{colors.on_surface.default.hex}}"
+set completion-group-bg "{{colors.surface_container_high.default.hex}}"
+set completion-group-fg "{{colors.primary.default.hex}}"
+set completion-highlight-bg "{{colors.primary.default.hex}}"
+set completion-highlight-fg "{{colors.on_primary.default.hex}}"
+
+set index-bg "{{colors.background.default.hex}}"
+set index-fg "{{colors.on_background.default.hex}}"
+set index-active-bg "{{colors.primary.default.hex}}"
+set index-active-fg "{{colors.on_primary.default.hex}}"
+
+set highlight-color "rgba({{colors.primary.default.red}}, {{colors.primary.default.green}}, {{colors.primary.default.blue}}, 0.35)"
+set highlight-active-color "rgba({{colors.tertiary.default.red}}, {{colors.tertiary.default.green}}, {{colors.tertiary.default.blue}}, 0.45)"
+
+set notification-bg "{{colors.surface_container.default.hex}}"
+set notification-fg "{{colors.on_surface.default.hex}}"
+set notification-error-bg "{{colors.error.default.hex}}"
+set notification-error-fg "{{colors.on_error.default.hex}}"
+set notification-warning-bg "{{colors.tertiary.default.hex}}"
+set notification-warning-fg "{{colors.on_tertiary.default.hex}}"
+
+set render-loading-bg "{{colors.background.default.hex}}"
+set render-loading-fg "{{colors.on_background.default.hex}}"
+
+# 重染色板：暗色模式下 Ctrl+R 把页面染成 主题背景/前景
+set recolor-lightcolor "{{colors.background.default.hex}}"
+set recolor-darkcolor "{{colors.on_background.default.hex}}"

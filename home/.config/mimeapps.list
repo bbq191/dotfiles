@@ -1,11 +1,11 @@
 [Default Applications]
-application/pdf=wps-office-pdf.desktop
-application/vnd.comicbook+zip=wps-office-pdf.desktop
-application/vnd.comicbook-rar=wps-office-pdf.desktop
-application/x-bzpdf=wps-office-pdf.desktop
-application/x-ext-pdf=wps-office-pdf.desktop
+application/pdf=org.pwmt.zathura.desktop
+application/vnd.comicbook+zip=org.pwmt.zathura.desktop
+application/vnd.comicbook-rar=org.pwmt.zathura.desktop
+application/x-bzpdf=org.pwmt.zathura.desktop
+application/x-ext-pdf=org.pwmt.zathura.desktop
 application/x-gnome-saved-search=thunar.desktop
-application/x-gzpdf=wps-office-pdf.desktop
+application/x-gzpdf=org.pwmt.zathura.desktop
 application/xhtml+xml=librewolf.desktop
 image/avif=satty.desktop
 image/bmp=satty.desktop
@@ -28,12 +28,12 @@ x-scheme-handler/unknown=microsoft-edge-canary.desktop
 
 [Added Associations]
 application/json=org.neovim.nvim.desktop;
-application/pdf=wps-office-pdf.desktop;
-application/vnd.comicbook+zip=wps-office-pdf.desktop;
-application/vnd.comicbook-rar=wps-office-pdf.desktop;
-application/x-bzpdf=wps-office-pdf.desktop;
-application/x-ext-pdf=wps-office-pdf.desktop;
-application/x-gzpdf=wps-office-pdf.desktop;
+application/pdf=org.pwmt.zathura.desktop;
+application/vnd.comicbook+zip=org.pwmt.zathura.desktop;
+application/vnd.comicbook-rar=org.pwmt.zathura.desktop;
+application/x-bzpdf=org.pwmt.zathura.desktop;
+application/x-ext-pdf=org.pwmt.zathura.desktop;
+application/x-gzpdf=org.pwmt.zathura.desktop;
 application/xhtml+xml=librewolf.desktop;
 image/avif=satty.desktop;
 image/bmp=satty.desktop;

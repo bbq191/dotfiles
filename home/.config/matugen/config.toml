@@ -4,3 +4,7 @@
 input_path = '~/.config/matugen/templates/papirus-folders.sh'
 output_path = '/tmp/dms-papirus-folders.sh'
 post_hook = 'bash /tmp/dms-papirus-folders.sh'
+
+[templates.zathura]
+input_path = '~/.config/matugen/templates/zathura'
+output_path = '~/.config/zathura/dank-colors'

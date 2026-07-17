@@ -1,0 +1,20 @@
+# ── 配色（matugen 动态生成，随壁纸/明暗变化）──────────────────────────────────
+include dank-colors
+
+# ── 剪贴板 ────────────────────────────────────────────────────────────────────
+# y 复制选中文本到系统剪贴板（Wayland）
+set selection-clipboard clipboard
+
+# ── 字体 ──────────────────────────────────────────────────────────────────────
+set font "Maple Mono NF CN 11"
+
+# ── 显示 ──────────────────────────────────────────────────────────────────────
+set adjust-open "best-fit"
+set statusbar-home-tilde true
+set window-title-basename true
+
+# ── 重染（recolor）────────────────────────────────────────────────────────────
+# 默认不重染 PDF 页面；Ctrl+R 切换按主题重染（暗色模式下阅读白底 PDF 用）
+set recolor false
+set recolor-keephue true
+map <C-r> recolor
