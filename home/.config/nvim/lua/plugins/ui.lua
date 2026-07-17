@@ -9,7 +9,7 @@ return {
     dependencies = { "nvim-tree/nvim-web-devicons" },
     opts = {
       options = {
-        theme             = "auto",   -- 自动跟随当前配色（dankcolors base16）
+        theme             = "auto",   -- 自动解析到 lua/lualine/themes/dms.lua（base46 动态主题）
         globalstatus      = true,
         component_separators = "|",
         section_separators  = { left = "", right = "" },
@@ -59,10 +59,11 @@ return {
       timeout  = 2500,
       max_width = 50,
       render   = "compact",
-      -- Normal 背景透明时 notify 需要实色兜底；动态取当前 base16 的 base00，matugen 换主题后自动跟随
+      -- Normal 背景透明时 notify 需要实色兜底；动态取 base46 dms 主题的 base00，matugen 换主题后自动跟随
       background_colour = function()
-        local ok, base16 = pcall(require, "base16-colorscheme")
-        return ok and base16.colors and base16.colors.base00 or "#15130f"
+        local ok, base46 = pcall(require, "base46")
+        local theme = ok and base46.theme_tables and base46.theme_tables.dms
+        return theme and theme.base_16 and theme.base_16.base00 or "#1a1c1f"
       end,
     },
     config = function(_, opts)
