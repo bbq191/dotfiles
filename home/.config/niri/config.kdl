@@ -134,6 +134,7 @@ binds {
     Mod+Shift+Minus { set-window-height "-10%"; }
     Mod+Shift+Equal { set-window-height "+10%"; }
     Mod+F { maximize-column; }
+    Mod+M { maximize-window-to-edges; }     // 传统最大化；浮动窗口会临时入平铺，还原后回浮动
     Mod+Shift+F { fullscreen-window; }
     // 滚动平铺特有：把窗口并入/移出当前列（替代 dwindle togglesplit）
     Mod+Comma { consume-window-into-column; }
