@@ -1,6 +1,12 @@
 source /usr/share/cachyos-fish-config/cachyos-config.fish
 # ↑ 已包含：eza/bat/grep 别名、fastfetch 欢迎、~/.local/bin PATH、!! !$ 历史补全
 
+# ── XDG 基础目录（必须显式定义，systemd/fish 不会自动 export）──────────────────
+set -gx XDG_DATA_HOME    $HOME/.local/share
+set -gx XDG_CONFIG_HOME  $HOME/.config
+set -gx XDG_CACHE_HOME   $HOME/.cache
+set -gx XDG_STATE_HOME   $HOME/.local/state
+
 # ── XDG 路径规范 ──────────────────────────────────────────────────────────────
 set -gx CARGO_HOME       $HOME/.local/share/cargo
 set -gx RUSTUP_HOME      $HOME/.local/share/rustup
