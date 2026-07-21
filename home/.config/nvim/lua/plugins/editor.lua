@@ -56,6 +56,7 @@ return {
         { "<leader>f", group = "Find/Format" },
         { "<leader>h", group = "Git hunk" },
         { "<leader>m", group = "Markdown" },
+        { "<leader>r", group = "Rename/Replace" },
         { "<leader>t", group = "Terminal" },
         { "<leader>y", group = "Yazi" },
       },
@@ -128,5 +129,26 @@ return {
       { "s",     function() require("flash").jump() end,       mode = { "n", "x", "o" }, desc = "Flash" },
       { "S",     function() require("flash").treesitter() end, mode = { "n", "o" },       desc = "Flash treesitter" },
     },
+  },
+
+  -- 跨文件查找替换（预览 + 逐个确认，弥补 <leader>s 只能单文件的短板）
+  {
+    "MagicDuck/grug-far.nvim",
+    cmd = "GrugFar",
+    keys = {
+      { "<leader>rf", function() require("grug-far").open() end, desc = "Replace in files" },
+      {
+        "<leader>rw",
+        function() require("grug-far").open({ prefills = { search = vim.fn.expand("<cword>") } }) end,
+        desc = "Replace word under cursor (project-wide)",
+      },
+      {
+        "<leader>rw",
+        function() require("grug-far").with_visual_selection() end,
+        mode = "v",
+        desc = "Replace selection (project-wide)",
+      },
+    },
+    opts = {},
   },
 }

@@ -29,6 +29,10 @@ map("x", "<leader>p", [["_dP]], { desc = "Paste without yank" })
 -- 清除高亮
 map("n", "<Esc>", "<cmd>nohlsearch<CR>")
 
+-- 光标词全局替换：全部直接替换 / 逐个确认
+map("n", "<leader>s", [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>]], { desc = "Replace word under cursor" })
+map("n", "<leader>S", [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gcI<Left><Left><Left><Left>]], { desc = "Replace word under cursor (confirm each)" })
+
 -- Buffer
 map("n", "<S-h>", "<cmd>bprevious<CR>")
 map("n", "<S-l>", "<cmd>bnext<CR>")
@@ -67,6 +71,13 @@ map("n", "<leader>de", vim.diagnostic.open_float, { desc = "Diagnostic float" })
 map({ "n", "v" }, "<leader>fm", function()
   require("conform").format({ async = true, lsp_fallback = true })
 end, { desc = "Format" })
+
+-- 自动换行（类似 VS Code Alt+Z）
+map("n", "<A-z>", function()
+  vim.wo.wrap = not vim.wo.wrap
+  vim.wo.linebreak = vim.wo.wrap
+  vim.notify("Wrap: " .. (vim.wo.wrap and "on" or "off"))
+end, { desc = "Toggle wrap" })
 
 -- 终端
 map("t", "<Esc><Esc>", "<C-\\><C-n>", { desc = "Exit terminal mode" })

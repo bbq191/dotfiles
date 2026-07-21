@@ -15,7 +15,11 @@
           "transform": "Normal",
           "vrr": false,
           "disabled": false,
-          "niri": {}
+          "niri": {
+            "hotCorners": {
+              "off": true
+            }
+          }
         }
       }
     },
@@ -24,7 +28,7 @@
       "name": "",
       "outputs": {
         "eDP-2": {
-          "mode": "2560x1600@300.000",
+          "mode": "2560x1600@60.001",
           "position": {
             "x": 0,
             "y": 0
@@ -33,11 +37,7 @@
           "transform": "Normal",
           "vrr": false,
           "disabled": false,
-          "niri": {
-            "hotCorners": {
-              "off": true
-            }
-          }
+          "niri": {}
         }
       }
     }

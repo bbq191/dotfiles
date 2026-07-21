@@ -28,6 +28,8 @@ environment {
     ELECTRON_OZONE_PLATFORM_HINT "auto"
     // ── LibreOffice：强制 GTK3 前端，吃 adw-gtk3 + dank-colors 主题链 ──
     SAL_USE_VCLPLUGIN "gtk3"
+    // ── Qt 应用读取 qt5ct/qt6ct 的字体与主题配置（冒号分隔，各 Qt 大版本各取各的）──
+    QT_QPA_PLATFORMTHEME "qt5ct:qt6ct"
 }
 
 ///////////
@@ -70,10 +72,10 @@ layout {
 
     // 屏幕边缘留白
     struts {
-        left 10
-        right 10
-        top 10
-        bottom 10
+        left 6
+        right 6
+        top 6
+        bottom 6
     }
 
     // DMS 壁纸绘制在 backdrop 层，桌面背景需透明

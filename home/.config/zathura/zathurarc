@@ -6,7 +6,7 @@ include dank-colors
 set selection-clipboard clipboard
 
 # ── 字体 ──────────────────────────────────────────────────────────────────────
-set font "Maple Mono NF CN 11"
+set font "Maple Mono NF CN 13"
 
 # ── 显示 ──────────────────────────────────────────────────────────────────────
 set adjust-open "best-fit"
