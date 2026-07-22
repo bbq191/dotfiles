@@ -250,6 +250,11 @@ window-rule {
 }
 
 window-rule {
+    match app-id="^kitty$"
+    open-maximized true
+}
+
+window-rule {
     // VRR 按需触发窗口（配合输出 variable-refresh-rate on-demand）
     match app-id="^mpv$"
     match app-id="^steam_app_.*$"

@@ -111,6 +111,9 @@ sudo cp "$DOTFILES/system/etc/systemd/system/ollama.service.d/override.conf" \
 sudo mkdir -p /etc/modprobe.d
 sudo cp "$DOTFILES/system/etc/modprobe.d/nvidia-local.conf" \
         /etc/modprobe.d/
+sudo mkdir -p /etc/greetd
+sudo cp "$DOTFILES/system/etc/greetd/config.toml" \
+        /etc/greetd/
 sudo mkdir -p /etc/tmpfiles.d
 sudo cp "$DOTFILES/system/etc/tmpfiles.d/thp.conf" \
         /etc/tmpfiles.d/

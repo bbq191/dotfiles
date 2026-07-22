@@ -159,6 +159,7 @@ sudo systemctl restart linux-enable-ir-emitter.service
 | `etc/tmpfiles.d/howdy-permissions.conf` | 授予 video 组读取 howdy 配置/模型的权限 |
 | `etc/sudoers.d/papirus-folders` | 允许 wheel 组免密码执行 papirus-folders（matugen 主题同步所需） |
 | `etc/pam.d/dankshell` `sudo` `greetd` | howdy 人脸识别接入 DMS 锁屏 / sudo / greetd 登录界面 |
+| `etc/greetd/config.toml` | 登录界面 niri 附加 NVIDIA 环境变量前缀（`GBM_BACKEND` 等），避免登录界面与登录后会话的 eDP connector 命名（分辨率/刷新率）不一致 |
 | `etc/keyd/default.conf` | capslock ↔ ctrl 互换 |
 | `etc/snapper/configs/root` | Btrfs 根分区快照策略 |
 | `etc/NetworkManager/conf.d/wifi-backend.conf` | Wi-Fi 后端切换为 iwd |
