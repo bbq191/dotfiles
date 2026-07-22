@@ -38,6 +38,7 @@ cd ~/Projects/dotfiles
 | SSH 密钥 | 在 Bitwarden 中存入 SSH Key 类型条目；`rbw unlock` 后执行 `rbw-ssh-load` 加载到 ssh-agent。后续 `git push/pull/fetch/clone` 会按需自动解锁并加载，无需手动操作 |
 | 壁纸 | 将图片放入 `~/Pictures/`，在 DMS 设置中选择壁纸 |
 | 人脸识别 | 见下方"人脸识别（howdy）"章节 |
+| greetd 登录界面主题同步 | `dms greeter enable && dms greeter sync`，生成/同步登录界面的 niri 输出配置（分辨率/缩放，读取自 `monitors.json`）与壁纸/主题；改了显示器配置后需重新执行 `dms greeter sync` |
 
 ### 可选
 
@@ -159,7 +160,7 @@ sudo systemctl restart linux-enable-ir-emitter.service
 | `etc/tmpfiles.d/howdy-permissions.conf` | 授予 video 组读取 howdy 配置/模型的权限 |
 | `etc/sudoers.d/papirus-folders` | 允许 wheel 组免密码执行 papirus-folders（matugen 主题同步所需） |
 | `etc/pam.d/dankshell` `sudo` `greetd` | howdy 人脸识别接入 DMS 锁屏 / sudo / greetd 登录界面 |
-| `etc/greetd/config.toml` | 登录界面 niri 附加 NVIDIA 环境变量前缀（`GBM_BACKEND` 等），避免登录界面与登录后会话的 eDP connector 命名（分辨率/刷新率）不一致 |
+| `etc/greetd/niri_overrides.kdl` | 登录界面 niri 附加 NVIDIA 环境变量（`GBM_BACKEND` 等）；`config.toml`/`niri/{config,dms}.kdl` 由 `dms greeter sync` 生成管理，不在仓库内静态跟踪 |
 | `etc/keyd/default.conf` | capslock ↔ ctrl 互换 |
 | `etc/snapper/configs/root` | Btrfs 根分区快照策略 |
 | `etc/NetworkManager/conf.d/wifi-backend.conf` | Wi-Fi 后端切换为 iwd |

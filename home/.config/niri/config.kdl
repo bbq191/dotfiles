@@ -23,7 +23,7 @@ environment {
     // ── NVIDIA ──
     LIBVA_DRIVER_NAME "nvidia"
     GBM_BACKEND "nvidia-drm"
-    __GLX_VENDOR_LIBRARY_NAME "nvidia"
+    "__GLX_VENDOR_LIBRARY_NAME" "nvidia"
     // ── Electron（VS Code 等）──
     ELECTRON_OZONE_PLATFORM_HINT "auto"
     // ── LibreOffice：强制 GTK3 前端，吃 adw-gtk3 + dank-colors 主题链 ──

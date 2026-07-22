@@ -112,7 +112,9 @@ sudo mkdir -p /etc/modprobe.d
 sudo cp "$DOTFILES/system/etc/modprobe.d/nvidia-local.conf" \
         /etc/modprobe.d/
 sudo mkdir -p /etc/greetd
-sudo cp "$DOTFILES/system/etc/greetd/config.toml" \
+# config.toml 本身由 `dms greeter enable`/`dms greeter sync` 生成管理（见下方手动步骤），
+# 这里只放 wrapper 每次启动都会 include、且不受 sync 覆盖的 NVIDIA 环境变量扩展点
+sudo cp "$DOTFILES/system/etc/greetd/niri_overrides.kdl" \
         /etc/greetd/
 sudo mkdir -p /etc/tmpfiles.d
 sudo cp "$DOTFILES/system/etc/tmpfiles.d/thp.conf" \

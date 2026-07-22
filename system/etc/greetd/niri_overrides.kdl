@@ -1,0 +1,8 @@
+// dms-greeter wrapper 每次启动都会自动 include 这个文件（若存在），
+// 且不受 `dms greeter sync` 管理/覆盖 —— NVIDIA 环境变量要放在这里才能在
+// 重新 sync 之后继续生效。与用户会话 niri/config.kdl 的 environment{} 保持一致。
+environment {
+    LIBVA_DRIVER_NAME "nvidia"
+    GBM_BACKEND "nvidia-drm"
+    "__GLX_VENDOR_LIBRARY_NAME" "nvidia"
+}
