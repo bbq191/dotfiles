@@ -95,6 +95,11 @@ done < <(find "$DOTFILES/home" -mindepth 1 -print0)
 stow --adopt --target="$HOME" home
 git -C "$DOTFILES" restore home/
 
+# dconf：niri 下没有 xsettings daemon，纯 GTK3 程序（如 Thunar）不读 gtk-3.0/settings.ini，
+# 而是直接吃 org.gnome.desktop.interface 这份 dconf 状态，必须单独同步字号/主题
+echo "[+] 应用 dconf 设置..."
+dconf load /org/gnome/desktop/interface/ < "$DOTFILES/system/dconf/interface.ini"
+
 # ── 5. 应用系统配置（需要 sudo）────────────────────────────────────────────────
 echo "[+] 应用系统配置..."
 sudo mkdir -p /etc/systemd/resolved.conf.d
