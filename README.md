@@ -182,6 +182,16 @@ ELECTRON_OZONE_PLATFORM_HINT=auto
 
 `install.sh` 会自动迁移原有的 `~/.gnupg` 数据，并动态生成 gpg-agent socket 单元 drop-in（socket 路径含 GNUPGHOME 的哈希，因此无法静态跟踪在仓库中，每台机器单独生成到 `~/.config/systemd/user/gpg-agent*.socket.d/`）。
 
+### SDKMAN XDG
+
+不使用发行版打包的 `sdkman-bin`（固定装在 `/usr/lib/sdkman`，程序本体 root 拥有、candidates 数据人工 chown 给用户，混合状态，也无法只搬数据部分实现 XDG——SDKMAN_DIR 是 sdkman 唯一的目录变量，程序和数据本就在同一棵树下）。改用官方安装脚本，直接指定 `SDKMAN_DIR=~/.local/share/sdkman` 装到 XDG 路径下，更新走 `sdk selfupdate` 而非 paru。
+
+fish 集成分两部分：
+- `~/.config/fish/conf.d/config_sdk.fish` 设置 `__sdkman_custom_dir`，必须先于 fisher 插件的 `conf.d/sdk.fish` 加载（conf.d 按字母序早于 config.fish 执行，此时 `$XDG_DATA_HOME` 还没定义，只能用 `$HOME` 硬编码）。
+- `~/.config/fish/fish_plugins` 声明 `reitzig/sdkman-for-fish`，提供 `sdk` 命令本身；新机器 `stow` 后需执行一次 `fisher update` 落地插件文件（`install.sh` 已包含这步）。
+
+`candidates/` 下已安装的 SDK 版本（Java、Maven 等）体积大且逐机器不同，不纳入仓库；新机器需要 `sdk install java` / `sdk install maven` 重新安装所需版本。
+
 ---
 
 ## 目录结构

@@ -226,7 +226,20 @@ if [[ -d "$HOME/.m2" && ! -L "$HOME/.m2" ]]; then
         || mv "$HOME/.m2" "$HOME/.m2.bak-$(date +%s)"
 fi
 
-# ── 10. mihomo 配置 ───────────────────────────────────────────────────────────
+# ── 10. SDKMAN ────────────────────────────────────────────────────────────────
+# 官方安装脚本直接装到 XDG_DATA_HOME 下（SDKMAN_DIR 是 sdkman 自身唯一的目录变量，
+# 程序本体和 candidates 数据混在一起，没法只迁移数据部分，因此不用发行版包）。
+# fish 端集成见 home/.config/fish/conf.d/config_sdk.fish（__sdkman_custom_dir）
+# 和 fish_plugins（reitzig/sdkman-for-fish），由 stow + fisher update 落地。
+echo "[+] 配置 SDKMAN..."
+SDKMAN_DIR_NEW="$HOME/.local/share/sdkman"
+if [[ ! -f "$SDKMAN_DIR_NEW/bin/sdkman-init.sh" ]]; then
+    curl -s "https://get.sdkman.io" | SDKMAN_DIR="$SDKMAN_DIR_NEW" bash
+    echo "    已安装 SDKMAN 到 $SDKMAN_DIR_NEW"
+fi
+fish -c "fisher update" 2>/dev/null || true
+
+# ── 11. mihomo 配置 ───────────────────────────────────────────────────────────
 echo "[+] 生成 mihomo 配置..."
 mkdir -p "$HOME/.config/mihomo"
 if rbw get mihomo-proxy-token &>/dev/null && rbw get mihomo-secret &>/dev/null; then
