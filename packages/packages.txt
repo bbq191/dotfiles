@@ -63,6 +63,7 @@ fcitx5-rime
 ffmpegthumbnailer
 file-roller
 fnm
+foliate
 fsarchiver
 fwupd
 gamemode
