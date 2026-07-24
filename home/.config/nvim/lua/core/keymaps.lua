@@ -98,7 +98,7 @@ map("n", "<leader>mp", function()
     "-V", "CJKsansfont=Maple Mono NF CN",
     "-V", "CJKmonofont=Maple Mono NF CN",
     "-V", "geometry:margin=2.5cm",
-    "-V", "fontsize=12pt",
+    "-V", "fontsize=11pt",
   }, {
     on_exit = function(_, code)
       if code == 0 then

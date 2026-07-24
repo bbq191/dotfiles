@@ -19,7 +19,7 @@
   // 编辑器核心设置
   // =============================================
   "editor.fontFamily": "'Maple Mono NF CN'",
-  "editor.fontSize": 13,
+  "editor.fontSize": 11,
   "editor.cursorStyle": "block",
   "editor.cursorBlinking": "solid",
   "editor.lineNumbers": "relative",
