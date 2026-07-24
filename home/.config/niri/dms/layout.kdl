@@ -22,6 +22,7 @@ window-rule {
 
 layer-rule {
     exclude namespace="^dms:bar$"
+    exclude namespace="^dms:frame$"
     background-effect {
         xray false
     }
