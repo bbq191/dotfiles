@@ -126,6 +126,7 @@ binds {
     Mod+Q { spawn "kitty"; }
     Mod+E { spawn "thunar"; }
     Mod+R { spawn "dms" "ipc" "call" "launcher" "toggle"; }
+    Mod+B { spawn "xdg-open" "https://"; }   // 启动默认浏览器（读取 mimeapps.list，不硬编码具体浏览器）
 
     // ── 窗口管理 ──
     Mod+C { close-window; }
@@ -232,7 +233,7 @@ binds {
 // 文件对话框居中：niri 浮窗默认居中打开，无需单独规则
 
 window-rule {
-    match app-id="^(thunar|blueman-manager|blueberry|nm-connection-editor|wechat|com\\.picc\\.lanxin|org\\.telegram\\.desktop|com\\.gabm\\.satty|org\\.quickshell|steam_app_default)$"
+    match app-id="^(thunar|org\\.gnome\\.Nautilus|blueman-manager|blueberry|nm-connection-editor|wechat|com\\.picc\\.lanxin|org\\.telegram\\.desktop|com\\.gabm\\.satty|org\\.quickshell|steam_app_default|com\\.danklinux\\.dankcalendar|net\\.lutris\\.Lutris)$"
     open-floating true
 }
 
