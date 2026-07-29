@@ -6,7 +6,7 @@ application/x-bzpdf=org.pwmt.zathura.desktop
 application/x-ext-pdf=org.pwmt.zathura.desktop
 application/x-gnome-saved-search=thunar.desktop
 application/x-gzpdf=org.pwmt.zathura.desktop
-application/xhtml+xml=librewolf.desktop
+application/xhtml+xml=microsoft-edge-canary.desktop
 image/avif=satty.desktop
 image/bmp=satty.desktop
 image/gif=satty.desktop
@@ -15,16 +15,16 @@ image/png=satty.desktop
 image/svg+xml=satty.desktop
 image/webp=satty.desktop
 inode/directory=thunar.desktop
-text/html=librewolf.desktop
+text/html=brave-browser-nightly.desktop
 text/plain=org.neovim.nvim.desktop
 text/x-python=org.neovim.nvim.desktop
 text/x-shellscript=org.neovim.nvim.desktop
-x-scheme-handler/about=microsoft-edge-canary.desktop
+x-scheme-handler/about=brave-browser-nightly.desktop
 x-scheme-handler/calendar=dms-open.desktop
 x-scheme-handler/claude-cli=claude-code-url-handler.desktop
-x-scheme-handler/http=librewolf.desktop
-x-scheme-handler/https=librewolf.desktop
-x-scheme-handler/unknown=microsoft-edge-canary.desktop
+x-scheme-handler/http=brave-browser-nightly.desktop
+x-scheme-handler/https=brave-browser-nightly.desktop
+x-scheme-handler/unknown=brave-browser-nightly.desktop
 
 [Added Associations]
 application/json=org.neovim.nvim.desktop;
@@ -34,7 +34,7 @@ application/vnd.comicbook-rar=org.pwmt.zathura.desktop;
 application/x-bzpdf=org.pwmt.zathura.desktop;
 application/x-ext-pdf=org.pwmt.zathura.desktop;
 application/x-gzpdf=org.pwmt.zathura.desktop;
-application/xhtml+xml=librewolf.desktop;
+application/xhtml+xml=librewolf.desktop;microsoft-edge-canary.desktop;
 image/avif=satty.desktop;
 image/bmp=satty.desktop;
 image/gif=satty.desktop;
@@ -42,10 +42,10 @@ image/jpeg=satty.desktop;
 image/png=satty.desktop;
 image/svg+xml=satty.desktop;
 image/webp=satty.desktop;
-text/html=librewolf.desktop;
+text/html=librewolf.desktop;microsoft-edge-canary.desktop;
 x-scheme-handler/calendar=dms-open.desktop;
-x-scheme-handler/http=librewolf.desktop;
-x-scheme-handler/https=librewolf.desktop;
+x-scheme-handler/http=librewolf.desktop;microsoft-edge-canary.desktop;
+x-scheme-handler/https=librewolf.desktop;microsoft-edge-canary.desktop;
 
 [Removed Associations]
 
