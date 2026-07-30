@@ -6,7 +6,7 @@ application/x-bzpdf=org.pwmt.zathura.desktop
 application/x-ext-pdf=org.pwmt.zathura.desktop
 application/x-gnome-saved-search=thunar.desktop
 application/x-gzpdf=org.pwmt.zathura.desktop
-application/xhtml+xml=microsoft-edge-canary.desktop
+application/xhtml+xml=brave-browser-nightly.desktop
 image/avif=satty.desktop
 image/bmp=satty.desktop
 image/gif=satty.desktop
@@ -34,7 +34,6 @@ application/vnd.comicbook-rar=org.pwmt.zathura.desktop;
 application/x-bzpdf=org.pwmt.zathura.desktop;
 application/x-ext-pdf=org.pwmt.zathura.desktop;
 application/x-gzpdf=org.pwmt.zathura.desktop;
-application/xhtml+xml=librewolf.desktop;microsoft-edge-canary.desktop;
 image/avif=satty.desktop;
 image/bmp=satty.desktop;
 image/gif=satty.desktop;
@@ -42,10 +41,7 @@ image/jpeg=satty.desktop;
 image/png=satty.desktop;
 image/svg+xml=satty.desktop;
 image/webp=satty.desktop;
-text/html=librewolf.desktop;microsoft-edge-canary.desktop;
 x-scheme-handler/calendar=dms-open.desktop;
-x-scheme-handler/http=librewolf.desktop;microsoft-edge-canary.desktop;
-x-scheme-handler/https=librewolf.desktop;microsoft-edge-canary.desktop;
 
 [Removed Associations]
 
