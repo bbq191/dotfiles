@@ -1,0 +1,24 @@
+# reMarkable Paper Pro Move 风格 · pandoc 导出配置（通用 dotfile）
+# 用法：
+#   pandoc 输入.md -d ~/.config/pandoc/remarkable.yaml -o 输出.pdf
+# 换字体/颜色/页边距改 remarkable.tex；换 mermaid 行为改 filters.lua。
+# 字体在 ~/.local/share/fonts/remarkable-pandoc/（与项目解耦）。
+
+from: markdown
+to: pdf
+pdf-engine: xelatex
+
+filters:
+  - type: lua
+    path: /home/afu/.config/pandoc/filters.lua
+
+include-in-header:
+  - /home/afu/.config/pandoc/remarkable.tex
+
+variables:
+  documentclass: article
+  fontsize: 11pt
+  colorlinks: true
+  # 目录：如需 pandoc 自动生成目录，把下面两行的注释去掉
+  # toc: true
+  # toc-depth: 2

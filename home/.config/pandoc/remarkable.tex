@@ -1,0 +1,145 @@
+% ============================================================
+%  reMarkable Paper Pro Move 风格 · pandoc/xelatex 头文件
+%  用法见 pandoc/remarkable.yaml。修改字体只改本文件。
+% ============================================================
+
+% ---------- 图片（mermaid 渲染图经 \includegraphics 内嵌，需显式加载）----------
+\usepackage{graphicx}
+
+% ---------- 配色（取自白皮书 HTML 的 light 主题）----------
+\usepackage{xcolor}
+\definecolor{rmpaper}{HTML}{ECE9E1}   % 纸张底色
+\definecolor{rmraised}{HTML}{F6F4EC}  % 代码/卡片底色
+\definecolor{rmink}{HTML}{201F1B}     % 正文
+\definecolor{rminksoft}{HTML}{5C584D} % 次要文字
+\definecolor{rminkfaint}{HTML}{8A8577}
+\definecolor{rmaccent}{HTML}{2B6357}  % 主强调（雾松绿）
+\definecolor{rmaccentink}{HTML}{1C4A41}
+\definecolor{rmcaution}{HTML}{A85C22}
+\definecolor{rmline}{HTML}{D7D2C8}    % 细线
+
+% 纸张底色。想要纯白（打印省墨）就注释掉下面这一行。
+\pagecolor{rmpaper}
+\AtBeginDocument{\color{rmink}}
+
+% ---------- 字体（项目字体，绝对路径引用，不依赖 fontconfig 注册）----------
+\usepackage{fontspec}
+\usepackage{xeCJK}
+% 字体统一放在本地字体区（与任何项目解耦）。换机时把这个目录一起带上即可。
+\def\rmfonts{/home/afu/.local/share/fonts/remarkable-pandoc/}
+\def\lxgw{/home/afu/.local/share/fonts/remarkable-pandoc/}
+\def\rmassets{/home/afu/.local/share/fonts/remarkable-pandoc/}
+
+% 拉丁正文：KF Readerly（阅读衬线）
+\setmainfont{KF Readerly}[
+  Path=\rmfonts,
+  UprightFont=KF_Readerly-Regular.ttf,
+  BoldFont=KF_Readerly-Bold.ttf,
+  ItalicFont=KF_Readerly-Italic.ttf,
+  BoldItalicFont=KF_Readerly-BoldItalic.ttf ]
+
+% 中文正文：霞鹜文楷（纸感楷体）
+\setCJKmainfont{LXGW WenKai}[
+  Path=\lxgw,
+  UprightFont=LXGWWenKai-Regular.ttf,
+  BoldFont=LXGWWenKai-Medium.ttf ]
+
+% 等宽/代码：霞鹜文楷等宽（含中文，代码里的中文注释也能正常显示）
+\setmonofont{LXGW WenKai Mono}[
+  Path=\lxgw, Scale=0.94,
+  UprightFont=LXGWWenKaiMono-Regular.ttf,
+  BoldFont=LXGWWenKaiMono-Medium.ttf ]
+\setCJKmonofont{LXGW WenKai Mono}[
+  Path=\lxgw, Scale=0.94,
+  UprightFont=LXGWWenKaiMono-Regular.ttf,
+  BoldFont=LXGWWenKaiMono-Medium.ttf ]
+
+% 标题字体：京華老宋（中文宋体显示）+ KF Readerly 粗（拉丁）
+\setCJKfamilyfont{rmheadcjk}{KingHwaOldSong}[ Path=\rmassets, UprightFont=KingHwaOldSong.ttf ]
+\newfontfamily\rmHeadLatin{KF Readerly}[ Path=\rmfonts,
+  UprightFont=KF_Readerly-Bold.ttf, BoldFont=KF_Readerly-Bold.ttf ]
+\newcommand{\rmHeadFont}{\rmHeadLatin\CJKfamily{rmheadcjk}}
+
+% ---------- 符号/emoji 兜底（正文字体不含这些字形，映射到 Noto CJK 单色等价）----------
+% MD 源里保留 emoji（网页查看好看）；PDF 用主题色单色符号呈现。
+\usepackage{newunicodechar}
+\newfontfamily\rmfallcjk{Noto Sans CJK SC}
+\newfontfamily\rmfallsym{Noto Sans Symbols 2}
+\newcommand{\rmglyph}[1]{{\rmfallcjk\char"#1}}
+\newcommand{\rmsymb}[1]{{\rmfallsym\char"#1}}
+\newunicodechar{→}{\rmglyph{2192}}
+\newunicodechar{①}{\rmglyph{2460}}
+\newunicodechar{②}{\rmglyph{2461}}
+\newunicodechar{③}{\rmglyph{2462}}
+\newunicodechar{④}{\rmglyph{2463}}
+\newunicodechar{▶}{\rmglyph{25B6}}
+\newunicodechar{▤}{\rmglyph{25A4}}
+\newunicodechar{▾}{\rmsymb{25BE}}
+\newunicodechar{▴}{\rmsymb{25B4}}
+\newunicodechar{◑}{\rmglyph{25D1}}
+\newunicodechar{✓}{\rmglyph{2713}}
+\newunicodechar{✗}{\rmsymb{2717}}
+\newunicodechar{⊂}{\rmglyph{2282}}
+\newunicodechar{∩}{\rmglyph{2229}}
+% 三个状态 emoji → 主题色单色徽标
+\newunicodechar{✅}{{\color{rmaccent}\rmglyph{2713}}}
+\newunicodechar{⚠}{{\color{rmcaution}\rmglyph{25B2}}}
+\newunicodechar{📌}{{\color{rminksoft}\rmglyph{25C6}}}
+\newunicodechar{️}{}  % U+FE0F 变体选择符，去掉
+
+% ---------- 版式 ----------
+\usepackage{geometry}
+\geometry{a4paper, margin=2.2cm}   % 想更贴近设备阅读可改 a5paper
+\usepackage{setspace}
+\setstretch{1.32}                  % 中文行距更舒展
+\usepackage{parskip}
+\setlength{\parskip}{0.55em}
+
+% ---------- 标题样式 ----------
+\usepackage{titlesec}
+\titleformat{\section}{\rmHeadFont\color{rmaccent}\LARGE}{}{0pt}{}
+\titleformat{\subsection}{\rmHeadFont\color{rmaccentink}\Large}{}{0pt}{}
+\titleformat{\subsubsection}{\bfseries\color{rmink}\large}{}{0pt}{}
+\titlespacing*{\section}{0pt}{1.7em}{0.7em}
+\titlespacing*{\subsection}{0pt}{1.2em}{0.5em}
+\titlespacing*{\subsubsection}{0pt}{1.0em}{0.4em}
+% 章节之间加一条细分隔线
+\titleformat{\section}[hang]{\rmHeadFont\color{rmaccent}\LARGE}{}{0pt}
+  {}[{\color{rmline}\titlerule[0.6pt]}]
+
+% ---------- 修复溢出（核心）----------
+% 1) 代码块长行折行
+\usepackage{fvextra}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{%
+  breaklines, breakanywhere, breaksymbolleft={}, commandchars=\\\{\}, fontsize=\small}
+\fvset{breaklines, breakanywhere, fontsize=\small}
+% 2) 长内联代码/路径/URL 断行（配合 filters.lua 的 \allowbreak 插入）
+\usepackage{xurl}
+\Urlmuskip=0mu plus 1mu\relax
+\setlength{\emergencystretch}{3em}
+% 3) 宽表格：缩小字号，pandoc 自身按比例分配的列宽即可自动换行
+\usepackage{etoolbox}
+\AtBeginEnvironment{longtable}{\small\setlength{\tabcolsep}{4pt}}
+\AtBeginEnvironment{tabular}{\small}
+
+% ---------- 代码块 / 引用块 卡片化 ----------
+\usepackage{mdframed}
+% 代码块：纸色底 + 细边（pandoc 定义了 Shaded 才重定义）
+\ifdefined\Shaded
+  \renewenvironment{Shaded}{%
+    \begin{mdframed}[backgroundcolor=rmraised, linecolor=rmline, linewidth=0.4pt,
+      roundcorner=3pt, innerleftmargin=8pt, innerrightmargin=8pt,
+      innertopmargin=6pt, innerbottommargin=6pt, skipabove=0.7em, skipbelow=0.7em]}%
+    {\end{mdframed}}
+\fi
+% 引用块（源码/说明卡片）：左侧强调竖条 + 纸色底
+\renewenvironment{quote}{%
+  \begin{mdframed}[topline=false, bottomline=false, rightline=false, leftline=true,
+    linecolor=rmaccent, linewidth=2.4pt, backgroundcolor=rmraised,
+    innerleftmargin=12pt, innerrightmargin=10pt, innertopmargin=7pt, innerbottommargin=7pt,
+    skipabove=0.7em, skipbelow=0.7em]\small\color{rminksoft}}%
+  {\end{mdframed}}
+
+% ---------- 链接配色（延到 hyperref 加载之后）----------
+\AtBeginDocument{\hypersetup{colorlinks=true, linkcolor=rmaccentink, urlcolor=rmaccent,
+  citecolor=rmaccent, filecolor=rmaccent}}

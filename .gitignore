@@ -31,3 +31,6 @@ home/.config/fish/conf.d/sdk.fish
 home/.config/fish/functions/sdk.fish
 home/.config/fish/completions/sdk.fish
 home/.config/fish/functions/__sdkman-noexport-init.sh
+
+# pandoc mermaid 渲染缓存（正常在 ~/.cache，防误入仓库）
+.pandoc-mermaid/
