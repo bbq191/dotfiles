@@ -11,5 +11,8 @@
   },
   "hotspotInternet": {
     "enabled": true
+  },
+  "usbInternet": {
+    "enabled": true
   }
 }
