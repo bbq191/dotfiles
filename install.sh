@@ -135,6 +135,10 @@ sudo chmod 0440 /etc/sudoers.d/papirus-folders
 sudo mkdir -p /etc/NetworkManager/conf.d
 sudo cp "$DOTFILES/system/etc/NetworkManager/conf.d/wifi-backend.conf" \
         /etc/NetworkManager/conf.d/
+# 固定 Wi-Fi 网卡名为 wlan0（iwlwifi 固件崩溃恢复后接口名会漂移成 wlan1）
+sudo mkdir -p /etc/systemd/network
+sudo cp "$DOTFILES/system/etc/systemd/network/10-wlan0.link" \
+        /etc/systemd/network/
 sudo mkdir -p /etc/keyd
 sudo cp "$DOTFILES/system/etc/keyd/default.conf" \
         /etc/keyd/

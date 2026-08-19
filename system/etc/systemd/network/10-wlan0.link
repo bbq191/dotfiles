@@ -1,0 +1,8 @@
+# 按永久 MAC 把内置 Wi-Fi（Intel BE200）固定命名为 wlan0。
+# 背景：iwlwifi 固件崩溃自恢复后会重新注册 phy，接口名漂移成 wlan1，
+# 导致 hotspot-internet 开关和免密 sudoers（都写死 wlan0）失效。
+[Match]
+PermanentMACAddress=80:c0:1e:5e:16:ef
+
+[Link]
+Name=wlan0
