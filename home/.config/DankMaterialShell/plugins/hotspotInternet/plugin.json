@@ -1,0 +1,13 @@
+{
+    "id": "hotspotInternet",
+    "name": "热点外网开关",
+    "description": "控制连接共享 Wi-Fi 热点的设备能否经 mihomo 访问外网（hotspot-internet 脚本的图形开关）",
+    "version": "1.0.0",
+    "author": "afu",
+    "type": "widget",
+    "capabilities": ["control-center", "dankbar-widget"],
+    "component": "./HotspotInternetWidget.qml",
+    "icon": "wifi_tethering",
+    "requires_dms": ">=1.0.0",
+    "permissions": ["process"]
+}

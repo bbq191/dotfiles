@@ -8,5 +8,8 @@
   },
   "emojiLauncher": {
     "enabled": true
+  },
+  "hotspotInternet": {
+    "enabled": true
   }
 }

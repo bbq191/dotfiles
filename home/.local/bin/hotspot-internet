@@ -1,0 +1,45 @@
+#!/usr/bin/env bash
+# 热点（共享 Wi-Fi「大郎少喝点」）外网开关：控制连上热点的设备能否经 mihomo 上真互联网。
+#
+# 原理：mihomo TUN 的策略路由（pref 9001/9002）把所有非本机产生的流量送进
+# Meta 表（2022），热点（wlan0）的转发流量因此走代理拿到真互联网。
+# off 时插入一条优先级更高的规则 `iif wlan0 lookup main`，热点流量只查 main 表：
+# mihomo DNS 返回的 fake-ip（28/8）在 main 表无路可达，等效于断外网。
+# ip rule 不持久，重启后自动回到默认 on。
+set -euo pipefail
+
+PREF=8990   # 必须小于 mihomo 自建规则的最小优先级 9000
+IFACE=wlan0
+
+bypass_on() { [ -n "$(ip rule show pref "$PREF")" ]; }
+
+# 提权：先试免密 sudo（可配 sudoers 免密），终端里退回交互式 sudo，
+# GUI 场景（DMS 面板开关，无 tty）走 pkexec 弹 DMS 的 polkit 认证框
+run_root() {
+    if [ "$(id -u)" -eq 0 ]; then "$@"; return; fi
+    if sudo -n "$@" 2>/dev/null; then return; fi
+    if [ -t 0 ]; then sudo "$@"; else pkexec "$@"; fi
+}
+
+case "${1:-status}" in
+    off)
+        bypass_on || run_root ip rule add iif "$IFACE" lookup main pref "$PREF"
+        ;;
+    on)
+        while bypass_on; do run_root ip rule del pref "$PREF"; done
+        ;;
+    toggle)
+        if bypass_on; then exec "$0" on; else exec "$0" off; fi
+        ;;
+    status) ;;
+    *)
+        echo "用法: ${0##*/} [on|off|toggle|status]" >&2
+        exit 2
+        ;;
+esac
+
+if bypass_on; then
+    echo "off — 热点设备已绕过 mihomo，无法上外网"
+else
+    echo "on — 热点设备经 mihomo 上外网"
+fi
