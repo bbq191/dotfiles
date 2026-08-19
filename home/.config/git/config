@@ -1,2 +1,5 @@
 [credential]
 	helper = rbw
+[user]
+	email = afu@localhost
+	name = afu
