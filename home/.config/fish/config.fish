@@ -14,7 +14,6 @@ set -gx PYENV_ROOT       $HOME/.local/share/pyenv
 set -gx npm_config_cache $HOME/.cache/npm
 set -gx CUDA_CACHE_PATH  $HOME/.cache/nvidia
 set -gx WINEPREFIX       $HOME/.local/share/wine
-set -gx GOPATH           $XDG_DATA_HOME/go
 set -gx GEMINI_CLI_HOME  $XDG_CONFIG_HOME/gemini
 set -gx TEXMFHOME        $XDG_DATA_HOME/texmf
 set -gx TEXMFVAR         $XDG_CACHE_HOME/texlive/texmf-var
