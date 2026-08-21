@@ -81,11 +81,18 @@
 \newunicodechar{✗}{\rmsymb{2717}}
 \newunicodechar{⊂}{\rmglyph{2282}}
 \newunicodechar{∩}{\rmglyph{2229}}
+\newunicodechar{➔}{\rmsymb{2794}}
 % 三个状态 emoji → 主题色单色徽标
 \newunicodechar{✅}{{\color{rmaccent}\rmglyph{2713}}}
 \newunicodechar{⚠}{{\color{rmcaution}\rmglyph{25B2}}}
 \newunicodechar{📌}{{\color{rminksoft}\rmglyph{25C6}}}
 \newunicodechar{️}{}  % U+FE0F 变体选择符，去掉
+
+% 通用 emoji 兜底：上面没逐个映射到的 emoji，由 filters.lua 包进 \rmEmoji，
+% 用单色 Noto Emoji 渲染（xelatex 渲染不了彩色 emoji 字体）。
+% 字体文件：google/fonts 仓库 ofl/notoemoji 的可变字体，默认实例即 Regular。
+\newfontfamily\rmEmojiFont{NotoEmoji-Regular.ttf}[Path=\rmfonts, Scale=0.9]
+\newcommand{\rmEmoji}[1]{{\rmEmojiFont #1}}
 
 % ---------- 版式 ----------
 \usepackage{geometry}

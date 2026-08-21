@@ -78,4 +78,47 @@ function Mermaid_filter.CodeBlock(el)
   return pandoc.RawBlock('latex', raw)
 end
 
-return { Code_filter, Mermaid_filter }
+------------------------------------------------------------------
+-- 3) emoji 通用兜底：正文字体没有的图形字符包进 \rmEmoji（单色 Noto Emoji）
+--    remarkable.tex 里 newunicodechar 逐个映射过的字符不受影响（活动字符优先）
+------------------------------------------------------------------
+local Emoji_filter = {}
+if FORMAT:match('latex') then
+  local function is_emoji(cp)
+    return (cp >= 0x1F000 and cp <= 0x1FAFF)  -- 各类 emoji/图形符号平面
+        or (cp >= 0x2600  and cp <= 0x27BF)   -- 杂项符号 + 装饰符号（⚖ ✂ ➔…）
+        or (cp >= 0x2B00  and cp <= 0x2BFF)   -- ⭐ ⬆ 等
+        or cp == 0x203C or cp == 0x2049       -- ‼ ⁉
+        or cp == 0x200D                       -- ZWJ，随组合序列一起进 emoji 字体
+  end
+  local function split(text)
+    local out, buf, mode = {}, {}, nil  -- mode: 'txt' | 'emo'
+    local function flush()
+      if #buf == 0 then return end
+      local s = table.concat(buf)
+      if mode == 'emo' then
+        out[#out+1] = pandoc.RawInline('latex', '\\rmEmoji{' .. s .. '}')
+      else
+        out[#out+1] = pandoc.Str(s)
+      end
+      buf = {}
+    end
+    for _, cp in utf8.codes(text) do
+      if cp ~= 0xFE0F then  -- 变体选择符直接丢弃
+        local m = is_emoji(cp) and 'emo' or 'txt'
+        if m ~= mode then flush(); mode = m end
+        buf[#buf+1] = utf8.char(cp)
+      end
+    end
+    flush()
+    return out
+  end
+  function Emoji_filter.Str(el)
+    for _, cp in utf8.codes(el.text) do
+      if is_emoji(cp) or cp == 0xFE0F then return split(el.text) end
+    end
+    return nil
+  end
+end
+
+return { Code_filter, Mermaid_filter, Emoji_filter }
