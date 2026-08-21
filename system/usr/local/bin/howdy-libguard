@@ -1,0 +1,41 @@
+#!/bin/bash
+# howdy-libguard —— 保护 sudo/polkit 不被残缺的 howdy 拖垮
+#
+# 背景：/usr/lib/howdy/howdy-compare 经 OpenCV/ffmpeg 间接链接大量共享库
+# （libjack、libav* 等）。任一被 pacman 移除，compare 就会 exit 127 崩溃，
+# pam_howdy 崩溃会污染整个 PAM 认证对话，导致连正确密码都被拒——把人锁在门外。
+#
+# 本脚本由 pacman PostTransaction 钩子在每次包事务后调用：
+#   · 缺库  → 自动置 config.ini 的 disabled=true（pam_howdy 读到后干净跳过，
+#            密码回退恢复正常），并留下 marker 记录“是本机制禁用的”。
+#   · 库齐 → 若之前是本机制禁用的（marker 存在），自动恢复 disabled=false。
+# marker 机制确保不会覆盖用户手动 disable howdy 的意图。
+set -u
+
+COMPARE=/usr/lib/howdy/howdy-compare
+CONFIG=/etc/howdy/config.ini
+MARKER=/etc/howdy/.libguard-autodisabled
+
+# howdy 未装或结构变化：静默退出，绝不阻塞 pacman
+[ -x "$COMPARE" ] || exit 0
+[ -f "$CONFIG" ]  || exit 0
+
+missing=$(ldd "$COMPARE" 2>/dev/null | awk '/not found/{printf "%s ", $1}')
+
+if [ -n "$missing" ]; then
+    # 有缺库：仅当当前处于启用状态才动手，避免重复写入
+    if grep -qE '^[[:space:]]*disabled[[:space:]]*=[[:space:]]*false' "$CONFIG"; then
+        sed -i -E 's/^([[:space:]]*disabled[[:space:]]*=[[:space:]]*)false/\1true/' "$CONFIG"
+        : > "$MARKER"
+        echo ">>> howdy-libguard: howdy-compare 缺失共享库: ${missing}"
+        echo ">>> 已自动设置 disabled=true，保护 sudo/polkit 的密码回退不被 pam_howdy 崩溃污染。"
+        echo ">>> 补回缺库后将在下次 pacman 事务自动恢复（或手动删除 $MARKER 并改回 disabled=false）。"
+    fi
+elif [ -f "$MARKER" ]; then
+    # 库已齐全，且此前是本机制禁用的 → 自动恢复
+    sed -i -E 's/^([[:space:]]*disabled[[:space:]]*=[[:space:]]*)true/\1false/' "$CONFIG"
+    rm -f "$MARKER"
+    echo ">>> howdy-libguard: 共享库依赖已恢复齐全，重新启用 howdy 人脸识别（disabled=false）。"
+fi
+
+exit 0

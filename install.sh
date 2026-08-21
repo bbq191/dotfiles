@@ -128,6 +128,12 @@ sudo cp "$DOTFILES/system/etc/pam.d/dankshell" /etc/pam.d/
 sudo cp "$DOTFILES/system/etc/pam.d/sudo" /etc/pam.d/
 # greetd 归 greetd 包管理，覆盖后上游更新会生成 .pacnew，需留意合并
 sudo cp "$DOTFILES/system/etc/pam.d/greetd" /etc/pam.d/
+# howdy 守护：pacman 事务后若 howdy-compare 缺共享库，自动禁用 howdy，
+# 防止 pam_howdy 崩溃污染 sudo/polkit 密码回退把人锁在门外（库补回后自动恢复）
+sudo install -Dm755 "$DOTFILES/system/usr/local/bin/howdy-libguard" \
+        /usr/local/bin/howdy-libguard
+sudo install -Dm644 "$DOTFILES/system/etc/pacman.d/hooks/50-howdy-libguard.hook" \
+        /etc/pacman.d/hooks/50-howdy-libguard.hook
 sudo mkdir -p /etc/sudoers.d
 sudo cp "$DOTFILES/system/etc/sudoers.d/papirus-folders" \
         /etc/sudoers.d/

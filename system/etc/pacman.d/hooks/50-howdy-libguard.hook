@@ -1,0 +1,14 @@
+# 每次包事务后检查 howdy-compare 的共享库是否完整，缺库则自动禁用 howdy，
+# 防止 pam_howdy 崩溃污染 sudo/polkit 的密码回退。详见 /usr/local/bin/howdy-libguard。
+[Trigger]
+Operation = Install
+Operation = Upgrade
+Operation = Remove
+Type = Path
+Target = usr/lib/*.so*
+
+[Action]
+Description = 校验 howdy 共享库依赖，缺库时自动禁用以保护密码回退...
+When = PostTransaction
+Exec = /usr/local/bin/howdy-libguard
+NeedsTargets
