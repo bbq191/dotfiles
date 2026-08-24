@@ -8,13 +8,13 @@ import qs.Modules.Plugins
 PluginComponent {
     id: root
 
-    // flag 文件含 SRC-IP = 热点设备被强制 DIRECT（不可翻墙）；联网/DNS 不受影响
+    // flag 文件含 SRC-IP = USB 设备被强制 DIRECT（不可翻墙）；网络接入本身常通
     property bool directActive: false
     property bool busy: false
     readonly property bool proxiedOn: !directActive
 
-    ccWidgetIcon: proxiedOn ? "wifi_tethering" : "wifi_tethering_off"
-    ccWidgetPrimaryText: "热点翻墙"
+    ccWidgetIcon: proxiedOn ? "usb" : "usb_off"
+    ccWidgetPrimaryText: "USB 翻墙"
     ccWidgetSecondaryText: busy ? "切换中…" : (proxiedOn ? "设备经 mihomo 可翻墙" : "已切直连（不可翻墙）")
     ccWidgetIsActive: proxiedOn
 
@@ -33,7 +33,7 @@ PluginComponent {
 
     Process {
         id: statusProc
-        command: ["cat", "/etc/mihomo/flags/hotspot-direct.yaml"]
+        command: ["cat", "/etc/mihomo/flags/usb-direct.yaml"]
         stdout: StdioCollector {
             onStreamFinished: root.directActive = text.includes("SRC-IP")
         }
@@ -41,12 +41,12 @@ PluginComponent {
 
     Process {
         id: toggleProc
-        command: ["sh", "-c", "exec \"$HOME/.local/bin/hotspot-internet\" toggle"]
+        command: ["sh", "-c", "exec \"$HOME/.local/bin/usb-internet\" toggle"]
         onExited: exitCode => {
             root.busy = false;
             root.refresh();
             if (exitCode !== 0)
-                ToastService.showError("热点翻墙", "切换失败：mihomo API 不可达");
+                ToastService.showError("USB 翻墙", "切换失败：mihomo API 不可达");
         }
     }
 
@@ -62,7 +62,7 @@ PluginComponent {
 
     horizontalBarPill: Component {
         DankIcon {
-            name: root.proxiedOn ? "wifi_tethering" : "wifi_tethering_off"
+            name: root.proxiedOn ? "usb" : "usb_off"
             size: Theme.barIconSize(root.barThickness, -4, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
             color: root.proxiedOn ? Theme.widgetTextColor : Theme.error
         }
@@ -70,7 +70,7 @@ PluginComponent {
 
     verticalBarPill: Component {
         DankIcon {
-            name: root.proxiedOn ? "wifi_tethering" : "wifi_tethering_off"
+            name: root.proxiedOn ? "usb" : "usb_off"
             size: Theme.barIconSize(root.barThickness, -4, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
             color: root.proxiedOn ? Theme.widgetTextColor : Theme.error
         }

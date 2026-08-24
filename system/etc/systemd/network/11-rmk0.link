@@ -1,0 +1,9 @@
+# 按 MAC 把 reMarkable（Paper Pro Move）的 USB CDC 网卡固定命名为 rmk0。
+# 背景：内核按插入端口起名（enp128s20f0u1c2 之类），换口即漂移；
+# NM 专属 profile（remarkable-usb）按 rmk0 绑定。
+# 该 MAC 由设备派生，实测跨重插/重启稳定；设备固件升级后若失联先查这里。
+[Match]
+MACAddress=7a:60:0d:7e:95:02
+
+[Link]
+Name=rmk0

@@ -1,0 +1,18 @@
+{
+    "id": "usbInternet",
+    "name": "USB 翻墙开关",
+    "description": "USB 直连 reMarkable 走 mihomo 分流（可翻墙）或强制直连（不可翻墙但有网）的切换（usb-internet 脚本的图形开关）",
+    "version": "2.0.0",
+    "author": "afu",
+    "type": "widget",
+    "capabilities": [
+        "control-center",
+        "dankbar-widget"
+    ],
+    "component": "./UsbInternetWidget.qml",
+    "icon": "usb",
+    "requires_dms": ">=1.0.0",
+    "permissions": [
+        "process"
+    ]
+}

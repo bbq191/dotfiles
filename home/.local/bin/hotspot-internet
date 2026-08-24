@@ -1,35 +1,43 @@
 #!/usr/bin/env bash
-# 热点（共享 Wi-Fi「大郎少喝点」）外网开关：控制连上热点的设备能否经 mihomo 上真互联网。
+# 热点（共享 Wi-Fi「大郎少喝点」）翻墙开关：
+# on  = 热点设备走 mihomo 完整分流，可翻墙；
+# off = 热点设备强制 DIRECT（经有线直连出去），国内可用、被墙的不通——不断网。
 #
-# 原理：mihomo TUN 的策略路由（pref 9001/9002）把所有非本机产生的流量送进
-# Meta 表（2022），热点（wlan0）的转发流量因此走代理拿到真互联网。
-# off 时插入一条优先级更高的规则 `iif wlan0 lookup main`，热点流量只查 main 表：
-# mihomo DNS 返回的 fake-ip（28/8）在 main 表无路可达，等效于断外网。
-# ip rule 不持久，重启后自动回到默认 on。
+# 原理：mihomo rules 置顶有一条 `RULE-SET,hotspot_direct,DIRECT`，本脚本改写
+# flag 文件（payload 含 SRC-IP-CIDR = off）并调本机 API 刷新 provider，再断掉
+# 该来源的存量连接使切换立即生效。无需 root；状态在 flag 文件里，重启后保持。
 set -euo pipefail
 
-PREF=8990   # 必须小于 mihomo 自建规则的最小优先级 9000
-IFACE=wlan0
+FLAG=/etc/mihomo/flags/hotspot-direct.yaml
+PROVIDER=hotspot_direct
+CIDR=10.42.0.0/24
+PREFIX=10.42.
+API=http://127.0.0.1:9090
 
-bypass_on() { [ -n "$(ip rule show pref "$PREF")" ]; }
+SECRET=$(awk -F'"' '/^secret:/{print $2}' /etc/mihomo/config.yaml)
+api() { curl -sf --connect-timeout 3 -H "Authorization: Bearer $SECRET" "$@"; }
 
-# 提权：先试免密 sudo（可配 sudoers 免密），终端里退回交互式 sudo，
-# GUI 场景（DMS 面板开关，无 tty）走 pkexec 弹 DMS 的 polkit 认证框
-run_root() {
-    if [ "$(id -u)" -eq 0 ]; then "$@"; return; fi
-    if sudo -n "$@" 2>/dev/null; then return; fi
-    if [ -t 0 ]; then sudo "$@"; else pkexec "$@"; fi
+proxied() { ! grep -q SRC-IP "$FLAG"; }
+
+apply() {
+    api -X PUT "$API/providers/rules/$PROVIDER" -o /dev/null
+    # 断掉该来源的存量连接，避免长连接沿用旧策略
+    api "$API/connections" |
+        jq -r --arg p "$PREFIX" '.connections[]? | select(.metadata.sourceIP | startswith($p)) | .id' |
+        while read -r id; do api -X DELETE "$API/connections/$id" -o /dev/null || true; done
 }
 
 case "${1:-status}" in
-    off)
-        bypass_on || run_root ip rule add iif "$IFACE" lookup main pref "$PREF"
-        ;;
     on)
-        while bypass_on; do run_root ip rule del pref "$PREF"; done
+        printf 'payload: []\n' > "$FLAG"
+        apply
+        ;;
+    off)
+        printf 'payload:\n  - SRC-IP-CIDR,%s\n' "$CIDR" > "$FLAG"
+        apply
         ;;
     toggle)
-        if bypass_on; then exec "$0" on; else exec "$0" off; fi
+        if proxied; then exec "$0" off; else exec "$0" on; fi
         ;;
     status) ;;
     *)
@@ -38,8 +46,8 @@ case "${1:-status}" in
         ;;
 esac
 
-if bypass_on; then
-    echo "off — 热点设备已绕过 mihomo，无法上外网"
+if proxied; then
+    echo "on — 热点设备经 mihomo 分流（可翻墙）"
 else
-    echo "on — 热点设备经 mihomo 上外网"
+    echo "off — 热点设备直连（不可翻墙，国内可用）"
 fi

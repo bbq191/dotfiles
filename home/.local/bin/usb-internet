@@ -1,42 +1,44 @@
 #!/usr/bin/env bash
-# USB 直连设备（10.11.99.1，imx93 类）经本机 mihomo 上外网的开关。
+# USB 直连 reMarkable（10.11.99.1）翻墙开关：
+# on  = 设备走 mihomo 完整分流，可翻墙；
+# off = 设备强制 DIRECT（经有线直连出去），国内可用、被墙的不通——不断网。
 #
-# on : 启动 remarkable-usb-share.timer（45s 自愈推送）并立即推送一次;
-# off: 停止 timer，并在设备在线时 SSH 撤销 usb1 的网关路由 + 链路级 DNS，
-#      设备路由回落到自身 Wi-Fi（Wi-Fi 连接全程不受影响）。
-#      全局 DoT 兜底配置保留——那是修设备自身 Wi-Fi 的 53 端口黑洞的，与共享无关。
-#
-# timer 是 enabled 的用户单元，重启后自动拉起 => 默认开启。
-# 已知边角：off 时设备若挂起（SSH 冻结）则无法撤销，设备醒后仍暂有外网；
-# 再执行一次 off 或等设备重启（/etc 为易失 overlay）即可清除。
+# 网络接入本身与本开关无关：remarkable-usb-share.timer 常开，设备一插上就被
+# 推送「网关/DNS 指向本机」的配置（enabled 用户单元，开机自动拉起）。
+# 本脚本只改写 mihomo 的 flag 文件（payload 含 SRC-IP-CIDR = off）并调 API
+# 刷新 provider + 断存量连接。无需 root、无需 SSH 上设备；状态重启后保持。
 set -euo pipefail
 
-DEV=10.11.99.1
-TIMER=remarkable-usb-share.timer
+FLAG=/etc/mihomo/flags/usb-direct.yaml
+PROVIDER=usb_direct
+CIDR=10.11.99.0/24
+PREFIX=10.11.99.
+API=http://127.0.0.1:9090
 
-sharing_on() { systemctl --user --quiet is-active "$TIMER"; }
+SECRET=$(awk -F'"' '/^secret:/{print $2}' /etc/mihomo/config.yaml)
+api() { curl -sf --connect-timeout 3 -H "Authorization: Bearer $SECRET" "$@"; }
 
-revert_device() {
-    ping -c1 -W1 "$DEV" >/dev/null 2>&1 || return 0
-    ssh -o BatchMode=yes -o ConnectTimeout=3 "root@$DEV" '
-        rm -f /etc/systemd/network/10-usb.network.d/pc-gateway.conf
-        networkctl reload
-        networkctl reconfigure usb1
-        logger -t remarkable-usb-share "deprovisioned by PC switch"
-    ' 2>/dev/null || echo "警告: 设备在线但撤销配置失败（SSH）" >&2
+proxied() { ! grep -q SRC-IP "$FLAG"; }
+
+apply() {
+    api -X PUT "$API/providers/rules/$PROVIDER" -o /dev/null
+    # 断掉该来源的存量连接，避免长连接沿用旧策略
+    api "$API/connections" |
+        jq -r --arg p "$PREFIX" '.connections[]? | select(.metadata.sourceIP | startswith($p)) | .id' |
+        while read -r id; do api -X DELETE "$API/connections/$id" -o /dev/null || true; done
 }
 
 case "${1:-status}" in
     on)
-        systemctl --user start "$TIMER"
-        systemctl --user start remarkable-usb-share.service
+        printf 'payload: []\n' > "$FLAG"
+        apply
         ;;
     off)
-        systemctl --user stop "$TIMER"
-        revert_device
+        printf 'payload:\n  - SRC-IP-CIDR,%s\n' "$CIDR" > "$FLAG"
+        apply
         ;;
     toggle)
-        if sharing_on; then exec "$0" off; else exec "$0" on; fi
+        if proxied; then exec "$0" off; else exec "$0" on; fi
         ;;
     status) ;;
     *)
@@ -45,8 +47,8 @@ case "${1:-status}" in
         ;;
 esac
 
-if sharing_on; then
-    echo "on — USB 设备经 mihomo 上外网（timer 自动推送）"
+if proxied; then
+    echo "on — USB 设备经 mihomo 分流（可翻墙）"
 else
-    echo "off — USB 共享已停止"
+    echo "off — USB 设备直连（不可翻墙，国内可用）"
 fi

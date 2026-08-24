@@ -1,13 +1,18 @@
 {
     "id": "hotspotInternet",
-    "name": "热点外网开关",
-    "description": "控制连接共享 Wi-Fi 热点的设备能否经 mihomo 访问外网（hotspot-internet 脚本的图形开关）",
-    "version": "1.0.0",
+    "name": "热点翻墙开关",
+    "description": "热点设备走 mihomo 分流（可翻墙）或强制直连（不可翻墙但有网）的切换（hotspot-internet 脚本的图形开关）",
+    "version": "2.0.0",
     "author": "afu",
     "type": "widget",
-    "capabilities": ["control-center", "dankbar-widget"],
+    "capabilities": [
+        "control-center",
+        "dankbar-widget"
+    ],
     "component": "./HotspotInternetWidget.qml",
     "icon": "wifi_tethering",
     "requires_dms": ">=1.0.0",
-    "permissions": ["process"]
+    "permissions": [
+        "process"
+    ]
 }
