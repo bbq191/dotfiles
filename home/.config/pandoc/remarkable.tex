@@ -72,6 +72,13 @@
 \newunicodechar{②}{\rmglyph{2461}}
 \newunicodechar{③}{\rmglyph{2462}}
 \newunicodechar{④}{\rmglyph{2463}}
+\newunicodechar{⑤}{\rmglyph{2464}}
+\newunicodechar{⑥}{\rmglyph{2465}}
+\newunicodechar{★}{\rmglyph{2605}}
+\newunicodechar{✕}{\rmsymb{2715}}
+\newunicodechar{∪}{\rmglyph{222A}}
+\newunicodechar{↔}{\rmglyph{2194}}
+\newunicodechar{√}{\rmglyph{221A}}
 \newunicodechar{▶}{\rmglyph{25B6}}
 \newunicodechar{▤}{\rmglyph{25A4}}
 \newunicodechar{▾}{\rmsymb{25BE}}
@@ -146,6 +153,15 @@
     innerleftmargin=12pt, innerrightmargin=10pt, innertopmargin=7pt, innerbottommargin=7pt,
     skipabove=0.7em, skipbelow=0.7em]\small\color{rminksoft}}%
   {\end{mdframed}}
+
+% ---------- 中文删除线 ----------
+% pandoc 删除线（~~文字~~）默认用 soul 的 \st，参数含 CJK 必报
+% "Package soul Error: Reconstruction failed"。换 xeCJKfntef 的 \CJKsout，
+% 中英混排都能划线且可断行。延到文档开始覆盖，保证盖过 pandoc 模板的定义。
+\usepackage{xeCJKfntef}
+\AtBeginDocument{%
+  \ifdefined\st\renewcommand{\st}[1]{\CJKsout{#1}}%
+  \else\newcommand{\st}[1]{\CJKsout{#1}}\fi}
 
 % ---------- 链接配色（延到 hyperref 加载之后）----------
 \AtBeginDocument{\hypersetup{colorlinks=true, linkcolor=rmaccentink, urlcolor=rmaccent,
