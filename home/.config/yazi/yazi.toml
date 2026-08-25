@@ -47,7 +47,7 @@ rules = [
   { mime = "video/*",          use = ["video", "open"] },
   # 音频
   { mime = "audio/*",          use = ["open"] },
-  # PDF — 走 xdg-open（librewolf）
+  # PDF — 走 xdg-open（mimeapps.list 指向 zathura）
   { mime = "application/pdf",  use = ["open"] },
   # 压缩包
   { mime = "application/zip",               use = ["extract", "open"] },

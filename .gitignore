@@ -10,21 +10,22 @@ home/.config/DankMaterialShell/settings.json
 home/.config/DankMaterialShell/clsettings.json
 home/.config/fcitx5/conf/cached_layouts
 
-# fish 变量（含本机路径）
+# fish 变量（含本机路径）；fisher 主题目录
 home/.config/fish/fish_variables
+home/.config/fish/themes/
 
 # mpv uosc 二进制（按平台区分，不入库）
 home/.config/mpv/scripts/uosc/bin/ziggy-darwin
 home/.config/mpv/scripts/uosc/bin/ziggy-windows.exe
 
-# mihomo 运行时数据（含 token 的 config.yaml 由 install.sh 从模板生成）
-home/.config/mihomo/config.yaml
-home/.config/mihomo/cache.db
-home/.config/mihomo/proxies/
-home/.config/mihomo/rules/
-home/.config/mihomo/ui/
-# DMS 插件由 dms plugins CLI 管理（内含独立 git 仓库），不入库
-home/.config/DankMaterialShell/plugins/
+# mihomo 以系统服务运行（/etc/mihomo），模板在 system/etc/mihomo/config.template.yaml，
+# 含 token 的真实 config.yaml 由 install.sh 从 rbw 取值生成，不进仓库
+
+# DMS 第三方插件由 `dms plugins` CLI 管理（内含独立 git 仓库），不入库；
+# 自研插件（hotspotInternet / usbInternet）显式放行
+home/.config/DankMaterialShell/plugins/*
+!home/.config/DankMaterialShell/plugins/hotspotInternet/
+!home/.config/DankMaterialShell/plugins/usbInternet/
 
 # fisher 插件落地文件，由 fish_plugins + fisher update 生成，不手动维护
 home/.config/fish/conf.d/sdk.fish

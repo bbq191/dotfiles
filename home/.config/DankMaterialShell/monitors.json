@@ -22,24 +22,6 @@
           }
         }
       }
-    },
-    {
-      "id": "auto_5af6116",
-      "name": "",
-      "outputs": {
-        "eDP-2": {
-          "mode": "2560x1600@60.001",
-          "position": {
-            "x": 0,
-            "y": 0
-          },
-          "scale": 1,
-          "transform": "Normal",
-          "vrr": false,
-          "disabled": false,
-          "niri": {}
-        }
-      }
     }
   ]
 }

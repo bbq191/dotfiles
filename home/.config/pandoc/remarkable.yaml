@@ -10,10 +10,10 @@ pdf-engine: xelatex
 
 filters:
   - type: lua
-    path: /home/afu/.config/pandoc/filters.lua
+    path: ${HOME}/.config/pandoc/filters.lua
 
 include-in-header:
-  - /home/afu/.config/pandoc/remarkable.tex
+  - ${HOME}/.config/pandoc/remarkable.tex
 
 variables:
   documentclass: article

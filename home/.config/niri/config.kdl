@@ -98,8 +98,7 @@ workspace "scratch"
 // DMS 由 systemd 用户服务 dms.service（WantedBy=graphical-session.target）自动拉起
 
 spawn-at-startup "fcitx5" "-d" "--replace"
-// DMS 剪贴板历史后端
-spawn-at-startup "sh" "-c" "wl-paste --watch cliphist store"
+// 剪贴板历史后端由 cliphist.service（用户单元，install.sh 启用）提供，此处不再重复 spawn
 
 ///////////
 //  杂项  //
@@ -242,12 +241,6 @@ window-rule {
     open-floating true
     default-column-width { fixed 800; }
     default-window-height { fixed 450; }
-}
-
-window-rule {
-    // VS Code Insiders — 与 kitty background_opacity 0.85 保持一致
-    match app-id="^code-insiders$"
-    opacity 0.85
 }
 
 window-rule {

@@ -19,7 +19,8 @@ fi
 
 # ── 2. 安装软件包 ─────────────────────────────────────────────────────────────
 echo "[+] 安装软件包..."
-grep -v '^\s*#' "$DOTFILES/packages/packages.txt" | grep -v '^\s*$' | paru -S --needed -
+# 清单支持整行注释与行内注释（pkg  # 说明），先剥掉再交给 paru
+sed -e 's/\s*#.*//' -e '/^\s*$/d' "$DOTFILES/packages/packages.txt" | paru -S --needed -
 
 # ── 3. 安装 Node（fnm）和全局 npm 包 ─────────────────────────────────────────
 echo "[+] 配置 fnm + Node..."
@@ -27,7 +28,8 @@ export FNM_DIR="$HOME/.local/share/fnm"
 eval "$(fnm env --shell bash)"
 fnm install --lts
 fnm default lts-latest
-npm install -g @google/gemini-cli
+# gemini-cli：Gemini CLI；mermaid-cli：pandoc filters.lua 用 mmdc 把 mermaid 代码块渲染成图
+npm install -g @google/gemini-cli @mermaid-js/mermaid-cli
 
 # ── 4. 应用配置文件（stow） ───────────────────────────────────────────────────
 echo "[+] 应用 dotfiles..."
@@ -40,46 +42,11 @@ backup_if_exists() {
     fi
 }
 
-# 手动备份已知冲突目标
-for item in \
-    .config/fish \
-    .config/niri \
-    .config/kitty \
-    .config/nvim \
-    .config/yazi \
-    .config/starship.toml \
-    .config/lazygit \
-    .config/mpv \
-    .config/satty \
-    .config/fcitx5 \
-    .config/environment.d \
-    .config/git \
-    .config/fontconfig \
-    .config/qt5ct \
-    .config/qt6ct \
-    .config/mimeapps.list \
-    .config/user-dirs.dirs \
-    .config/user-dirs.locale \
-    .config/xdg-terminals.list \
-    .config/danksearch \
-    .config/dankcal \
-    .config/rbw \
-    .config/Thunar/uca.xml \
-    .config/DankMaterialShell \
-    .config/matugen \
-    ".config/Code - Insiders/User/settings.json" \
-    ".config/Code - Insiders/User/keybindings.json" \
-    ".config/gtk-3.0/settings.ini" \
-    ".config/gtk-4.0/settings.ini" \
-    .ssh/config \
-    .config/btop/btop.conf \
-    .config/fastfetch/config.jsonc \
-    .config/gemini/GEMINI.md \
-    .local/share/rustup/settings.toml \
-    .config/maven/settings.xml
-do
-    backup_if_exists "$item"
-done
+# 备份目标位置已存在的实体文件（非符号链接）：按仓库文件清单逐个检查，
+# 新增配置无需再手动登记；目录不整体搬走，stow 会在已有目录内逐文件建链
+while IFS= read -r rel; do
+    backup_if_exists "$rel"
+done < <(git -C "$DOTFILES" ls-files home | sed 's|^home/||')
 
 # 清理指向仓库的旧绝对路径符号链接：stow 只认自己创建的相对链接，
 # 绝对链接会被判定为冲突导致中止（链接目标不变，stow 会原地重建为相对链接）
@@ -140,10 +107,14 @@ sudo cp "$DOTFILES/system/etc/sudoers.d/papirus-folders" \
 sudo chmod 0440 /etc/sudoers.d/papirus-folders
 sudo mkdir -p /etc/NetworkManager/conf.d
 sudo cp "$DOTFILES/system/etc/NetworkManager/conf.d/wifi-backend.conf" \
+        "$DOTFILES/system/etc/NetworkManager/conf.d/99-firewall.conf" \
         /etc/NetworkManager/conf.d/
 # 固定 Wi-Fi 网卡名为 wlan0（iwlwifi 固件崩溃恢复后接口名会漂移成 wlan1）
 sudo mkdir -p /etc/systemd/network
 sudo cp "$DOTFILES/system/etc/systemd/network/10-wlan0.link" \
+        /etc/systemd/network/
+# 固定 reMarkable USB 网卡名为 rmk0（NM profile remarkable-usb 按此名绑定）；MAC 随设备而变，见文件注释
+sudo cp "$DOTFILES/system/etc/systemd/network/11-rmk0.link" \
         /etc/systemd/network/
 sudo mkdir -p /etc/keyd
 sudo cp "$DOTFILES/system/etc/keyd/default.conf" \
@@ -165,29 +136,18 @@ sudo systemctl enable linux-enable-ir-emitter.service
 sudo systemctl restart NetworkManager
 systemctl --user enable --now ssh-agent.socket
 systemctl --user enable --now dms.service 2>/dev/null || true
+# DMS 后端：剪贴板历史 / 日历 / Spotlight 文件索引（包自带单元）
+systemctl --user enable --now cliphist.service dcal.service dsearch.service 2>/dev/null || true
+# 壁纸变化 → 用户 matugen 模板（papirus 文件夹色 / zathura 配色）
+systemctl --user enable --now dms-user-matugen.path
+# USB 直连 reMarkable 时周期推送「网关/DNS 指向本机」配置（设备端不持久，靠定时器自愈）
+systemctl --user enable --now remarkable-usb-share.timer
 
 # ── 7. 目录初始化 ─────────────────────────────────────────────────────────────
 mkdir -p "$HOME/.local/share/wine"
 mkdir -p "$HOME/.local/share/ollama/models"
 mkdir -p "$HOME/.cache/ssh"
 chmod 700 "$HOME/.cache/ssh"
-
-# VSCode Insiders：VSCODE_PORTABLE 路径下的 user-data 软链接
-# settings/keybindings 源文件由 stow 管理在 ~/.config/Code - Insiders/User/
-VSCODE_USER="$HOME/.local/share/vscode-insiders/user-data/User"
-mkdir -p "$VSCODE_USER"
-for f in settings.json keybindings.json; do
-    src="$HOME/.config/Code - Insiders/User/$f"
-    dst="$VSCODE_USER/$f"
-    if [[ -f "$src" && ! -L "$dst" ]]; then
-        [[ -e "$dst" ]] && mv "$dst" "${dst}.bak-$(date +%s)"
-        ln -sf "$src" "$dst"
-        echo "    VSCode: 链接 $f → VSCODE_PORTABLE/user-data/User/"
-    elif [[ ! -e "$dst" ]]; then
-        ln -sf "$src" "$dst"
-        echo "    VSCode: 链接 $f → VSCODE_PORTABLE/user-data/User/"
-    fi
-done
 
 # ── 8. GnuPG XDG 迁移 ────────────────────────────────────────────────────────
 echo "[+] 配置 GnuPG XDG 路径..."
@@ -250,8 +210,16 @@ fi
 fish -c "fisher update" 2>/dev/null || true
 
 # ── 11. mihomo 配置 ───────────────────────────────────────────────────────────
+# mihomo 以系统服务运行（mihomo-bin 自带 mihomo.service，-d /etc/mihomo）。
+# 模板 system/etc/mihomo/config.template.yaml 只缺订阅 token 和面板密码，
+# 两者从 rbw 取出后 sed 填入；flags/ 目录归本用户所有，供 hotspot-internet /
+# usb-internet 脚本（无 root）改写外网开关标志，mihomo 以 file rule-provider 读取。
 echo "[+] 生成 mihomo 配置..."
-mkdir -p "$HOME/.config/mihomo"
+sudo mkdir -p /etc/mihomo/flags
+sudo chown "$USER:$USER" /etc/mihomo/flags
+for flag in hotspot-direct usb-direct; do
+    [[ -f "/etc/mihomo/flags/$flag.yaml" ]] || printf 'payload: []\n' > "/etc/mihomo/flags/$flag.yaml"
+done
 if rbw get mihomo-proxy-token &>/dev/null && rbw get mihomo-secret &>/dev/null; then
     MIHOMO_TOKEN=$(rbw get mihomo-proxy-token)
     MIHOMO_SECRET=$(rbw get mihomo-secret)
@@ -259,10 +227,12 @@ if rbw get mihomo-proxy-token &>/dev/null && rbw get mihomo-secret &>/dev/null; 
     SECRET_ESC=$(printf '%s\n' "$MIHOMO_SECRET" | sed 's/[\/&]/\\&/g')
     sed -e "s/__MIHOMO_TOKEN__/${TOKEN_ESC}/" \
         -e "s/__MIHOMO_SECRET__/${SECRET_ESC}/" \
-        "$DOTFILES/home/.config/mihomo/config.template.yaml" \
-        > "$HOME/.config/mihomo/config.yaml"
-    chmod 600 "$HOME/.config/mihomo/config.yaml"
-    echo "    mihomo config.yaml 已生成"
+        "$DOTFILES/system/etc/mihomo/config.template.yaml" \
+        | sudo tee /etc/mihomo/config.yaml >/dev/null
+    sudo chmod 644 /etc/mihomo/config.yaml   # hotspot-internet/usb-internet 以普通用户读 secret 调 API
+    sudo systemctl enable --now mihomo
+    sudo systemctl restart mihomo
+    echo "    /etc/mihomo/config.yaml 已生成，mihomo 已启动"
 else
     echo "    跳过：rbw 中未找到 mihomo-proxy-token 或 mihomo-secret，请手动添加后重新运行"
 fi
@@ -272,5 +242,8 @@ echo "完成。手动步骤："
 echo "  - mihomo：rbw add mihomo-proxy-token（订阅 token）和 rbw add mihomo-secret（面板密码）"
 echo "  - rbw：执行 'rbw register' 登录 Bitwarden"
 echo "  - SSH：将 SSH 私钥存入 Bitwarden（SSH Key 类型），rbw 解锁后执行 rbw-ssh-load 加载"
+echo "  - 字体：Maple Mono NF CN 与 pandoc 字体不在软件源，需手动放入 ~/.local/share/fonts（见 README）"
 echo "  - 壁纸：DMS Settings → Wallpaper 中设置（或 dms ipc call wallpaper set <路径>）"
-echo "  - NVIDIA：参考 README 中的已知问题"
+echo "  - 登录界面：dms greeter enable && dms greeter sync"
+echo "  - 人脸识别：sudo linux-enable-ir-emitter configure，然后 sudo howdy add（见 README）"
+echo "  - 热点/USB 共享：nmcli 重建 Hotspot / remarkable-usb 连接（见 README「网络共享」）"

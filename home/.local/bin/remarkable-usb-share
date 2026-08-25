@@ -1,0 +1,38 @@
+#!/bin/bash
+# 自动为 USB 直连的 reMarkable 类设备(10.11.99.1)配置经本机 mihomo 上网。
+# 设备 /etc 是易失 overlay + A/B 根分区,重启后配置会丢,由本脚本在 USB 在线时自动重推。
+# 由 remarkable-usb-share.timer 周期调用;设备不在线或已配置时为空转。
+DEV=10.11.99.1
+
+ping -c1 -W1 "$DEV" >/dev/null 2>&1 || exit 0
+
+ssh -o BatchMode=yes -o ConnectTimeout=3 -o StrictHostKeyChecking=accept-new "root@$DEV" '
+# 已配置(含 v2 标记 Domains=~.)则直接退出(幂等)
+grep -qs "Domains=~." /etc/systemd/network/10-usb.network.d/pc-gateway.conf \
+  && [ "$(cat /proc/sys/net/ipv4/conf/usb1/ignore_routes_with_linkdown 2>/dev/null)" = "1" ] \
+  && [ "$(readlink /etc/resolv.conf)" = "/run/systemd/resolve/stub-resolv.conf" ] \
+  && exit 0
+
+mkdir -p /etc/systemd/resolved.conf.d /etc/systemd/network/10-usb.network.d
+
+# usb1 链路级 DNS = PC 上的 mihomo(fake-ip)。Domains=~. 使其在 USB 在线时优先于一切;
+# 链路断开即随之消失。DNSOverTLS=no 避免对明文 1053 端口做 TLS 探测造成卡顿。
+printf "[Network]\nDNS=10.11.99.2:1053\nDomains=~.\nDNSDefaultRoute=yes\nDNSOverTLS=no\n\n[Route]\nGateway=10.11.99.2\nMetric=500\n" \
+  > /etc/systemd/network/10-usb.network.d/pc-gateway.conf
+
+# 全局兜底:公共 DoT(设备常在的 Wi-Fi 对明文 53 端口有过滤),仅在 USB 不在时被用到
+printf "[Resolve]\nDNS=223.5.5.5#dns.alidns.com 119.29.29.29#dot.pub\nDNSOverTLS=opportunistic\n" \
+  > /etc/systemd/resolved.conf.d/pc-gateway-dns.conf
+
+# 无载波接口的路由不参与选路,拔线后立即回落 Wi-Fi
+for f in /proc/sys/net/ipv4/conf/*/ignore_routes_with_linkdown \
+         /proc/sys/net/ipv6/conf/*/ignore_routes_with_linkdown; do
+  echo 1 > "$f" 2>/dev/null
+done
+
+ln -sf /run/systemd/resolve/stub-resolv.conf /etc/resolv.conf
+systemctl restart systemd-resolved
+networkctl reload
+networkctl reconfigure usb1
+logger -t remarkable-usb-share "device provisioned (v2)"
+' 2>/dev/null

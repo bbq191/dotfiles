@@ -1,0 +1,10 @@
+[Unit]
+Description=Periodically provision USB-connected reMarkable device
+
+[Timer]
+OnStartupSec=30
+OnUnitActiveSec=45
+AccuracySec=10
+
+[Install]
+WantedBy=timers.target

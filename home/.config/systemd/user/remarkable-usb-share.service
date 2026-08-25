@@ -1,0 +1,6 @@
+[Unit]
+Description=Provision USB-connected reMarkable device to route via mihomo
+
+[Service]
+Type=oneshot
+ExecStart=%h/.local/bin/remarkable-usb-share

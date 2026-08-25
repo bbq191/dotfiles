@@ -31,7 +31,6 @@ cachyos-snapper-support
 cachyos-v3-mirrorlist
 cachyos-v4-mirrorlist
 cachyos-wallpapers
-cage
 cantarell-fonts
 cava
 chwd
@@ -63,7 +62,6 @@ fcitx5-rime
 ffmpegthumbnailer
 file-roller
 fnm
-foliate
 fsarchiver
 fwupd
 gamemode
@@ -106,7 +104,6 @@ libdvdcss
 libgepub
 libgsf
 libopenraw
-librewolf-bin
 libva-nvidia-driver
 libva-utils
 limine
@@ -133,7 +130,6 @@ mkinitcpio
 mpv
 mtools
 neovim-nightly-bin
-netctl
 networkmanager
 networkmanager-openvpn
 nfs-utils
@@ -224,20 +220,87 @@ xorg-xwayland
 yazi
 yt-dlp
 zoxide
+# ── 主题 / Qt / 浏览器 / 阅读 ──
+adw-gtk-theme          # GTK3 主题（gtk-3.0/settings.ini 与 dconf 指向 adw-gtk3，吃 DMS matugen 配色）
+qt5ct
+qt6ct                  # QT_QPA_PLATFORMTHEME=qt5ct:qt6ct，Qt 应用读 matugen 配色与字体
+zathura
+zathura-pdf-mupdf      # 默认 PDF 阅读器（mimeapps.list），matugen 模板动态配色
+python-qrcode
+# ── 截图 / 录屏 / 文件 ──
+wf-recorder            # niri Super+Alt+A 区域录屏
+gvfs-mtp               # MTP 设备（手机/电子书）挂载
+jq                     # hotspot-internet / usb-internet 脚本解析 mihomo API
+stow
+zip
+# ── 办公 / 笔记 / 传输 ──
+libreoffice-fresh
+libreoffice-fresh-zh-cn
+obsidian               # fish obsync 函数同步 ~/Documents/ikate 笔记库
+localsend
+# ── pandoc → PDF（nvim <leader>mp，reMarkable 纸感导出）──
+pandoc-cli
+texlive-basic
+texlive-xetex
+texlive-latexrecommended
+texlive-latexextra
+texlive-fontsrecommended
+texlive-fontsextra
+texlive-langchinese
+texlive-binextra
+texlive-bibtexextra
+texlive-context
+texlive-fontutils
+texlive-formatsextra
+texlive-games
+texlive-humanities
+texlive-luatex
+texlive-mathscience
+texlive-metapost
+texlive-music
+texlive-pictures
+texlive-plaingeneric
+texlive-pstricks
+texlive-publishers
+# ── 开发 / 网络工具 ──
+github-cli
+uv
+cmake
+ninja
+android-tools
+python-fonttools
+curl-impersonate
+nmap
+radare2
+sshpass
+aarch64-linux-gnu-gcc
+aarch64-linux-gnu-binutils
+# ── 游戏 ──
+protonup-qt            # 图形化安装/更新 Proton-GE（取代 proton-ge-custom-bin）
+
 # DMS 可选后端：Spotlight 文件搜索 + 日历集成（dms doctor 建议）
 dsearch-bin
 dankcalendar-bin
-# DMS greeter 界面（配合 greetd，dms greeter install 自动配置）
+# DMS greeter 登录界面（配合 greetd；dms greeter enable && dms greeter sync）
 greetd-dms-greeter-bin
 fcitx5-theme-wechat
 howdy-next
 linux-enable-ir-emitter
 matugen-bin
 mihomo-bin
-proton-ge-custom-bin
 rime-ice-git
 rime-wanxiang-gram-zh-hans
-visual-studio-code-insiders-bin
 vmware-keymaps
 vmware-workstation
-wechat-universal-bwrap
+# ── 其余 AUR ──
+brave-nightly-bin      # 默认浏览器（mimeapps.list / Mod+B）
+python-pywalfox        # DMS matugen Pywalfox 模板 → 浏览器配色
+jmtpfs
+remanager-bin          # reMarkable 管理器
+calibre-plugin-dedrm
+debtap                 # 把 deb 转成 pacman 包（蓝信 com.picc.lanxin 即由此构建）
+ffuf-bin
+lazysql-bin
+reqable-bin
+wechat                 # 微信（AUR wechat，portable 沙箱）；取代 wechat-universal-bwrap
+# com.picc.lanxin      # 蓝信（人保 e 办）：无 AUR 包，用 debtap 转换官方 deb 后 pacman -U 安装
