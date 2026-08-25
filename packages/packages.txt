@@ -54,6 +54,8 @@ ethtool
 exfatprogs
 f2fs-tools
 fastfetch
+fish                   # cachyos-fish-config 会带入，显式列出表明意图
+fisher                 # fish 插件管理（sdkman-for-fish）
 fcitx5
 fcitx5-configtool
 fcitx5-gtk

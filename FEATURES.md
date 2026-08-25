@@ -138,7 +138,7 @@ fcitx5 的 `XMODIFIERS` / `QT_IM_MODULE` / `SDL_IM_MODULE` 在 `environment.d/fc
 | `?` / `cb` | 内置：设置搜索 / 剪贴板搜索 |
 | — | **hotspotInternet**、**usbInternet**（自研，控制中心开关 + 状态栏胶囊；`FileView` 监听 flag 文件，脚本或 CLI 改动即时反映，见「网络与代理」） |
 
-第三方插件由 `dms plugins` 安装（含独立 git 仓库，不入库），自研两个在仓库 `DankMaterialShell/plugins/`。后端：`dsearch`（Spotlight 文件索引，`danksearch/config.toml` 索引 `~` 深度 6）、`dcal`（日历，`dankcal/ui-settings.json`）。
+第三方插件由 `dms plugins install` 安装（install.sh 已包含；含独立 git 仓库，不入库），自研两个在仓库 `DankMaterialShell/plugins/`。后端：`dsearch`（Spotlight 文件索引，`danksearch/config.toml` 索引 `~` 深度 6）、`dcal`（日历，`dankcal/ui-settings.json`）。
 
 ### 控制中心
 

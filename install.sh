@@ -151,6 +151,10 @@ sudo systemctl enable linux-enable-ir-emitter.service
 sudo systemctl restart NetworkManager
 systemctl --user enable --now ssh-agent.socket
 systemctl --user enable --now dms.service 2>/dev/null || true
+# DMS 第三方启动器插件（plugin_settings.json 里已启用，但插件本体由 dms CLI 克隆，不在仓库）
+for plugin in calculator emojiLauncher niriWindows; do
+    [[ -d "$HOME/.config/DankMaterialShell/plugins/$plugin" ]] || dms plugins install "$plugin" || true
+done
 # DMS 后端：剪贴板历史 / 日历 / Spotlight 文件索引（包自带单元）
 systemctl --user enable --now cliphist.service dcal.service dsearch.service 2>/dev/null || true
 # 用户级 tmpfiles：user-tmpfiles.d/cleanup.conf 靠它执行（preset 写着 enable，但本机实测默认是 disabled）

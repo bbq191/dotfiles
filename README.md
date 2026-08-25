@@ -28,7 +28,7 @@ cd ~/Projects/dotfiles
 3. fnm 安装 Node LTS，全局 npm 安装 `@google/gemini-cli` 与 `@mermaid-js/mermaid-cli`（pandoc 渲染 mermaid 用）
 4. stow 将 `home/` 链接到 `$HOME`：目标位置已有的实体文件按仓库清单逐个备份为 `*.bak-<时间戳>`（已经通过上级目录链接指向仓库的文件会跳过），旧的绝对路径链接原地重建为相对链接；随后 `dconf load` 同步 GTK 字体/主题（Thunar 等纯 GTK3 程序不读 `settings.ini`）
 5. 复制 `system/etc`、`system/usr/local/bin` 到系统：resolved / ollama drop-in / NVIDIA modprobe / greetd NVIDIA 覆盖 / tmpfiles（THP、howdy 权限）/ PAM（dankshell、sudo、greetd、polkit-1）/ howdy-libguard 与 pacman 钩子 / sudoers（papirus-folders）/ NetworkManager（iwd 后端、iptables 防火墙后端）/ `.link` 网卡命名（wlan0、rmk0）/ sysctl（ip_forward、min_free_kbytes）/ udev（IO 调度器、uuu）/ keyd / snapper；并 mask `NetworkManager-wait-online`
-6. 启用 systemd 服务：系统级 iwd、keyd、linux-enable-ir-emitter（ollama 只装 override，不自启）；用户级 ssh-agent.socket、dms、cliphist、dcal、dsearch、remarkable-usb-share.timer、systemd-tmpfiles-setup（否则 `user-tmpfiles.d/cleanup.conf` 不生效，本机实测默认 disabled）
+6. 启用 systemd 服务：系统级 iwd、keyd、linux-enable-ir-emitter（ollama 只装 override，不自启）；`dms plugins install` 拉取三个第三方启动器插件（calculator / emojiLauncher / niriWindows）；用户级 ssh-agent.socket、dms、cliphist、dcal、dsearch、remarkable-usb-share.timer、systemd-tmpfiles-setup（否则 `user-tmpfiles.d/cleanup.conf` 不生效，本机实测默认 disabled）
 7. 初始化目录（wine prefix、ollama 模型、ssh ControlPath）
 8. GnuPG 迁移到 XDG 路径（`~/.local/share/gnupg`），生成 gpg-agent socket 单元 drop-in
 9. Maven 本地仓库迁移到 `~/.cache/maven/repository`
@@ -317,7 +317,7 @@ dotfiles/
 | `/etc/linux-enable-ir-emitter/` | IR 补光参数（机器专属）；`sudo linux-enable-ir-emitter configure` |
 | `/etc/greetd/config.toml`、`/etc/greetd/niri/` | `dms greeter enable && dms greeter sync` 生成 |
 | `~/.local/share/fonts/` | Maple Mono、pandoc 字体，手动放置 |
-| DMS 第三方插件（calculator、emojiLauncher、niriWindows） | `dms plugins` 安装（内含 git 仓库）；`plugin_settings.json` 记录了启用状态 |
+| DMS 第三方插件（calculator、emojiLauncher、niriWindows） | `install.sh` 用 `dms plugins install` 拉取（内含 git 仓库）；`plugin_settings.json` 记录了启用状态 |
 | `~/.config/DankMaterialShell/settings.json` | DMS 运行时设置，随操作频繁变化（主题、字体、通知等在 FEATURES 有记录） |
 | SDKMAN candidates、fnm Node、pyenv、cargo | 体积大且逐机器不同，`sdk install` / `fnm install` 重装 |
 | `~/.local/share/fcitx5/rime/` 除 `*.custom.yaml` 外 | 词库 userdb、build 产物；重新部署即生成 |
