@@ -33,7 +33,7 @@ cd ~/Projects/dotfiles
 8. GnuPG 迁移到 XDG 路径（`~/.local/share/gnupg`），生成 gpg-agent socket 单元 drop-in
 9. Maven 本地仓库迁移到 `~/.cache/maven/repository`
 10. SDKMAN 官方脚本安装到 `~/.local/share/sdkman`，fish 插件文件缺失时 `fisher update` 落地
-11. mihomo：从 rbw 取订阅 token 与面板密码填入模板，写到 `/etc/mihomo/config.yaml`（`640 root:用户`）并启动系统服务；建 `/etc/mihomo/flags/`（归当前用户，供外网开关脚本写入）
+11. mihomo：从 rbw 取订阅 token 与面板密码渲染模板，与 `/etc/mihomo/config.yaml` 不同时才写入（`640 root:用户`）并重启服务，相同则只确保服务已启用；建 `/etc/mihomo/flags/`（归当前用户，供外网开关脚本写入）。rbw 未解锁或缺条目则跳过并提示
 
 ---
 
@@ -325,8 +325,10 @@ dotfiles/
 
 ## 维护提示
 
-- 换壁纸后 `kitty/dank-*.conf`、`nvim/colors/dms.lua`、`niri/dms/colors.kdl`、`zathura/dank-colors` 会被 matugen 重写，产生「主题重生成」差异，属正常；提交时顺手一起提交即可
+- 换壁纸或切明暗后 `kitty/dank-*.conf`、`nvim/colors/dms.lua`、`niri/dms/colors.kdl`、`zathura/dank-colors`、`qt5ct|qt6ct/colors/matugen.conf` 会被 matugen 重写，产生「主题重生成」差异，属正常；提交时顺手一起提交即可
 - `niri/dms/*.kdl` 由 DMS Settings 写入，改布局请在 DMS 设置里改；`config.kdl` 只放 DMS 不管的项
 - 升级出现 `.pacnew`（`pam.d/sudo`、`pam.d/greetd`、`howdy/config.ini` 尤其要看）用 `pacdiff` 合并，不要整文件覆盖
 - 修改 mihomo 规则时改 `system/etc/mihomo/config.template.yaml`，别只改 `/etc/mihomo/config.yaml`
-- 重跑 `install.sh` 是安全的：包只装缺失的，NetworkManager / mihomo / gpg-agent 只在对应配置真的变化时才重启；Node / npm 全局包 / fisher 插件也只在缺失时安装，不做升级
+- 重跑 `install.sh` 是安全的：包只装缺失的，NetworkManager / mihomo / gpg-agent 只在对应配置真的变化时才重启；Node / npm 全局包 / fisher 插件也只在缺失时安装，不做升级。系统升级仍走 `paru -Syu`
+- 输入法词库：增删 Iorest 分库改 `home/.local/share/fcitx5/rime/rime_ice_ext.dict.yaml` 的 `import_tables`，然后 `rime-dict-sync`（也用它拉取词库更新）；`~/.local/share/fcitx5/rime/iorest/` 是生成物，不提交
+- nvim 插件切主分支或迁仓库时配置**不会报错只会静默失效**（treesitter、conform 都发生过），`Lazy update` 后看一眼 breaking changes，或在插件源码里 grep `deprecated`

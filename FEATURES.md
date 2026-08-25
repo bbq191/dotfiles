@@ -174,7 +174,7 @@ fcitx5 的 `XMODIFIERS` / `QT_IM_MODULE` / `SDL_IM_MODULE` 在 `environment.d/fc
 | Neovim | `nvim/colors/dms.lua`（base46：github_light/dark 向壁纸主色调和 0.5，设背景） |
 | dgop | DMS 系统监控 |
 
-关闭的：Alacritty、Foot、Ghostty、WezTerm、Emacs、Zed、VS Code、Vesktop/Equibop/Vencord、Firefox 原生、Hyprland、Zen、MangoWC。`matugenTemplatePywalfox` 目前仍为 true 但已无意义——Pywalfox 只支持 Firefox 系，LibreWolf 已卸载、默认浏览器 Brave 没有 matugen 通道，建议在 DMS Settings → Theme 里关掉。
+关闭的：Alacritty、Foot、Ghostty、WezTerm、Emacs、Zed、VS Code、Vesktop/Equibop/Vencord、Firefox 原生、Hyprland、Zen、MangoWC。Pywalfox 已关（只支持 Firefox 系，LibreWolf 已卸载）；默认浏览器 Brave 没有 matugen 通道，浏览器是桌面里唯一不跟随壁纸配色的部分。
 
 **用户模板**（`runUserMatugenTemplates = true`，`~/.config/matugen/config.toml`）：
 
