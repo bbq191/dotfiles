@@ -25,17 +25,33 @@ fi
 
 # ── 2. 安装软件包 ─────────────────────────────────────────────────────────────
 echo "[+] 安装软件包..."
-# 清单支持整行注释与行内注释（pkg  # 说明），先剥掉再交给 paru
-sed -e 's/\s*#.*//' -e '/^\s*$/d' "$DOTFILES/packages/packages.txt" | paru -S --needed -
+# 清单支持整行注释与行内注释（pkg  # 说明），先剥掉再交给 paru。
+# 必须用数组传参而不是 `paru -S -` 读管道：管道会占住 stdin，pacman 的 [Y/n] 确认读到 EOF 就直接取消
+mapfile -t PKGS < <(sed -e 's/\s*#.*//' -e '/^\s*$/d' "$DOTFILES/packages/packages.txt")
+# 只装缺失的：pacman -T 列出未安装项。直接把整份清单交给 paru 会顺带升级/对齐已装包
+# （等于半次 paru -Sua），重跑时噪音大且有副作用；升级请用 paru -Syu
+mapfile -t MISSING < <(pacman -T "${PKGS[@]}" || true)
+if (( ${#MISSING[@]} )); then
+    paru -S --needed "${MISSING[@]}"
+else
+    echo "    清单中的软件包均已安装"
+fi
 
 # ── 3. 安装 Node（fnm）和全局 npm 包 ─────────────────────────────────────────
 echo "[+] 配置 fnm + Node..."
 export FNM_DIR="$HOME/.local/share/fnm"
 eval "$(fnm env --shell bash)"
-fnm install --lts
-fnm default lts-latest
+# 已有默认 Node 就不再联网装 LTS（想升级：fnm install --lts && fnm default lts-latest）
+if [[ ! -e "$FNM_DIR/aliases/default" ]]; then
+    fnm install --lts
+    fnm default lts-latest
+fi
+eval "$(fnm env --shell bash)"   # 让 default 别名进 PATH
 # gemini-cli：Gemini CLI；mermaid-cli：pandoc filters.lua 用 mmdc 把 mermaid 代码块渲染成图
-npm install -g @google/gemini-cli @mermaid-js/mermaid-cli
+NPM_MISSING=()
+command -v gemini >/dev/null || NPM_MISSING+=(@google/gemini-cli)
+command -v mmdc   >/dev/null || NPM_MISSING+=(@mermaid-js/mermaid-cli)
+(( ${#NPM_MISSING[@]} )) && npm install -g "${NPM_MISSING[@]}"
 
 # ── 4. 应用配置文件（stow） ───────────────────────────────────────────────────
 echo "[+] 应用 dotfiles..."
@@ -115,6 +131,10 @@ sudo cp "$DOTFILES/system/etc/sudoers.d/papirus-folders" \
         /etc/sudoers.d/
 sudo chmod 0440 /etc/sudoers.d/papirus-folders
 sudo mkdir -p /etc/NetworkManager/conf.d
+NM_CHANGED=0
+for f in wifi-backend.conf 99-firewall.conf; do
+    cmp -s "$DOTFILES/system/etc/NetworkManager/conf.d/$f" "/etc/NetworkManager/conf.d/$f" || NM_CHANGED=1
+done
 sudo cp "$DOTFILES/system/etc/NetworkManager/conf.d/wifi-backend.conf" \
         "$DOTFILES/system/etc/NetworkManager/conf.d/99-firewall.conf" \
         /etc/NetworkManager/conf.d/
@@ -148,7 +168,8 @@ sudo systemctl enable --now iwd
 sudo systemctl enable --now keyd
 # IR 补光服务（howdy 人脸识别依赖）；新机器需先 sudo linux-enable-ir-emitter configure
 sudo systemctl enable linux-enable-ir-emitter.service
-sudo systemctl restart NetworkManager
+# 只有 NM 配置真的变了才重启（重启会让 Wi-Fi 断几秒）
+(( NM_CHANGED )) && sudo systemctl restart NetworkManager
 systemctl --user enable --now ssh-agent.socket
 systemctl --user enable --now dms.service 2>/dev/null || true
 # DMS 第三方启动器插件（plugin_settings.json 里已启用，但插件本体由 dms CLI 克隆，不在仓库）
@@ -188,17 +209,19 @@ declare -A _SOCKET_MAP=(
     [gpg-agent-browser.socket]="S.gpg-agent.browser"
     [gpg-agent-extra.socket]="S.gpg-agent.extra"
 )
+GPG_CHANGED=0
 for unit in "${!_SOCKET_MAP[@]}"; do
     dropin_dir="$HOME/.config/systemd/user/${unit}.d"
     mkdir -p "$dropin_dir"
-    cat > "$dropin_dir/socket-path.conf" << EOF
-[Socket]
-ListenStream=
-ListenStream=${SOCKETDIR}/${_SOCKET_MAP[$unit]}
-EOF
+    content=$(printf '[Socket]\nListenStream=\nListenStream=%s/%s\n' "$SOCKETDIR" "${_SOCKET_MAP[$unit]}")
+    if [[ "$(cat "$dropin_dir/socket-path.conf" 2>/dev/null)" != "$content" ]]; then
+        printf '%s\n' "$content" > "$dropin_dir/socket-path.conf"
+        GPG_CHANGED=1
+    fi
 done
 systemctl --user daemon-reload
-systemctl --user restart gpg-agent.service 2>/dev/null || true
+# 只有 socket 路径变了才重启 agent（重启会清掉已缓存的口令）
+(( GPG_CHANGED )) && { systemctl --user restart gpg-agent.service 2>/dev/null || true; }
 
 # ── 9. Maven XDG 迁移 ────────────────────────────────────────────────────────
 echo "[+] 配置 Maven XDG 路径..."
@@ -226,7 +249,8 @@ if [[ ! -f "$SDKMAN_DIR_NEW/bin/sdkman-init.sh" ]]; then
     curl -s "https://get.sdkman.io" | SDKMAN_DIR="$SDKMAN_DIR_NEW" bash
     echo "    已安装 SDKMAN 到 $SDKMAN_DIR_NEW"
 fi
-fish -c "fisher update" 2>/dev/null || true
+# fisher 插件落地文件缺失时才拉取（fish_plugins 已锁定版本，重复 update 只是重复下载）
+[[ -f "$HOME/.config/fish/functions/sdk.fish" ]] || fish -c "fisher update" 2>/dev/null || true
 
 # ── 11. mihomo 配置 ───────────────────────────────────────────────────────────
 # mihomo 以系统服务运行（mihomo-bin 自带 mihomo.service，-d /etc/mihomo）。
@@ -244,16 +268,21 @@ if rbw get mihomo-proxy-token &>/dev/null && rbw get mihomo-secret &>/dev/null; 
     MIHOMO_SECRET=$(rbw get mihomo-secret)
     TOKEN_ESC=$(printf '%s\n' "$MIHOMO_TOKEN" | sed 's/[\/&]/\\&/g')
     SECRET_ESC=$(printf '%s\n' "$MIHOMO_SECRET" | sed 's/[\/&]/\\&/g')
-    sed -e "s/__MIHOMO_TOKEN__/${TOKEN_ESC}/" \
+    RENDERED=$(sed -e "s/__MIHOMO_TOKEN__/${TOKEN_ESC}/" \
         -e "s/__MIHOMO_SECRET__/${SECRET_ESC}/" \
-        "$DOTFILES/system/etc/mihomo/config.template.yaml" \
-        | sudo tee /etc/mihomo/config.yaml >/dev/null
-    # 含订阅 token 与 API secret：只让 root 和本用户读（hotspot-internet/usb-internet 要读 secret 调 API）
-    sudo chown "root:$USER" /etc/mihomo/config.yaml
-    sudo chmod 640 /etc/mihomo/config.yaml
-    sudo systemctl enable --now mihomo
-    sudo systemctl restart mihomo
-    echo "    /etc/mihomo/config.yaml 已生成，mihomo 已启动"
+        "$DOTFILES/system/etc/mihomo/config.template.yaml")
+    if [[ "$RENDERED" != "$(cat /etc/mihomo/config.yaml 2>/dev/null)" ]]; then
+        printf '%s\n' "$RENDERED" | sudo tee /etc/mihomo/config.yaml >/dev/null
+        # 含订阅 token 与 API secret：只让 root 和本用户读（hotspot-internet/usb-internet 要读 secret 调 API）
+        sudo chown "root:$USER" /etc/mihomo/config.yaml
+        sudo chmod 640 /etc/mihomo/config.yaml
+        sudo systemctl enable --now mihomo
+        sudo systemctl restart mihomo   # 配置变了才重启（代理会断 1-2 秒）
+        echo "    /etc/mihomo/config.yaml 已更新，mihomo 已重启"
+    else
+        sudo systemctl enable --now mihomo
+        echo "    /etc/mihomo/config.yaml 无变化，跳过"
+    fi
 else
     echo "    跳过：rbw 中未找到 mihomo-proxy-token 或 mihomo-secret，请手动添加后重新运行"
 fi
