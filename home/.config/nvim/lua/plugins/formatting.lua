@@ -20,8 +20,8 @@ return {
         markdown = { "prettier" },
       },
       format_on_save = {
-        timeout_ms   = 3000,
-        lsp_fallback = true,
+        timeout_ms = 3000,
+        lsp_format = "fallback",   -- 旧写法 lsp_fallback 已废弃
       },
     },
   },

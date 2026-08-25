@@ -1,17 +1,17 @@
 return {
   -- Mason：LSP 二进制安装管理
   {
-    "williamboman/mason.nvim",
+    "mason-org/mason.nvim",   -- 上游已从 williamboman 迁到 mason-org 组织
     build = ":MasonUpdate",
     opts = { ui = { border = "rounded" } },
   },
 
   -- mason-lspconfig：用 LSP server 名字管理安装
-  -- automatic_enable = true（默认）：安装后自动调用 vim.lsp.enable()
+  -- automatic_enable = true（默认）：安装后自动调用 vim.lsp.enable()；v2 已移除 automatic_installation
   -- 服务端配置从 lsp/*.lua 文件读取（Neovim 0.11+ runtimepath 机制）
   {
-    "williamboman/mason-lspconfig.nvim",
-    dependencies = { "williamboman/mason.nvim" },
+    "mason-org/mason-lspconfig.nvim",
+    dependencies = { "mason-org/mason.nvim" },
     opts = {
       ensure_installed = {
         "basedpyright",
@@ -21,7 +21,6 @@ return {
         "jsonls",
         "html",
       },
-      automatic_installation = true,
     },
   },
 

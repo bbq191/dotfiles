@@ -3,3 +3,17 @@
 [user]
 	email = afu@localhost
 	name = afu
+
+# ── git-delta：diff / log / show / blame 的分页器（lazygit 另有自己的 pager 配置）──
+[core]
+	pager = delta
+[interactive]
+	diffFilter = delta --color-only
+[delta]
+	navigate = true          # n / N 在文件间跳
+	line-numbers = true
+	side-by-side = false     # 终端宽度不定，默认上下对照；需要时 git -c delta.side-by-side=true diff
+[merge]
+	conflictStyle = zdiff3   # 冲突块同时显示共同祖先，比 merge 风格更好判断
+[diff]
+	colorMoved = default     # 移动的代码块用不同颜色，区别于增删

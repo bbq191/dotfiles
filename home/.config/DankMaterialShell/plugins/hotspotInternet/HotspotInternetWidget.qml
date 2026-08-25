@@ -28,15 +28,18 @@ PluginComponent {
     }
 
     function refresh() {
-        statusProc.running = true;
+        flagFile.reload();
     }
 
-    Process {
-        id: statusProc
-        command: ["cat", "/etc/mihomo/flags/hotspot-direct.yaml"]
-        stdout: StdioCollector {
-            onStreamFinished: root.directActive = text.includes("SRC-IP")
-        }
+    // flag 文件事件驱动：脚本改写 / mihomo 重生成时立即刷新，不再轮询
+    FileView {
+        id: flagFile
+        path: "/etc/mihomo/flags/hotspot-direct.yaml"
+        watchChanges: true
+        printErrors: false
+        onFileChanged: reload()
+        onLoaded: root.directActive = text().includes("SRC-IP")
+        onLoadFailed: root.directActive = false
     }
 
     Process {
@@ -48,14 +51,6 @@ PluginComponent {
             if (exitCode !== 0)
                 ToastService.showError("热点翻墙", "切换失败：mihomo API 不可达");
         }
-    }
-
-    Timer {
-        interval: 5000
-        running: true
-        repeat: true
-        triggeredOnStart: true
-        onTriggered: root.refresh()
     }
 
     pillClickAction: () => root.requestToggle()

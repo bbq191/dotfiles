@@ -14,10 +14,6 @@ home/.config/fcitx5/conf/cached_layouts
 home/.config/fish/fish_variables
 home/.config/fish/themes/
 
-# mpv uosc 二进制（按平台区分，不入库）
-home/.config/mpv/scripts/uosc/bin/ziggy-darwin
-home/.config/mpv/scripts/uosc/bin/ziggy-windows.exe
-
 # mihomo 以系统服务运行（/etc/mihomo），模板在 system/etc/mihomo/config.template.yaml，
 # 含 token 的真实 config.yaml 由 install.sh 从 rbw 取值生成，不进仓库
 

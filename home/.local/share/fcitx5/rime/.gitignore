@@ -1,0 +1,4 @@
+# 只跟踪 *.custom.yaml 补丁；rime 运行时产物（build/、词库 userdb、installation.yaml、user.yaml）不入库
+*
+!.gitignore
+!*.custom.yaml

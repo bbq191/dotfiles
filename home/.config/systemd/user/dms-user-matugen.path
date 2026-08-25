@@ -1,8 +1,0 @@
-[Unit]
-Description=Watch DMS session for wallpaper changes
-
-[Path]
-PathModified=%h/.local/state/DankMaterialShell/session.json
-
-[Install]
-WantedBy=default.target

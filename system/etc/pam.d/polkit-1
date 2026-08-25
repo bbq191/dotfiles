@@ -1,0 +1,7 @@
+#%PAM-1.0
+# polkit 图形提权（DMS polkit 代理弹窗）：howdy 人脸优先，失败回退密码。
+# Arch 的 polkit 把默认 PAM 放在 /usr/lib/pam.d/，此文件是 /etc 覆盖。
+auth      sufficient   pam_howdy.so
+auth      include      system-auth
+account   include      system-auth
+session   include      system-auth

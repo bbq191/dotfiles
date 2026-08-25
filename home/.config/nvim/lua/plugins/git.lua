@@ -15,8 +15,9 @@ return {
         local function map(mode, l, r, desc)
           vim.keymap.set(mode, l, r, { buffer = bufnr, desc = desc })
         end
-        map("n", "]h", gs.next_hunk,    "Next hunk")
-        map("n", "[h", gs.prev_hunk,    "Prev hunk")
+        -- next_hunk/prev_hunk 已废弃，统一走 nav_hunk
+        map("n", "]h", function() gs.nav_hunk("next") end, "Next hunk")
+        map("n", "[h", function() gs.nav_hunk("prev") end, "Prev hunk")
         map("n", "<leader>hs", gs.stage_hunk,   "Stage hunk")
         map("n", "<leader>hr", gs.reset_hunk,   "Reset hunk")
         map("n", "<leader>hS", gs.stage_buffer, "Stage buffer")

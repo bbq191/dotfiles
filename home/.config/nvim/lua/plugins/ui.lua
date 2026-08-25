@@ -74,7 +74,7 @@ return {
 
   -- 颜色码内联预览（Tailwind 开发用得上）
   {
-    "NvChad/nvim-colorizer.lua",
+    "catgoose/nvim-colorizer.lua",   -- NvChad 仓库已归档，维护迁到 catgoose
     event = { "BufReadPost", "BufNewFile" },
     opts = {
       user_default_options = {

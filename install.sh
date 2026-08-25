@@ -3,6 +3,12 @@ set -euo pipefail
 
 DOTFILES="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
+# 第 4 步会 stow --adopt 后 git restore home/，任何未提交的 home/ 改动都会被还原，先拦住
+if [[ -n "$(git -C "$DOTFILES" status --porcelain -- home/)" ]]; then
+    echo "home/ 有未提交的改动，先 commit 或 stash 再运行（stow --adopt + git restore 会把它们还原）" >&2
+    exit 1
+fi
+
 # ── 1. 依赖检查 ───────────────────────────────────────────────────────────────
 if ! command -v paru &>/dev/null; then
     echo "[+] 安装 paru..."
@@ -96,6 +102,8 @@ sudo cp "$DOTFILES/system/etc/pam.d/dankshell" /etc/pam.d/
 sudo cp "$DOTFILES/system/etc/pam.d/sudo" /etc/pam.d/
 # greetd 归 greetd 包管理，覆盖后上游更新会生成 .pacnew，需留意合并
 sudo cp "$DOTFILES/system/etc/pam.d/greetd" /etc/pam.d/
+# polkit 图形提权走 howdy（Arch 默认 PAM 在 /usr/lib/pam.d，这里是 /etc 覆盖）
+sudo cp "$DOTFILES/system/etc/pam.d/polkit-1" /etc/pam.d/
 # howdy 守护：pacman 事务后若 howdy-compare 缺共享库，自动禁用 howdy，
 # 防止 pam_howdy 崩溃污染 sudo/polkit 密码回退把人锁在门外（库补回后自动恢复）
 sudo install -Dm755 "$DOTFILES/system/usr/local/bin/howdy-libguard" \
@@ -117,6 +125,12 @@ sudo cp "$DOTFILES/system/etc/systemd/network/10-wlan0.link" \
 # 固定 reMarkable USB 网卡名为 rmk0（NM profile remarkable-usb 按此名绑定）；MAC 随设备而变，见文件注释
 sudo cp "$DOTFILES/system/etc/systemd/network/11-rmk0.link" \
         /etc/systemd/network/
+# sysctl：ip_forward（热点/USB 共享）、min_free_kbytes；udev：IO 调度器覆盖、uuu 刷机 USB 权限
+sudo mkdir -p /etc/sysctl.d /etc/udev/rules.d
+sudo cp "$DOTFILES/system/etc/sysctl.d/"*.conf /etc/sysctl.d/
+sudo sysctl -q --system
+sudo cp "$DOTFILES/system/etc/udev/rules.d/"*.rules /etc/udev/rules.d/
+sudo udevadm control --reload
 sudo mkdir -p /etc/keyd
 sudo cp "$DOTFILES/system/etc/keyd/default.conf" \
         /etc/keyd/
@@ -141,8 +155,6 @@ systemctl --user enable --now dms.service 2>/dev/null || true
 systemctl --user enable --now cliphist.service dcal.service dsearch.service 2>/dev/null || true
 # 用户级 tmpfiles：user-tmpfiles.d/cleanup.conf 靠它执行（preset 写着 enable，但本机实测默认是 disabled）
 systemctl --user enable --now systemd-tmpfiles-setup.service systemd-tmpfiles-clean.timer
-# 壁纸变化 → 用户 matugen 模板（papirus 文件夹色 / zathura 配色）
-systemctl --user enable --now dms-user-matugen.path
 # USB 直连 reMarkable 时周期推送「网关/DNS 指向本机」配置（设备端不持久，靠定时器自愈）
 systemctl --user enable --now remarkable-usb-share.timer
 
@@ -232,7 +244,9 @@ if rbw get mihomo-proxy-token &>/dev/null && rbw get mihomo-secret &>/dev/null; 
         -e "s/__MIHOMO_SECRET__/${SECRET_ESC}/" \
         "$DOTFILES/system/etc/mihomo/config.template.yaml" \
         | sudo tee /etc/mihomo/config.yaml >/dev/null
-    sudo chmod 644 /etc/mihomo/config.yaml   # hotspot-internet/usb-internet 以普通用户读 secret 调 API
+    # 含订阅 token 与 API secret：只让 root 和本用户读（hotspot-internet/usb-internet 要读 secret 调 API）
+    sudo chown "root:$USER" /etc/mihomo/config.yaml
+    sudo chmod 640 /etc/mihomo/config.yaml
     sudo systemctl enable --now mihomo
     sudo systemctl restart mihomo
     echo "    /etc/mihomo/config.yaml 已生成，mihomo 已启动"

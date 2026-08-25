@@ -69,7 +69,7 @@ map("n", "<leader>de", vim.diagnostic.open_float, { desc = "Diagnostic float" })
 
 -- 格式化
 map({ "n", "v" }, "<leader>fm", function()
-  require("conform").format({ async = true, lsp_fallback = true })
+  require("conform").format({ async = true, lsp_format = "fallback" })
 end, { desc = "Format" })
 
 -- 自动换行（类似 VS Code Alt+Z）

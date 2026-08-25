@@ -136,7 +136,7 @@ fcitx5 的 `XMODIFIERS` / `QT_IM_MODULE` / `SDL_IM_MODULE` 在 `environment.d/fc
 | `=` | calculator：算式求值，结果进剪贴板 |
 | `:e` | emojiLauncher：emoji / Unicode 搜索 |
 | `?` / `cb` | 内置：设置搜索 / 剪贴板搜索 |
-| — | **hotspotInternet**、**usbInternet**（自研，控制中心开关 + 状态栏胶囊，见「网络与代理」） |
+| — | **hotspotInternet**、**usbInternet**（自研，控制中心开关 + 状态栏胶囊；`FileView` 监听 flag 文件，脚本或 CLI 改动即时反映，见「网络与代理」） |
 
 第三方插件由 `dms plugins` 安装（含独立 git 仓库，不入库），自研两个在仓库 `DankMaterialShell/plugins/`。后端：`dsearch`（Spotlight 文件索引，`danksearch/config.toml` 索引 `~` 深度 6）、`dcal`（日历，`dankcal/ui-settings.json`）。
 
@@ -172,17 +172,16 @@ fcitx5 的 `XMODIFIERS` / `QT_IM_MODULE` / `SDL_IM_MODULE` 在 `environment.d/fc
 | Qt5ct / Qt6ct + KColorScheme | `~/.local/share/color-schemes/DankMatugen.colors`（qt5ct/qt6ct.conf 引用） |
 | Kitty | `kitty/dank-theme.conf`、`dank-tabs.conf` |
 | Neovim | `nvim/colors/dms.lua`（base46：github_light/dark 向壁纸主色调和 0.5，设背景） |
-| Pywalfox | 浏览器配色（`python-pywalfox`） |
 | dgop | DMS 系统监控 |
 
-关闭的：Alacritty、Foot、Ghostty、WezTerm、Emacs、Zed、VS Code、Vesktop/Equibop/Vencord、Firefox 原生、Hyprland、Zen、MangoWC。
+关闭的：Alacritty、Foot、Ghostty、WezTerm、Emacs、Zed、VS Code、Vesktop/Equibop/Vencord、Firefox 原生、Hyprland、Zen、MangoWC。`matugenTemplatePywalfox` 目前仍为 true 但已无意义——Pywalfox 只支持 Firefox 系，LibreWolf 已卸载、默认浏览器 Brave 没有 matugen 通道，建议在 DMS Settings → Theme 里关掉。
 
 **用户模板**（`runUserMatugenTemplates = true`，`~/.config/matugen/config.toml`）：
 
 - `papirus-folders.sh`：主色 HSV 色相映射到 papirus-folders 颜色名，`sudo papirus-folders -C` 同步 Papirus / Dark / Light 三套（sudoers 免密）
 - `zathura`：生成 `zathura/dank-colors`，含重染色板
 
-**触发链路**：DMS 换壁纸 → 写 `~/.local/state/DankMaterialShell/session.json` → `dms-user-matugen.path` 检测变化 → `dms-user-matugen.service` 执行 `apply-user-templates.sh` → 壁纸路径与上次不同时 `dms matugen generate --run-user-templates` 重算配色 → 读 `dms-colors.json` 的 `source_color` → `matugen color hex` 跑用户模板。`StartLimitIntervalSec=0` 防止 session.json 连写触发启动限频。
+**触发链路**：DMS 换壁纸 / 切明暗 → `dms matugen generate --run-user-templates`（`Theme.qml`，`regenSystemThemes`）→ 渲染 DMS 内置模板后，直接执行 `~/.config/matugen/config.toml` 里的用户模板，明暗模式随 DMS 当前值。实测：换壁纸后 5 秒内 zathura 配色与 Papirus 文件夹色即更新，无需任何 systemd path/service。
 
 `nvim/colors/dms.lua` 自带 `uv.fs_event` 监听自身与 `settings.json`，文件变化即热重载主题。
 
@@ -287,7 +286,7 @@ LSP → LuaSnip（friendly-snippets）→ 路径 → buffer（≥3 字符）。`
 | which-key | `<leader>b/c/d/f/h/m/r/t/y` 分组 |
 | yazi.nvim | `<leader>yy` 当前文件 / `<leader>yw` 工作区 |
 | toggleterm | `<leader>tt` 浮动 / `<leader>th` 水平 / `<leader>tg` LazyGit，`Esc Esc` 退出终端模式 |
-| Treesitter + rainbow-delimiters | 高亮、缩进、彩虹括号；`Ctrl+Space` 增量选择，`BS` 收缩 |
+| Treesitter（`main` 分支）+ rainbow-delimiters | 18 个 parser 由插件按需编译（需 `tree-sitter-cli`）；高亮与缩进在 `FileType` 时用内置 `vim.treesitter.start()` 启用；彩虹括号。`main` 分支已移除增量选择，`<C-Space>` 不再有该功能 |
 | Telescope（fzf-native） | `<leader>ff/fg/fb/fr/fs/fd`（含隐藏文件） |
 | gitsigns | `]h` / `[h`，`<leader>hs/hr/hS/hp/hb/hd` |
 | lualine / bufferline / indent-blankline / nvim-notify / colorizer / mini.icons | UI |
@@ -323,7 +322,7 @@ LSP → LuaSnip（friendly-snippets）→ 路径 → buffer（≥3 字符）。`
 ### Yazi
 
 - 面板 1:2:4；图片预览 lanczos3、512MB 缓存；目录优先、自然排序、显示软链目标、size 行模式
-- 打开规则：文本 / JSON → nvim；图片 → satty（可直接标注）→ xdg-open；视频 → mpv；音频 → xdg-open；PDF → xdg-open（zathura）；压缩包 → 7z / unzip 解压；兜底先 nvim
+- 打开规则：文本 / JSON → nvim（`org.neovim.nvim.desktop` 覆盖版在 kitty 里启动，供 xdg-open / Thunar 用）；图片 → satty（可直接标注）→ xdg-open；视频 → mpv；音频 → xdg-open；PDF → xdg-open（zathura）；压缩包 → 7z / unzip 解压；兜底先 nvim
 - 配色 `theme.toml` 为静态 Tokyo Night（不随 matugen）
 
 | 键位 | 功能 |
@@ -339,7 +338,7 @@ LSP → LuaSnip（friendly-snippets）→ 路径 → buffer（≥3 字符）。`
 
 ### Thunar
 
-浮动窗口；归档插件、tumbler 缩略图；自定义动作「Open Terminal Here」（`exo-open`，终端由 `xdg-terminals.list` 指向 kitty）。
+浮动窗口；归档插件；缩略图已在偏好里关掉（`misc-thumbnail-mode=NEVER`，tumbler 装着但不出图）；自定义动作「Open Terminal Here」（`exo-open`，终端由 `xdg-terminals.list` 指向 kitty）。xfconf 的 `thunar.xml` 随窗口几何频繁改写，不入库。
 
 ### Zathura
 
@@ -350,7 +349,7 @@ LSP → LuaSnip（friendly-snippets）→ 路径 → buffer（≥3 字符）。`
 ## 输入法（Fcitx5 + Rime）
 
 - Fcitx5 走 Wayland Input Method 协议；XWayland / Qt / SDL 通过 `environment.d/fcitx5.conf`
-- 方案：**Rime**（`rime-ice` 雾凇拼音 + `rime-wanxiang-gram-zh-hans` 万象语法模型）
+- 方案：**Rime**（`rime-ice` 雾凇拼音 + `rime-wanxiang-gram-zh-hans` 万象语法模型）。用户补丁在 `~/.local/share/fcitx5/rime/*.custom.yaml`（已入库）：`default.custom.yaml` 引入雾凇预设；`rime_ice` / `double_pinyin_flypy` 两个方案把 `grammar/language` 指到 `wanxiang-lts-zh-hans`（没有这一行万象模型不会生效）并让中英开关每次部署重置。词库 userdb / build 产物不入库
 - 外观：wechat-light / wechat-dark 主题、跟随系统强调色、横排候选、Maple Mono NF CN 11、Wayland 分数缩放
 - 蓝信等 X11-only 应用用 `GTK_IM_MODULE=xim` 兜底（`.desktop` 里指定）
 
@@ -389,7 +388,7 @@ DMS 内置 polkit 代理；gnome-keyring 由 PAM `greetd` 自动解锁。本机 
 
 - `vo=gpu-next` + Vulkan，`hwdec=nvdec-copy`，`profile=high-quality`，自动 ICC，窗口自适应 60%，退出记忆进度
 - 语言优先中文 → 日文 → 英文，字幕模糊匹配
-- uosc 接管 UI（时间轴、控制栏、菜单、缓冲指示、音量），右键菜单
+- uosc 接管 UI（时间轴、控制栏、菜单、缓冲指示、音量），右键菜单。来自 AUR `mpv-uosc`（`/usr/share/mpv/scripts/uosc`，非 mpv 自动加载目录，`mpv.conf` 用 `script=` + `sub-fonts-dir=` 指定）；仓库只保留 `script-opts/uosc.conf`，不再 vendor 整套脚本与字体
 - `Ctrl+V` 粘贴 URL / 路径直接播放（`clipboard-paste.lua`，wl-paste）
 - 键位：空格暂停、Enter 全屏、←→ 5s、↑↓ 60s、滚轮音量、`m` 静音、`q` 退出
 
@@ -416,10 +415,10 @@ Satty：箭头 / 矩形 / 圆 / 文本 / 马赛克 / 荧光笔；右键即复制
 ## Git 工作流
 
 - **LazyGit**：Neovim `<leader>tg`、Yazi `Ctrl+G`；Tokyo Night 配色（静态），Nerd Font v3，delta 分页
-- **git-delta**：diff 语法高亮、行号、side-by-side
+- **git-delta**：`core.pager=delta`、`interactive.diffFilter`，`git diff/log/show/blame` 语法高亮 + 行号，`n`/`N` 跨文件跳转；`merge.conflictStyle=zdiff3`、`diff.colorMoved`。需要并排时 `git -c delta.side-by-side=true diff`
 - **Meld**：图形化 diff / merge
 - 全局 `git/ignore`：`.claude/`、`CLAUDE.md`、`GEMINI.md`、`.gitignore`（AI 辅助文件不进项目仓库）
-- `user.name/email` 在仓库 `git/config`（本机标识）
+- `user.name/email`、delta/merge/diff 选项都在仓库 `git/config`
 
 ---
 
@@ -432,7 +431,7 @@ Satty：箭头 / 矩形 / 圆 / 文本 / 马赛克 / 荧光笔；右键即复制
 | 代理 | **mihomo**（Clash Meta）系统服务，`/etc/mihomo`：TUN mixed + fake-ip、mixed-port 6153、API 9090 + zashboard；规则集 MetaCubeX mrs（AI / GitHub / YouTube / Google / Apple / Microsoft / Telegram / 游戏 / 巴哈 / 广告 REJECT / 国内直连）；地区分组香港 / 台湾 / 日本 / 美国 / 新加坡；工作内网网段与 `iam.picc.com` 走内网 DNS 并排除路由 |
 | 热点 / USB 翻墙开关 | `hotspot-internet` / `usb-internet` 脚本 + DMS 插件：on = 设备走 mihomo 分流；off = 强制直连不断网（改 flag 文件 + API 刷新 provider + 断存量连接，无需 root）。详见 README「网络共享」 |
 | DNS | systemd-resolved（mDNS 关闭防与 avahi 冲突）；mihomo DNS 监听 `0.0.0.0:1053` 供共享设备使用 |
-| 防火墙 | UFW；NM 防火墙后端 iptables（共享连接 NAT 同链） |
+| 防火墙 | UFW；NM 防火墙后端 iptables（共享连接 NAT 同链）；`sysctl net.ipv4.ip_forward=1` |
 | 远程 | ssh ControlMaster；旧设备 `40.10.1.53` 显式允许 ssh-rsa |
 
 ---
@@ -442,6 +441,7 @@ Satty：箭头 / 矩形 / 圆 / 文本 / 马赛克 / 荧光笔；右键即复制
 - **USB 直连共享上网**：设备插上 → NM `remarkable-usb`（rmk0，10.11.99.2/24，不抢默认路由）→ `remarkable-usb-share.timer` 每 45s 检查设备在线并 SSH 推送网关/DNS 配置（设备 `/etc` 易失，重启自愈）→ 设备经本机 mihomo 出网；`usb-internet` 开关决定是否翻墙
 - **remanager**：reMarkable 文件管理器（AUR `remanager-bin`）
 - **纸感 PDF**：Neovim `<leader>mp` → pandoc reMarkable 配置（见编辑器一节）
+- **recovery 刷机**：`udev/rules.d/70-uuu.rules` 给 NXP uuu 工具 USB 权限（设备 recovery 模式下以 NXP VID 出现）；uuu 本体按需装
 - 墨香（微信读书桥接 `moxiang-bridge.service`）属另一项目，不在本仓库
 
 ---
@@ -480,7 +480,7 @@ Satty：箭头 / 矩形 / 圆 / 文本 / 马赛克 / 荧光笔；右键即复制
 
 **howdy-next**（IR 摄像头 `/dev/video2`，`yunet 0.8` / `sface 0.6942`）：
 
-- PAM 接入 DMS 锁屏（`dankshell`）、`sudo`、`greetd` 登录
+- PAM 接入 DMS 锁屏（`dankshell`）、`sudo`、`greetd` 登录、`polkit-1` 图形提权
 - `tmpfiles.d` 给 video 组读取权限（每次 `howdy add` 后需重新 `systemd-tmpfiles --create`）
 - `linux-enable-ir-emitter.service` 开机点亮 IR 补光（参数机器专属）
 - `howdy-libguard` pacman 钩子：缺共享库自动禁用 howdy，防 pam_howdy 崩溃锁死密码回退
@@ -500,4 +500,6 @@ Satty：箭头 / 矩形 / 圆 / 文本 / 马赛克 / 荧光笔；右键即复制
 | 网络启动 | mask `NetworkManager-wait-online`；Wi-Fi 后端 iwd |
 | 日志 / 固件 / 镜像 | logrotate、fwupd、cachyos-rate-mirrors |
 | $HOME 清洁 | XDG 环境变量 + `user-tmpfiles.d/cleanup.conf` |
-| 硬盘 | `fstrim.timer` |
+| 硬盘 | `fstrim.timer`；IO 调度器 NVMe `none` / SATA SSD `mq-deadline`（udev 覆盖） |
+| 内存 | `vm.min_free_kbytes=512M` |
+| 内核参数 | `nvidia-drm.modeset=1 nvidia-drm.fbdev=1`，initramfs 预载 nvidia 模块（chwd） |

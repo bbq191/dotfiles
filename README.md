@@ -21,19 +21,19 @@ cd ~/Projects/dotfiles
 ./install.sh
 ```
 
-`install.sh` 依次完成（可重复执行，均为幂等操作）：
+`install.sh` 依次完成（可重复执行，均为幂等操作；开头会检查 `home/` 没有未提交改动——第 4 步的 `stow --adopt` + `git restore` 会把未提交内容还原，matugen 重生成的主题文件也算，先 commit 或 stash）：
 
 1. 安装 paru（AUR helper）和 stow
 2. 通过 paru 安装 `packages/packages.txt` 中的全部软件包
 3. fnm 安装 Node LTS，全局 npm 安装 `@google/gemini-cli` 与 `@mermaid-js/mermaid-cli`（pandoc 渲染 mermaid 用）
 4. stow 将 `home/` 链接到 `$HOME`：目标位置已有的实体文件按仓库清单逐个备份为 `*.bak-<时间戳>`（已经通过上级目录链接指向仓库的文件会跳过），旧的绝对路径链接原地重建为相对链接；随后 `dconf load` 同步 GTK 字体/主题（Thunar 等纯 GTK3 程序不读 `settings.ini`）
-5. 复制 `system/etc`、`system/usr/local/bin` 到系统：resolved / ollama drop-in / NVIDIA modprobe / greetd NVIDIA 覆盖 / tmpfiles（THP、howdy 权限）/ PAM（dankshell、sudo、greetd）/ howdy-libguard 与 pacman 钩子 / sudoers（papirus-folders）/ NetworkManager（iwd 后端、iptables 防火墙后端）/ `.link` 网卡命名（wlan0、rmk0）/ keyd / snapper；并 mask `NetworkManager-wait-online`
-6. 启用 systemd 服务：系统级 iwd、keyd、linux-enable-ir-emitter（ollama 只装 override，不自启）；用户级 ssh-agent.socket、dms、cliphist、dcal、dsearch、dms-user-matugen.path、remarkable-usb-share.timer、systemd-tmpfiles-setup（否则 `user-tmpfiles.d/cleanup.conf` 不生效，本机实测默认 disabled）
+5. 复制 `system/etc`、`system/usr/local/bin` 到系统：resolved / ollama drop-in / NVIDIA modprobe / greetd NVIDIA 覆盖 / tmpfiles（THP、howdy 权限）/ PAM（dankshell、sudo、greetd、polkit-1）/ howdy-libguard 与 pacman 钩子 / sudoers（papirus-folders）/ NetworkManager（iwd 后端、iptables 防火墙后端）/ `.link` 网卡命名（wlan0、rmk0）/ sysctl（ip_forward、min_free_kbytes）/ udev（IO 调度器、uuu）/ keyd / snapper；并 mask `NetworkManager-wait-online`
+6. 启用 systemd 服务：系统级 iwd、keyd、linux-enable-ir-emitter（ollama 只装 override，不自启）；用户级 ssh-agent.socket、dms、cliphist、dcal、dsearch、remarkable-usb-share.timer、systemd-tmpfiles-setup（否则 `user-tmpfiles.d/cleanup.conf` 不生效，本机实测默认 disabled）
 7. 初始化目录（wine prefix、ollama 模型、ssh ControlPath）
 8. GnuPG 迁移到 XDG 路径（`~/.local/share/gnupg`），生成 gpg-agent socket 单元 drop-in
 9. Maven 本地仓库迁移到 `~/.cache/maven/repository`
 10. SDKMAN 官方脚本安装到 `~/.local/share/sdkman`，`fisher update` 落地 fish 插件
-11. mihomo：从 rbw 取订阅 token 与面板密码填入模板，写到 `/etc/mihomo/config.yaml` 并启动系统服务；建 `/etc/mihomo/flags/`（归当前用户，供外网开关脚本写入）
+11. mihomo：从 rbw 取订阅 token 与面板密码填入模板，写到 `/etc/mihomo/config.yaml`（`640 root:用户`）并启动系统服务；建 `/etc/mihomo/flags/`（归当前用户，供外网开关脚本写入）
 
 ---
 
@@ -73,7 +73,7 @@ cd ~/Projects/dotfiles
 
 `install.sh` 已自动完成：
 - 授予 `video` 组对 `/etc/howdy/` 的读权限（`tmpfiles.d/howdy-permissions.conf`，DMS 锁屏以普通用户身份调用 PAM）
-- 部署 PAM 配置 `system/etc/pam.d/`：`dankshell`（DMS 锁屏）、`sudo`、`greetd`（登录）。`sudo`/`greetd` 归 pambase / greetd 包管理，升级出现 `.pacnew` 时需合并
+- 部署 PAM 配置 `system/etc/pam.d/`：`dankshell`（DMS 锁屏）、`sudo`、`greetd`（登录）、`polkit-1`（图形提权弹窗）。`sudo`/`greetd` 归 pambase / greetd 包管理，升级出现 `.pacnew` 时需合并；`polkit-1` 是对 `/usr/lib/pam.d/polkit-1` 的 `/etc` 覆盖，不会有 pacnew
 - 启用 `linux-enable-ir-emitter.service`（开机/唤醒时点亮 IR 补光）
 - 安装 `howdy-libguard`（`/usr/local/bin`）与 pacman `PostTransaction` 钩子：每次包事务后 `ldd` 检查 `howdy-compare`，缺共享库就自动把 `config.ini` 置 `disabled=true`（并留 marker），库补回后自动恢复。目的是防止 pam_howdy 崩溃污染 sudo/polkit 的密码回退把人锁在门外
 
@@ -155,7 +155,7 @@ sudo systemctl daemon-reload && sudo systemctl restart linux-enable-ir-emitter.s
 
 - 以**系统服务**运行：`mihomo.service`（mihomo-bin 自带），工作目录 `/etc/mihomo`。TUN（mixed 栈）+ fake-ip，混合端口 6153，API `127.0.0.1:9090`，面板 zashboard（`/etc/mihomo/ui`）
 - 配置模板 `system/etc/mihomo/config.template.yaml` 与实际配置只差两处占位符：订阅 token（`__MIHOMO_TOKEN__`，嵌在 URL 编码的订阅链接里）与面板密码（`__MIHOMO_SECRET__`），均从 rbw 取值。**改了规则/分组请改模板**，再重跑 `install.sh` 的 mihomo 段，避免 `/etc/mihomo/config.yaml` 与仓库漂移
-- `config.yaml` 权限 644：`hotspot-internet`/`usb-internet` 以普通用户读取 `secret:` 行调用 API
+- `config.yaml` 权限 `640 root:afu`：文件含订阅 token 与 API secret，只让 root 与本用户可读；`hotspot-internet`/`usb-internet` 以本用户读取 `secret:` 行调用 API
 
 ### 热点 / USB 直连设备的外网开关
 
@@ -169,7 +169,7 @@ sudo systemctl daemon-reload && sudo systemctl restart linux-enable-ir-emitter.s
 - `on`：flag 置 `payload: []`，设备走 mihomo 完整分流（可翻墙）
 - `off`：flag 写入 `SRC-IP-CIDR,<网段>`，该来源全部 DIRECT——国内可用、被墙的不通，**不断网**
 - 脚本改写 flag → `PUT /providers/rules/<name>` 刷新 → 删掉该来源存量连接立即生效。无需 root；状态在 flag 文件里，重启后保持
-- `flags/` 目录归当前用户所有（`install.sh` 创建）；插件每 5s 读一次 flag 显示状态
+- `flags/` 目录归当前用户所有（`install.sh` 创建）；插件用 Quickshell `FileView` 监听 flag 文件变化，脚本 / CLI 切换后状态即时更新，无轮询
 
 ### 热点（Wi-Fi AP）
 
@@ -200,7 +200,11 @@ nmcli con add type ethernet ifname rmk0 con-name remarkable-usb \
 
 ## 图标主题（Papirus）
 
-换壁纸时 matugen 用户模板把 Papirus 文件夹颜色同步为当前主色调（HSV 色相映射到 papirus-folders 的颜色名）。模板 `~/.config/matugen/templates/papirus-folders.sh`，由 `~/.config/matugen/config.toml` 注册并经 `apply-user-templates.sh` 执行；`sudoers.d/papirus-folders` 允许 wheel 免密执行 `papirus-folders`。同一个 config.toml 还挂了 zathura 配色模板。
+换壁纸或切明暗时，DMS（`runUserMatugenTemplates = true`）会在跑完自家模板后直接执行 matugen 默认用户配置 `~/.config/matugen/config.toml`，其中：
+- `papirus-folders.sh`：把主色 HSV 色相映射到 papirus-folders 颜色名，`sudo papirus-folders -C` 同步三套 Papirus（`sudoers.d/papirus-folders` 免密）
+- `zathura`：生成 `~/.config/zathura/dank-colors`
+
+不需要任何额外的 path/service 或脚本——早期的 `dms-user-matugen.path` + `apply-user-templates.sh` 链路已删除（会让 papirus 重复跑两遍，且不感知明暗切换）。
 
 ---
 
@@ -219,7 +223,11 @@ nmcli con add type ethernet ifname rmk0 con-name remarkable-usb \
 | `etc/tmpfiles.d/howdy-permissions.conf` | 授予 video 组读取 howdy 配置/模型 |
 | `etc/pacman.d/hooks/50-howdy-libguard.hook` + `usr/local/bin/howdy-libguard` | 包事务后校验 howdy 共享库，缺库自动禁用 / 补回自动恢复 |
 | `etc/sudoers.d/papirus-folders` | wheel 免密执行 papirus-folders（matugen 主题同步） |
-| `etc/pam.d/dankshell` `sudo` `greetd` | howdy 人脸识别接入 DMS 锁屏 / sudo / greetd 登录（greetd 还接 gnome-keyring 自动解锁） |
+| `etc/pam.d/dankshell` `sudo` `greetd` `polkit-1` | howdy 人脸识别接入 DMS 锁屏 / sudo / greetd 登录 / polkit 图形提权（greetd 还接 gnome-keyring 自动解锁）；dankshell 的密码回退不带 `nullok`，空密码账户无法解锁 |
+| `etc/sysctl.d/99-ip-forward.conf` | `net.ipv4.ip_forward=1`，热点 / USB 共享上网的内核转发 |
+| `etc/sysctl.d/99-custom.conf` | `vm.min_free_kbytes=512M`，内存压力下减少卡顿 |
+| `etc/udev/rules.d/60-ioschedulers.rules` | 覆盖 cachyos-settings：NVMe `none`、SATA SSD `mq-deadline`（本机无 HDD） |
+| `etc/udev/rules.d/70-uuu.rules` | NXP uuu 刷机工具的 USB `uaccess`（reMarkable recovery 模式）；uuu 本体未装，需要时 AUR `mfgtools-uuu` |
 | `etc/greetd/niri_overrides.kdl` | 登录界面 niri 的 NVIDIA 环境变量扩展点；`config.toml`、`niri/{config,dms}.kdl` 由 `dms greeter sync` 生成，不入库 |
 | `etc/keyd/default.conf` | capslock ↔ leftcontrol 互换，仅作用于 DELL 外接键盘（`[ids] 0d62:9abc`，`sudo keyd list-keyboards` 查 id） |
 | `etc/snapper/configs/root` | Btrfs 根分区快照策略：只做 pacman pre/post 编号快照（上限 50），不开 timeline |
@@ -239,6 +247,8 @@ ELECTRON_OZONE_PLATFORM_HINT=auto   # 仅用户会话
 ```
 
 不一致的后果之一：登录界面的 niri 实例没走 nvidia-drm 时，eDP 面板的 DRM connector 名（eDP-1/eDP-2）会与用户会话不同，表现为登录界面分辨率与锁屏不一样。
+
+内核参数（`/etc/kernel/cmdline`，含根分区 UUID 故不入库）额外带 `nvidia-drm.modeset=1 nvidia-drm.fbdev=1`；initramfs 由 chwd 生成的 `mkinitcpio.conf.d/10-chwd.conf` 预载 nvidia 四个模块。新机器由 CachyOS 安装器 / chwd 自动写入，只需核对。
 
 ### GnuPG XDG
 
@@ -263,16 +273,16 @@ dotfiles/
 ├── home/                        # stow --target=$HOME home
 │   ├── .config/
 │   │   ├── niri/                # 合成器主配置 + DMS 托管的 dms/*.kdl（勿手改）
-│   │   ├── DankMaterialShell/   # monitors.json、插件启用记录、matugen 用户模板注册、自研插件（hotspotInternet / usbInternet）
-│   │   ├── matugen/             # apply-user-templates.sh + 用户模板（papirus-folders、zathura）
-│   │   ├── systemd/user/        # dms-user-matugen.{path,service}、remarkable-usb-share.{service,timer}、gpg/ssh-agent drop-in
+│   │   ├── DankMaterialShell/   # monitors.json、插件启用记录、自研插件（hotspotInternet / usbInternet）
+│   │   ├── matugen/             # config.toml + 用户模板（papirus-folders、zathura），由 DMS 直接执行
+│   │   ├── systemd/user/        # remarkable-usb-share.{service,timer}、gpg/ssh-agent drop-in
 │   │   ├── fish/                # config.fish、conf.d（sdkman、rustup）、functions（git 拦截、obsync）
 │   │   ├── kitty/               # kitty.conf + matugen 生成的 dank-theme/dank-tabs
 │   │   ├── nvim/                # Lazy.nvim；colors/dms.lua 为 matugen 生成的 base46 主题
 │   │   ├── yazi/                # 文件管理器（gvfs 插件、SFTP vfs）
 │   │   ├── zathura/             # PDF 阅读器 + matugen 配色
 │   │   ├── pandoc/              # reMarkable 纸感 PDF 导出（defaults / tex 头 / lua 过滤器）
-│   │   ├── mpv/                 # gpu-next + uosc + 剪贴板播放
+│   │   ├── mpv/                 # gpu-next + uosc（AUR mpv-uosc，script= 显式加载）+ 剪贴板播放
 │   │   ├── lazygit/  satty/  btop/  fastfetch/  starship.toml
 │   │   ├── fcitx5/              # Rime + wechat 主题
 │   │   ├── fontconfig/  gtk-3.0/  gtk-4.0/  qt5ct/  qt6ct/   # 字体与主题
@@ -280,7 +290,7 @@ dotfiles/
 │   │   ├── git/  maven/  gemini/  danksearch/  dankcal/  Thunar/
 │   │   └── mimeapps.list  user-dirs.dirs  user-dirs.locale  xdg-terminals.list  user-tmpfiles.d/
 │   ├── .local/bin/              # hotspot-internet、usb-internet、remarkable-usb-share、rbw-ssh-load、git-credential-rbw、wine-setup-fonts
-│   ├── .local/share/            # applications/*.desktop、rustup/settings.toml
+│   ├── .local/share/            # applications/*.desktop（蓝信、nvim 在 kitty 中打开）、fcitx5/rime/*.custom.yaml、rustup/settings.toml
 │   └── .ssh/config
 ├── system/
 │   ├── dconf/interface.ini
@@ -310,6 +320,8 @@ dotfiles/
 | DMS 第三方插件（calculator、emojiLauncher、niriWindows） | `dms plugins` 安装（内含 git 仓库）；`plugin_settings.json` 记录了启用状态 |
 | `~/.config/DankMaterialShell/settings.json` | DMS 运行时设置，随操作频繁变化（主题、字体、通知等在 FEATURES 有记录） |
 | SDKMAN candidates、fnm Node、pyenv、cargo | 体积大且逐机器不同，`sdk install` / `fnm install` 重装 |
+| `~/.local/share/fcitx5/rime/` 除 `*.custom.yaml` 外 | 词库 userdb、build 产物；重新部署即生成 |
+| `~/.local/share/applications/claude-code-url-handler.desktop` | Claude Code 安装器生成（`mimeapps.list` 的 `claude-cli` scheme 指向它） |
 
 ## 维护提示
 

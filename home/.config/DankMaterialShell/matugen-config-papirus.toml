@@ -1,4 +1,0 @@
-[templates.papirus-folders]
-input_path = 'CONFIG_DIR/matugen/templates/papirus-folders.sh'
-output_path = '/tmp/dms-papirus-folders.sh'
-post_hook = 'bash /tmp/dms-papirus-folders.sh'

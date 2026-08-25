@@ -187,6 +187,7 @@ texinfo
 thunar
 thunar-archive-plugin
 tree-sitter
+tree-sitter-cli        # nvim-treesitter main 分支编译 parser 必需（tree-sitter 只是库）
 ttf-bitstream-vera
 ttf-dejavu
 ttf-liberation
@@ -264,6 +265,7 @@ texlive-pstricks
 texlive-publishers
 # ── 开发 / 网络工具 ──
 github-cli
+shellcheck             # 脚本静态检查（install.sh / .local/bin）
 uv
 cmake
 ninja
@@ -294,7 +296,7 @@ vmware-keymaps
 vmware-workstation
 # ── 其余 AUR ──
 brave-nightly-bin      # 默认浏览器（mimeapps.list / Mod+B）
-python-pywalfox        # DMS matugen Pywalfox 模板 → 浏览器配色
+mpv-uosc               # mpv UI，装到 /usr/share/mpv，mpv.conf 用 script= 显式加载（取代 vendored 副本）
 jmtpfs
 remanager-bin          # reMarkable 管理器
 calibre-plugin-dedrm
