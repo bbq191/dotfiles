@@ -48,6 +48,7 @@ cd ~/Projects/dotfiles
 | Bitwarden | `rbw register`，然后 `rbw unlock`；再 `rbw add mihomo-proxy-token`（订阅 token）、`rbw add mihomo-secret`（面板密码），重跑 `./install.sh` 或只执行其 mihomo 段生成配置 |
 | SSH 密钥 | 在 Bitwarden 中存入 SSH Key 类型条目；`rbw unlock` 后执行 `rbw-ssh-load` 加载到 ssh-agent。之后 `git push/pull/fetch/clone` 会按需自动解锁并加载（`fish/functions/git.fish`） |
 | 壁纸 | 将图片放入 `~/Pictures/`，DMS Settings → Wallpaper 选择（或 `dms ipc call wallpaper set <路径>`）。换壁纸会触发整条 matugen 链（见 FEATURES「动态主题」） |
+| 明暗自动切换 | DMS Settings → Theme → 自动切换选 **按时间**（深色 19:30 → 07:00），并关闭"与夜间色温共用时段"。不要选"按位置"：dms-shell ≤1.5.3 的 `suncalc.go` 以 UTC 日期零点为基准算日出，东八区/东经 103° 的日出会落到 UTC 前一天，导致每天日出到 08:00 之间被判成夜间（配色跳回深色，调度循环每秒空转，上游 issue [#3179](https://github.com/AvengeMedia/DankMaterialShell/issues/3179)）。此设置存于 `~/.local/state/DankMaterialShell/session.json`，不入库 |
 | 登录界面 | `dms greeter enable && dms greeter sync`：生成 `/etc/greetd/config.toml` 与 `/etc/greetd/niri/{config,dms}.kdl`（分辨率/缩放读自 `monitors.json`，壁纸/主题与锁屏同步）。改显示器配置后需重新 `dms greeter sync`；NVIDIA 环境变量在 `niri_overrides.kdl`，不受 sync 覆盖 |
 | 人脸识别 | 见下方「人脸识别（howdy）」 |
 | Claude Code | 官方原生安装：`curl -fsSL https://claude.ai/install.sh \| bash`（装到 `~/.local/share/claude`，`~/.local/bin/claude` 为链接），然后 `claude` 登录；`~/.claude` 不在仓库 |
@@ -246,7 +247,7 @@ __GLX_VENDOR_LIBRARY_NAME=nvidia
 ELECTRON_OZONE_PLATFORM_HINT=auto   # 仅用户会话
 ```
 
-不一致的后果之一：登录界面的 niri 实例没走 nvidia-drm 时，eDP 面板的 DRM connector 名（eDP-1/eDP-2）会与用户会话不同，表现为登录界面分辨率与锁屏不一样。
+内屏的 DRM connector 名会在 eDP-1/eDP-2 间漂移：面板走 NVIDIA（MUX 独显直连），但 i915 开机时会先为自己空着的 DDI A 占住 eDP-1 约 1.5s 再释放，而 eDP-N 编号是跨显卡的全局计数器，nvidia-drm 注册早于或晚于这次释放就分别得到 eDP-1 或 eDP-2（initramfs 预载 nvidia 模块也挡不住，nvidia-drm 自身初始化耗时不定）。因此 `config.kdl` 的 output 块按 `"AU Optronics 0x96B1 Unknown"`（厂商 型号 序列号）匹配，不写连接器名；DMS 生成的 `dms/outputs.kdl` 仍按连接器名写，被前者覆盖，`monitors.json` 里两个 eDP 名各留一份相同的 profile 以免 DMS 反复新建。
 
 内核参数（`/etc/kernel/cmdline`，含根分区 UUID 故不入库）额外带 `nvidia-drm.modeset=1 nvidia-drm.fbdev=1`；initramfs 由 chwd 生成的 `mkinitcpio.conf.d/10-chwd.conf` 预载 nvidia 四个模块。新机器由 CachyOS 安装器 / chwd 自动写入，只需核对。
 

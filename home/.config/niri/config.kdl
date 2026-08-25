@@ -6,7 +6,11 @@
 //  输出显示  //
 ///////////////
 
-output "eDP-1" {
+// 按厂商/型号匹配而非连接器名：面板走 NVIDIA（MUX 独显直连），但 i915 开机时会先为自己
+// 空着的 DDI A 占住 eDP-1 约 1.5s 再释放，eDP-N 编号又是跨显卡的全局计数器，
+// 于是 nvidia-drm 注册早晚不同就会得到 eDP-1 或 eDP-2。此块在 include dms/outputs.kdl
+// 之前，niri 取首个匹配，故 DMS 生成的同屏配置始终被此块覆盖
+output "AU Optronics 0x96B1 Unknown" {
     mode "2560x1600@300.000"
     scale 1.0
     // 按需 VRR：仅当匹配 variable-refresh-rate 窗口规则的窗口（mpv、Steam 游戏）

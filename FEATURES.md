@@ -37,7 +37,7 @@
 | 内核 | linux-cachyos / linux-cachyos-lts（双内核，各带 nvidia-open 模块） |
 | 引导 | Limine（`limine-snapper-sync` 把 Snapper 快照挂进启动菜单；`/usr/local/bin/mkinitcpio` 是 limine-mkinitcpio-hook 的包装） |
 | 文件系统 | Btrfs + snapper（pacman 前后快照），btrfs-assistant 图形管理 |
-| 显示 | 内屏 eDP-1 2560×1600 @ 300Hz，scale 1，VRR 按需 |
+| 显示 | 内屏 2560×1600 @ 300Hz，scale 1，VRR 按需；按厂商/型号匹配（连接器名在 eDP-1/eDP-2 间漂移） |
 | GPU | NVIDIA（nvidia-open 内核驱动 + libva-nvidia-driver 硬解），Intel 核显作为混合显卡副卡（`nvidia-prime`、`switcheroo-control`） |
 | 音频 | PipeWire + WirePlumber |
 | 蓝牙 | BlueZ（DMS 控制中心管理） |
