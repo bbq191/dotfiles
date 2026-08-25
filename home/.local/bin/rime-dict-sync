@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+# 同步 Iorest/rime-dict 增强词库到 Rime 用户目录并重新编译。
+#   1. 克隆/更新仓库到 ~/.cache/rime-dict（原文件多为繁体，不直接使用）
+#   2. 按 rime_ice_ext.dict.yaml 里 import_tables 列出的 iorest/* 分库，用 opencc t2s 转成简体
+#      写入 ~/.local/share/fcitx5/rime/iorest/
+#   3. rime_deployer 重新编译；fcitx5 在运行则重启使其生效
+# 用法：rime-dict-sync [--no-restart]
+set -euo pipefail
+
+SRC="$HOME/.cache/rime-dict"
+RIME="$HOME/.local/share/fcitx5/rime"
+DST="$RIME/iorest"
+DICT="$RIME/rime_ice_ext.dict.yaml"
+REPO="https://github.com/Iorest/rime-dict.git"
+
+[[ -f "$DICT" ]] || { echo "找不到 $DICT（先 stow dotfiles）" >&2; exit 1; }
+for c in git opencc rime_deployer; do
+    command -v "$c" >/dev/null || { echo "缺少命令：$c" >&2; exit 1; }
+done
+
+if [[ -d "$SRC/.git" ]]; then
+    git -C "$SRC" pull -q --ff-only
+else
+    git clone -q --depth 1 "$REPO" "$SRC"
+fi
+
+mkdir -p "$DST"
+n=0
+while IFS= read -r name; do
+    src="$SRC/$name.dict.yaml"
+    [[ -f "$src" ]] || { echo "仓库中没有 $name.dict.yaml，跳过" >&2; continue; }
+    # 只转第一列（词）；拼音/权重是 ASCII，opencc 不会动
+    opencc -c t2s.json -i "$src" -o "$DST/$name.dict.yaml"
+    n=$((n + 1))
+done < <(sed -nE 's|^\s*-\s*iorest/([A-Za-z0-9_.]+).*|\1|p' "$DICT")
+echo "已转换 $n 个分库 → $DST"
+
+(cd "$RIME" && rime_deployer --build . /usr/share/rime-data build >/dev/null 2>&1)
+echo "已重新编译：$(du -h "$RIME/build/rime_ice_ext.table.bin" | cut -f1) rime_ice_ext.table.bin"
+
+if [[ "${1:-}" != "--no-restart" ]] && pgrep -x fcitx5 >/dev/null; then
+    setsid -f fcitx5 -d --replace >/dev/null 2>&1
+    echo "fcitx5 已重启"
+fi

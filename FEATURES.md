@@ -349,7 +349,9 @@ LSP → LuaSnip（friendly-snippets）→ 路径 → buffer（≥3 字符）。`
 ## 输入法（Fcitx5 + Rime）
 
 - Fcitx5 走 Wayland Input Method 协议；XWayland / Qt / SDL 通过 `environment.d/fcitx5.conf`
-- 方案：**Rime**（`rime-ice` 雾凇拼音 + `rime-wanxiang-gram-zh-hans` 万象语法模型）。用户补丁在 `~/.local/share/fcitx5/rime/*.custom.yaml`（已入库）：`default.custom.yaml` 引入雾凇预设；`rime_ice` / `double_pinyin_flypy` 两个方案把 `grammar/language` 指到 `wanxiang-lts-zh-hans`（没有这一行万象模型不会生效）并让中英开关每次部署重置。词库 userdb / build 产物不入库
+- 方案：**Rime**，日常用 `double_pinyin_flypy`（小鹤双拼），底座 `rime-ice` 雾凇拼音 + `rime-wanxiang-gram-zh-hans` 万象语法模型。用户补丁 `~/.local/share/fcitx5/rime/*.custom.yaml`（已入库）：`default.custom.yaml` 引入雾凇预设；`rime_ice` / `double_pinyin_flypy` 两个方案把 `grammar/language` 指到 `wanxiang-lts-zh-hans`（没有这一行万象模型不会生效）、中英开关每次部署重置为英文、词典指向 `rime_ice_ext`
+- **增强词库**：`rime_ice_ext.dict.yaml`（已入库）= 雾凇原生五库（8105 字表 / base / ext / tencent / others）+ [Iorest/rime-dict](https://github.com/Iorest/rime-dict) 17 个分库（基础、日常、实用、汉语、成语、饮食、历史、古文、诗词、网络、聊天、计算机、网站、人名、影视、音乐、游戏；未收 sougou / 粤语 / moba / 表情 / 动漫）。Iorest 原文件六到八成是繁体且大多不带拼音，`~/.local/bin/rime-dict-sync` 负责克隆 → `opencc t2s` 转简体 → 靠 8105 字表自动编码 → `rime_deployer` 编译 → 重启 fcitx5；权重全为 1，只在雾凇没有该词时补位，不改变常用词排序。编译后 table 85M，约 15s
+- **自动调频**：`translator/user_dict` 钉在 `rime_ice`，用户词库 `rime_ice.userdb` 跨方案共用、换词典不丢；选词后权重累积，同一输入下次前置。词库 userdb / build 产物 / `iorest/` 不入库
 - 外观：wechat-light / wechat-dark 主题、跟随系统强调色、横排候选、Maple Mono NF CN 11、Wayland 分数缩放
 - 蓝信等 X11-only 应用用 `GTK_IM_MODULE=xim` 兜底（`.desktop` 里指定）
 

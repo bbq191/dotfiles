@@ -1,0 +1,37 @@
+# 雾凇拼音词典 + Iorest/rime-dict 增强词库（https://github.com/Iorest/rime-dict）
+# 分库文件由 install.sh 克隆到 ~/.local/share/fcitx5/rime/iorest/，不入库。
+# 有重复词条时排在前面的权重生效，雾凇原生放最前；Iorest 词条大多无拼音、权重 1，
+# 由字表自动编码、排在雾凇原生词条之后，只起补漏作用。
+# 启用/停用分库：注释掉对应行后重新部署。未收录：sougou（77 万条、噪音大）、gd（粤语）、
+# moba、biaoqing（rime-ice 自带 emoji）、cn_en（rime-ice 自带）、anime。
+---
+name: rime_ice_ext
+version: "2026.08.25"
+sort: by_weight
+import_tables:
+  # —— 雾凇原生（与 /usr/share/rime-data/rime_ice.dict.yaml 保持一致；librime 的 import 不递归，
+  #    不能直接写 rime_ice，否则只得到一个空壳）——
+  - cn_dicts/8105     # 字表：Iorest 无拼音词条靠它自动编码，必须在最前
+  - cn_dicts/base
+  - cn_dicts/ext
+  - cn_dicts/tencent
+  - cn_dicts/others
+  # —— Iorest 增强库 ——
+  - iorest/luna_pinyin.basis
+  - iorest/luna_pinyin.daily
+  - iorest/luna_pinyin.practical
+  - iorest/luna_pinyin.hanyu
+  - iorest/luna_pinyin.idiom
+  - iorest/luna_pinyin.diet
+  - iorest/luna_pinyin.history
+  - iorest/luna_pinyin.classical
+  - iorest/luna_pinyin.poetry
+  - iorest/luna_pinyin.net
+  - iorest/luna_pinyin.chat
+  - iorest/luna_pinyin.computer
+  - iorest/luna_pinyin.website
+  - iorest/luna_pinyin.name
+  - iorest/luna_pinyin.movie
+  - iorest/luna_pinyin.music
+  - iorest/luna_pinyin.game
+...

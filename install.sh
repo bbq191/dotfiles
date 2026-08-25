@@ -85,6 +85,9 @@ done < <(find "$DOTFILES/home" -mindepth 1 -print0)
 stow --adopt --target="$HOME" home
 git -C "$DOTFILES" restore home/
 
+# Rime 增强词库：克隆 Iorest/rime-dict → opencc 转简体 → 编译（见 ~/.local/bin/rime-dict-sync）
+rime-dict-sync --no-restart || echo "    rime-dict-sync 失败（网络？），稍后手动执行"
+
 # dconf：niri 下没有 xsettings daemon，纯 GTK3 程序（如 Thunar）不读 gtk-3.0/settings.ini，
 # 而是直接吃 org.gnome.desktop.interface 这份 dconf 状态，必须单独同步字号/主题
 echo "[+] 应用 dconf 设置..."

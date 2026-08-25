@@ -1,4 +1,7 @@
 patch:
   "grammar/language": wanxiang-lts-zh-hans
   "switches/@0/reset": 1
-
+  # 词典换成 rime_ice + Iorest 增强库（rime_ice_ext.dict.yaml）；
+  # user_dict 显式钉在 rime_ice，沿用已有的 rime_ice.userdb（自动调频数据不丢）
+  "translator/dictionary": rime_ice_ext
+  "translator/user_dict": rime_ice

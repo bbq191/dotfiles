@@ -2,3 +2,4 @@
 *
 !.gitignore
 !*.custom.yaml
+!rime_ice_ext.dict.yaml

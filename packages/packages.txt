@@ -61,6 +61,7 @@ fcitx5-configtool
 fcitx5-gtk
 fcitx5-qt
 fcitx5-rime
+opencc                 # rime-dict-sync 用 opencc CLI 把 Iorest 繁体词库转简体（librime 依赖，显式列出）
 ffmpegthumbnailer
 file-roller
 fnm
