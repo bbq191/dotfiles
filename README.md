@@ -26,9 +26,9 @@ cd ~/Projects/dotfiles
 1. 安装 paru（AUR helper）和 stow
 2. 通过 paru 安装 `packages/packages.txt` 中的全部软件包
 3. fnm 安装 Node LTS，全局 npm 安装 `@google/gemini-cli` 与 `@mermaid-js/mermaid-cli`（pandoc 渲染 mermaid 用）
-4. stow 将 `home/` 链接到 `$HOME`：目标位置已有的实体文件按仓库清单逐个备份为 `*.bak-<时间戳>`，旧的绝对路径链接原地重建为相对链接；随后 `dconf load` 同步 GTK 字体/主题（Thunar 等纯 GTK3 程序不读 `settings.ini`）
+4. stow 将 `home/` 链接到 `$HOME`：目标位置已有的实体文件按仓库清单逐个备份为 `*.bak-<时间戳>`（已经通过上级目录链接指向仓库的文件会跳过），旧的绝对路径链接原地重建为相对链接；随后 `dconf load` 同步 GTK 字体/主题（Thunar 等纯 GTK3 程序不读 `settings.ini`）
 5. 复制 `system/etc`、`system/usr/local/bin` 到系统：resolved / ollama drop-in / NVIDIA modprobe / greetd NVIDIA 覆盖 / tmpfiles（THP、howdy 权限）/ PAM（dankshell、sudo、greetd）/ howdy-libguard 与 pacman 钩子 / sudoers（papirus-folders）/ NetworkManager（iwd 后端、iptables 防火墙后端）/ `.link` 网卡命名（wlan0、rmk0）/ keyd / snapper；并 mask `NetworkManager-wait-online`
-6. 启用 systemd 服务：系统级 ollama、iwd、keyd、linux-enable-ir-emitter；用户级 ssh-agent.socket、dms、cliphist、dcal、dsearch、dms-user-matugen.path、remarkable-usb-share.timer
+6. 启用 systemd 服务：系统级 iwd、keyd、linux-enable-ir-emitter（ollama 只装 override，不自启）；用户级 ssh-agent.socket、dms、cliphist、dcal、dsearch、dms-user-matugen.path、remarkable-usb-share.timer、systemd-tmpfiles-setup（否则 `user-tmpfiles.d/cleanup.conf` 不生效，本机实测默认 disabled）
 7. 初始化目录（wine prefix、ollama 模型、ssh ControlPath）
 8. GnuPG 迁移到 XDG 路径（`~/.local/share/gnupg`），生成 gpg-agent socket 单元 drop-in
 9. Maven 本地仓库迁移到 `~/.cache/maven/repository`
@@ -44,7 +44,7 @@ cd ~/Projects/dotfiles
 | 步骤 | 命令 / 操作 |
 |------|-------------|
 | 字体 | 软件源没有 Maple Mono：从 [subframe7536/maple-font](https://github.com/subframe7536/maple-font/releases) 下载 `MapleMono-NF-CN-unhinted.zip`，解压到 `~/.local/share/fonts/MapleMono/`，`fc-cache -f`。终端 / 编辑器 / GTK / Qt / DMS / fcitx5 全部指向该字体，缺失会整体回退成 DejaVu |
-| pandoc 字体 | `<leader>mp` 导出 PDF 依赖 `~/.local/share/fonts/remarkable-pandoc/` 下的 KF Readerly、LXGW WenKai（含 Mono）、KingHwaOldSong、NotoEmoji-Regular.ttf（`remarkable.tex` 以绝对路径引用，不走 fontconfig） |
+| pandoc 字体 | `<leader>mp` 导出 PDF 依赖 `~/.local/share/fonts/remarkable-pandoc/` 下的 KF Readerly、LXGW WenKai（含 Mono）、KingHwaOldSong、NotoEmoji-Regular.ttf。`remarkable.tex` 以 `/home/afu/...` 绝对路径引用（fontspec 的 `Path=` 不展开 `~`，已实测），换用户名时改文件顶部三个 `\def` |
 | Bitwarden | `rbw register`，然后 `rbw unlock`；再 `rbw add mihomo-proxy-token`（订阅 token）、`rbw add mihomo-secret`（面板密码），重跑 `./install.sh` 或只执行其 mihomo 段生成配置 |
 | SSH 密钥 | 在 Bitwarden 中存入 SSH Key 类型条目；`rbw unlock` 后执行 `rbw-ssh-load` 加载到 ssh-agent。之后 `git push/pull/fetch/clone` 会按需自动解锁并加载（`fish/functions/git.fish`） |
 | 壁纸 | 将图片放入 `~/Pictures/`，DMS Settings → Wallpaper 选择（或 `dms ipc call wallpaper set <路径>`）。换壁纸会触发整条 matugen 链（见 FEATURES「动态主题」） |
@@ -59,7 +59,7 @@ cd ~/Projects/dotfiles
 | 步骤 | 说明 |
 |------|------|
 | VMware | `vmware-workstation`（AUR）安装后执行 `sudo vmware-modconfig --console --install-all` 编译内核模块 |
-| Ollama 模型 | `ollama pull <model>`；本机当前把 `ollama.service` 设为 disabled，按需 `systemctl start ollama` |
+| Ollama | 不开机自启：`sudo systemctl start ollama` 后 `ollama pull <model>`；模型在 `~/.local/share/ollama/models` |
 | 蓝信（人保 e 办） | 无 AUR 包：`debtap` 转换官方 deb 后 `pacman -U`；`.desktop` 在仓库（强制 X11 + fcitx XIM） |
 | Obsidian | 笔记库 `~/Documents/ikate` 为 git 仓库，`obsync` 一键 commit/pull --rebase/push |
 

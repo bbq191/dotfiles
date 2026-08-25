@@ -236,9 +236,9 @@ fcitx5 的 `XMODIFIERS` / `QT_IM_MODULE` / `SDL_IM_MODULE` 在 `environment.d/fc
 
 ### 环境变量（XDG）
 
-`XDG_{DATA,CONFIG,CACHE,STATE}_HOME` 显式 export（systemd/fish 不会自动给）；Cargo、Rustup、Pyenv、npm cache、CUDA cache、Wine prefix、Gemini CLI、TeX（TEXMFHOME/VAR/CONFIG）、GnuPG 全部映射到 XDG 路径；`EDITOR=nvim`；`SSH_AUTH_SOCK` 指向 systemd socket 激活的 `ssh-agent.socket`；`OLLAMA_MODELS` 在 `~/.local/share/ollama/models`。
+`config.fish` 中 fnm 对非交互 shell 也生效（脚本要找 node），zoxide / fzf / starship / SSH 密钥加载只在 `status is-interactive` 时初始化。`XDG_{DATA,CONFIG,CACHE,STATE}_HOME` 显式 export（systemd/fish 不会自动给）；Cargo、Rustup、Pyenv、npm cache、CUDA cache、Wine prefix、Gemini CLI、TeX（TEXMFHOME/VAR/CONFIG）、GnuPG 全部映射到 XDG 路径；`EDITOR=nvim`；`SSH_AUTH_SOCK` 指向 systemd socket 激活的 `ssh-agent.socket`；`OLLAMA_MODELS` 在 `~/.local/share/ollama/models`。
 
-`user-tmpfiles.d/cleanup.conf` 每次登录清掉程序无视 XDG 又写回 `$HOME` 的 `.nv`、`.pycorrector`、`.dotnet`。
+`user-tmpfiles.d/cleanup.conf` 每次登录清掉程序无视 XDG 又写回 `$HOME` 的 `.nv`、`.pycorrector`、`.dotnet`（依赖用户级 `systemd-tmpfiles-setup.service`，install.sh 已启用）。
 
 ### 函数
 
@@ -452,7 +452,7 @@ Satty：箭头 / 矩形 / 圆 / 文本 / 马赛克 / 荧光笔；右键即复制
 |------|------|
 | **Claude Code** | 官方原生安装（`~/.local/share/claude`，`~/.local/bin/claude`）；`~/.claude` 不入库；`git/ignore` 全局忽略 `.claude/` 与 `CLAUDE.md` |
 | **Gemini CLI** | npm 全局；`GEMINI_CLI_HOME=~/.config/gemini`，系统提示词 `GEMINI.md` 入库 |
-| **Ollama** | `ollama-cuda`，以用户身份运行，模型 `~/.local/share/ollama/models`；本机当前 `ollama.service` disabled，按需启动 |
+| **Ollama** | `ollama-cuda`，以用户身份运行，模型 `~/.local/share/ollama/models`；不开机自启（install.sh 只装 override），`systemctl start ollama` 按需拉起 |
 | mermaid-cli | npm 全局 `mmdc`，pandoc 过滤器渲染 mermaid |
 | Python | pyenv（`~/.local/share/pyenv`）、uv、basedpyright / ruff |
 | Node | fnm（自动切换）+ Prettier / ts_ls（Mason） |

@@ -36,10 +36,11 @@ echo "[+] 应用 dotfiles..."
 
 backup_if_exists() {
     local target="$HOME/$1"
-    if [[ -e "$target" && ! -L "$target" ]]; then
-        mv "$target" "${target}.bak-$(date +%s)"
-        echo "    备份: $target"
-    fi
+    [[ -e "$target" && ! -L "$target" ]] || return 0
+    # 上级目录已是指向仓库的链接（如 ~/.config/fish → 仓库）时，target 实际就是仓库文件，不能搬走
+    [[ "$(realpath -- "$target")" == "$DOTFILES"/* ]] && return 0
+    mv "$target" "${target}.bak-$(date +%s)"
+    echo "    备份: $target"
 }
 
 # 备份目标位置已存在的实体文件（非符号链接）：按仓库文件清单逐个检查，
@@ -127,7 +128,7 @@ sudo systemctl mask NetworkManager-wait-online.service
 # ── 6. systemd 服务 ───────────────────────────────────────────────────────────
 echo "[+] 启用 systemd 服务..."
 sudo systemctl daemon-reload
-sudo systemctl enable --now ollama
+# ollama 只部署 override（用户身份 + XDG 模型路径），不开机自启；需要时 systemctl start ollama
 sudo systemctl disable --now wpa_supplicant 2>/dev/null || true
 sudo systemctl enable --now iwd
 sudo systemctl enable --now keyd
@@ -138,6 +139,8 @@ systemctl --user enable --now ssh-agent.socket
 systemctl --user enable --now dms.service 2>/dev/null || true
 # DMS 后端：剪贴板历史 / 日历 / Spotlight 文件索引（包自带单元）
 systemctl --user enable --now cliphist.service dcal.service dsearch.service 2>/dev/null || true
+# 用户级 tmpfiles：user-tmpfiles.d/cleanup.conf 靠它执行（preset 写着 enable，但本机实测默认是 disabled）
+systemctl --user enable --now systemd-tmpfiles-setup.service systemd-tmpfiles-clean.timer
 # 壁纸变化 → 用户 matugen 模板（papirus 文件夹色 / zathura 配色）
 systemctl --user enable --now dms-user-matugen.path
 # USB 直连 reMarkable 时周期推送「网关/DNS 指向本机」配置（设备端不持久，靠定时器自愈）
