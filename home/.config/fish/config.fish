@@ -19,6 +19,7 @@ set -gx TEXMFHOME        $XDG_DATA_HOME/texmf
 set -gx TEXMFVAR         $XDG_CACHE_HOME/texlive/texmf-var
 set -gx TEXMFCONFIG      $XDG_CONFIG_HOME/texlive/texmf-config
 set -gx GNUPGHOME        $XDG_DATA_HOME/gnupg
+set -gx GOPATH           $XDG_DATA_HOME/go   # go 平时不装，但 paru 编译 go 写的 AUR 包会临时装并写缓存，没这行会落到 ~/go
 
 # ── 环境变量 ──────────────────────────────────────────────────────────────────
 set -gx EDITOR nvim
