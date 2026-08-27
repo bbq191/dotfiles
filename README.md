@@ -61,7 +61,7 @@ cd ~/Projects/dotfiles
 |------|------|
 | VMware | `vmware-workstation`（AUR）安装后执行 `sudo vmware-modconfig --console --install-all` 编译内核模块 |
 | Ollama | 不开机自启：`sudo systemctl start ollama` 后 `ollama pull <model>`；模型在 `~/.local/share/ollama/models` |
-| 蓝信（人保 e 办） | 无 AUR 包：`debtap` 转换官方 deb 后 `pacman -U`；`.desktop` 在仓库（强制 X11 + fcitx XIM） |
+| 蓝信（人保 e 办） | 无 AUR 包：`debtap` 转换官方 deb 后 `pacman -U`；转换包不声明依赖，需手动 `pacman -S --asexplicit gtk2`（`LxMainNew`/`libcef.so` 链接 gtk2，被当孤儿清掉就起不来）；`.desktop` 在仓库（强制 X11 + fcitx XIM） |
 | Obsidian | 笔记库 `~/Documents/ikate` 为 git 仓库，`obsync` 一键 commit/pull --rebase/push |
 
 ---
