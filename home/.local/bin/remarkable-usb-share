@@ -7,17 +7,21 @@ DEV=10.11.99.1
 ping -c1 -W1 "$DEV" >/dev/null 2>&1 || exit 0
 
 ssh -o BatchMode=yes -o ConnectTimeout=3 -o StrictHostKeyChecking=accept-new "root@$DEV" '
-# 已配置(含 v2 标记 Domains=~.)则直接退出(幂等)
-grep -qs "Domains=~." /etc/systemd/network/10-usb.network.d/pc-gateway.conf \
+# 已配置(含 v3 标记)则直接退出(幂等)
+grep -qs "rmk-share-v3" /etc/systemd/network/10-usb.network.d/pc-gateway.conf \
   && [ "$(cat /proc/sys/net/ipv4/conf/usb1/ignore_routes_with_linkdown 2>/dev/null)" = "1" ] \
   && [ "$(readlink /etc/resolv.conf)" = "/run/systemd/resolve/stub-resolv.conf" ] \
   && exit 0
 
 mkdir -p /etc/systemd/resolved.conf.d /etc/systemd/network/10-usb.network.d
 
-# usb1 链路级 DNS = PC 上的 mihomo(fake-ip)。Domains=~. 使其在 USB 在线时优先于一切;
-# 链路断开即随之消失。DNSOverTLS=no 避免对明文 1053 端口做 TLS 探测造成卡顿。
-printf "[Network]\nDNS=10.11.99.2:1053\nDomains=~.\nDNSDefaultRoute=yes\nDNSOverTLS=no\n\n[Route]\nGateway=10.11.99.2\nMetric=500\n" \
+# usb1 链路级 DNS = PC 上的 mihomo。**只用 DNSDefaultRoute=yes、不用 Domains=~.**：
+# 前者随链路载波重估(usb1 无载波→scopes:none→自动回落 Wi-Fi/兜底 DNS)，插着时仍把 ~.
+# 查询送 mihomo(真机验证 google.com→link usb1);后者 Domains=~. 是**静态路由域**、对无载波
+# 链路仍粘着,拔 USB/换异网时把全部 DNS 死钉到不可达的 10.11.99.2:1053 → 换别的 Wi-Fi 没网
+# (2026-08-28 真机 bug 根因,见 cang-jie device-fw-169-ota-regressions)。DNSOverTLS=no 避免
+# 对明文 1053 做 TLS 探测卡顿。首行 # rmk-share-v3 = 幂等版本标记。
+printf "# rmk-share-v3\n[Network]\nDNS=10.11.99.2:1053\nDNSDefaultRoute=yes\nDNSOverTLS=no\n\n[Route]\nGateway=10.11.99.2\nMetric=500\n" \
   > /etc/systemd/network/10-usb.network.d/pc-gateway.conf
 
 # 全局兜底:公共 DoT(设备常在的 Wi-Fi 对明文 53 端口有过滤),仅在 USB 不在时被用到
@@ -34,5 +38,5 @@ ln -sf /run/systemd/resolve/stub-resolv.conf /etc/resolv.conf
 systemctl restart systemd-resolved
 networkctl reload
 networkctl reconfigure usb1
-logger -t remarkable-usb-share "device provisioned (v2)"
+logger -t remarkable-usb-share "device provisioned (v3)"
 ' 2>/dev/null

@@ -441,7 +441,7 @@ Satty：箭头 / 矩形 / 圆 / 文本 / 马赛克 / 荧光笔；右键即复制
 
 ## reMarkable 工作流
 
-- **USB 直连共享上网**：设备插上 → NM `remarkable-usb`（rmk0，10.11.99.2/24，不抢默认路由）→ `remarkable-usb-share.timer` 每 45s 检查设备在线并 SSH 推送网关/DNS 配置（设备 `/etc` 易失，重启自愈）→ 设备经本机 mihomo 出网；`usb-internet` 开关决定是否翻墙
+- **USB 直连共享上网**：设备插上 → NM `remarkable-usb`（rmk0，10.11.99.2/24，不抢默认路由）→ `remarkable-usb-share.timer` 每 45s 检查设备在线并 SSH 推送网关/DNS 配置（设备 `/etc` 易失，重启自愈）→ 设备经本机 mihomo 出网；`usb-internet` 开关决定是否翻墙。设备端 DNS 只用 `DNSDefaultRoute=yes` 不用 `Domains=~.`（v3）：前者随 usb1 载波消失自动回落 Wi-Fi DNS，后者对无载波链路仍粘着，拔线/换异网会把全部 DNS 死钉到不可达的 10.11.99.2 导致没网
 - **remanager**：reMarkable 文件管理器（AUR `remanager-bin`）
 - **纸感 PDF**：Neovim `<leader>mp` → pandoc reMarkable 配置（见编辑器一节）
 - **recovery 刷机**：`udev/rules.d/70-uuu.rules` 给 NXP uuu 工具 USB 权限（设备 recovery 模式下以 NXP VID 出现）；uuu 本体按需装
