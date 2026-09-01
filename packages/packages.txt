@@ -88,6 +88,7 @@ hwinfo
 niri
 xwayland-satellite
 xdg-desktop-portal-gnome
+imagemagick            # nvim snacks.image 转换 SVG/PDF 为位图内联显示（原为 zbar 依赖，显式声明防孤儿清理）
 inetutils
 intel-media-driver
 intel-ucode

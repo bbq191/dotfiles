@@ -290,6 +290,8 @@ LSP → LuaSnip（friendly-snippets）→ 路径 → buffer（≥3 字符）。`
 | Treesitter（`main` 分支）+ rainbow-delimiters | 18 个 parser 由插件按需编译（需 `tree-sitter-cli`）；高亮与缩进在 `FileType` 时用内置 `vim.treesitter.start()` 启用；彩虹括号。`main` 分支已移除增量选择，`<C-Space>` 不再有该功能 |
 | Telescope（fzf-native） | `<leader>ff/fg/fb/fr/fs/fd`（含隐藏文件） |
 | gitsigns | `]h` / `[h`，`<leader>hs/hr/hS/hp/hb/hd` |
+| render-markdown.nvim | Markdown 编辑器内渲染（标题/列表/代码块/表格美化，光标行还原源码），`<leader>mr` 开关；latex 支持已关（未装 parser） |
+| snacks.nvim（仅 image 模块） | Markdown 内联显示图片（kitty graphics protocol）；SVG/PDF 经 imagemagick 栅格化 |
 | lualine / bufferline / indent-blankline / nvim-notify / colorizer / mini.icons | UI |
 
 ### 核心键位（`<leader> = Space`）
@@ -309,6 +311,7 @@ LSP → LuaSnip（friendly-snippets）→ 路径 → buffer（≥3 字符）。`
 | `<A-z>` | 切换自动换行 |
 | `<Esc>` | 清除搜索高亮 |
 | `<leader>mp` | Markdown → PDF（见下） |
+| `<leader>mr` | Markdown 编辑器内渲染开关（render-markdown.nvim） |
 
 ### Markdown → PDF（reMarkable 纸感）
 
