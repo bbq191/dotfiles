@@ -75,7 +75,7 @@ fcitx5 的 `XMODIFIERS` / `QT_IM_MODULE` / `SDL_IM_MODULE` 在 `environment.d/fc
 
 ### 启动项
 
-`fcitx5 -d --replace`。剪贴板历史由用户单元 `cliphist.service` 提供（`wl-paste --watch cliphist store`）。
+`fcitx5 -d --replace`。剪贴板历史由用户单元 `cliphist.service` 提供（`wl-paste --watch cliphist store`）。X11↔Wayland 文本剪贴板由用户单元 `x11-clipboard-bridge.service`（`~/.local/bin/x11-clipboard-bridge`，GTK3 owner-change + `wl-paste --watch`）桥接——xwayland-satellite 0.8.2 自带桥接运行一段时间后会卡死（上游 #485），VMware 等 X11 应用靠它复制粘贴；只桥接文本。
 
 ### 键位（`Mod = Super`）
 
@@ -99,6 +99,7 @@ fcitx5 的 `XMODIFIERS` / `QT_IM_MODULE` / `SDL_IM_MODULE` 在 `environment.d/fc
 | `Super + 左键拖` / `右键拖` | 移动 / 缩放窗口（niri 内置） |
 | `Super + A` | 框选截图 → 剪贴板 → Satty 标注 |
 | `Super + Shift + A` | 当前窗口截图（`~/Pictures/Screenshots` + 剪贴板） |
+| `Super + Ctrl + V` / `Super + Ctrl + C` | 手动把宿主剪贴板推给 X11 / 把 X11 剪贴板拉回宿主（桥接服务失效时的兜底，xclip） |
 | `Super + Ctrl + A` | 全屏截图 → Satty |
 | `Super + Alt + A` | 区域录屏（wf-recorder，再按停止，存 `~/Downloads`） |
 | `Print` | niri 内置交互式截图 |

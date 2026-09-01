@@ -276,7 +276,7 @@ dotfiles/
 │   │   ├── niri/                # 合成器主配置 + DMS 托管的 dms/*.kdl（勿手改）
 │   │   ├── DankMaterialShell/   # monitors.json、插件启用记录、自研插件（hotspotInternet / usbInternet）
 │   │   ├── matugen/             # config.toml + 用户模板（papirus-folders、zathura），由 DMS 直接执行
-│   │   ├── systemd/user/        # remarkable-usb-share.{service,timer}、gpg/ssh-agent drop-in
+│   │   ├── systemd/user/        # remarkable-usb-share.{service,timer}、x11-clipboard-bridge.service、gpg/ssh-agent drop-in
 │   │   ├── fish/                # config.fish、conf.d（sdkman、rustup）、functions（git 拦截、obsync）
 │   │   ├── kitty/               # kitty.conf + matugen 生成的 dank-theme/dank-tabs
 │   │   ├── nvim/                # Lazy.nvim；colors/dms.lua 为 matugen 生成的 base46 主题
@@ -290,7 +290,7 @@ dotfiles/
 │   │   ├── environment.d/       # fcitx5 / gnupg / maven 环境变量
 │   │   ├── git/  maven/  gemini/  danksearch/  dankcal/  Thunar/
 │   │   └── mimeapps.list  user-dirs.dirs  user-dirs.locale  xdg-terminals.list  user-tmpfiles.d/
-│   ├── .local/bin/              # hotspot-internet、usb-internet、remarkable-usb-share、rime-dict-sync、rbw-ssh-load、git-credential-rbw、wine-setup-fonts
+│   ├── .local/bin/              # hotspot-internet、usb-internet、remarkable-usb-share、x11-clipboard-bridge、rime-dict-sync、rbw-ssh-load、git-credential-rbw、wine-setup-fonts
 │   ├── .local/share/            # applications/*.desktop（蓝信、nvim 在 kitty 中打开）、fcitx5/rime/（*.custom.yaml、rime_ice_ext.dict.yaml）、rustup/settings.toml
 │   └── .ssh/config
 ├── system/

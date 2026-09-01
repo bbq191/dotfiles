@@ -226,6 +226,11 @@ binds {
     XF86AudioPlay  allow-when-locked=true { spawn "playerctl" "play-pause"; }
     XF86AudioPrev  allow-when-locked=true { spawn "playerctl" "previous"; }
 
+    // ── X11 剪贴板手动桥接（xwayland-satellite 0.8.2 桥接会跑几小时后卡死，上游 #485）──
+    // VMware 等 X11 应用复制粘贴失灵时用；纯 xclip 操作，不经过 satellite
+    Mod+Ctrl+V { spawn "sh" "-c" "wl-paste -n | DISPLAY=:0 xclip -i -selection clipboard && notify-send -t 1500 '剪贴板 → X11/VMware'"; }   // 宿主内容推给 X11，再去虚拟机里粘贴
+    Mod+Ctrl+C { spawn "sh" "-c" "DISPLAY=:0 xclip -o -selection clipboard | wl-copy && notify-send -t 1500 'X11/VMware → 剪贴板'"; }   // 把虚拟机里复制的内容拉回宿主
+
     // ── 会话 ──
     Mod+Shift+E { quit; }
 }

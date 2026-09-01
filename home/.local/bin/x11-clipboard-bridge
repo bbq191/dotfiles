@@ -1,0 +1,81 @@
+#!/usr/bin/env python3
+"""X11 ↔ Wayland 文本剪贴板双向桥接。
+
+xwayland-satellite 0.8.2 自带的剪贴板桥接会在运行一段时间后卡死
+（Wayland 有内容但 X11 CLIPBOARD 无所有者，上游 issue #485），
+VMware 等 X11 应用随之无法与宿主互相复制粘贴。本脚本绕开 satellite：
+  - Wayland 侧：`wl-paste --watch`（data-control 协议，不需要焦点）
+  - X11 侧：GTK3 的 owner-change 信号（XFixes）
+只桥接文本；用「上次同步内容」比对防止两侧互相触发回环。
+"""
+import os
+import subprocess
+import sys
+import threading
+
+os.environ["GDK_BACKEND"] = "x11"
+os.environ.setdefault("DISPLAY", ":0")
+
+import gi  # noqa: E402
+
+gi.require_version("Gdk", "3.0")
+gi.require_version("Gtk", "3.0")
+from gi.repository import Gdk, GLib, Gtk  # noqa: E402
+
+Gtk.init([])
+clipboard = Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD)
+last = None  # 最近一次同步过的文本，两侧共用
+
+
+def log(msg):
+    print(msg, file=sys.stderr, flush=True)
+
+
+def on_x11_text(_cb, text):
+    global last
+    if not text or text == last:
+        return
+    last = text
+    subprocess.run(["wl-copy", "--type", "text/plain;charset=utf-8"], input=text.encode(), check=False)
+    log(f"X11 → Wayland ({len(text)} 字符)")
+
+
+def on_x11_owner_change(cb, _event):
+    cb.request_text(on_x11_text)
+
+
+def on_wayland_text(text):
+    global last
+    if not text or text == last:
+        return False
+    last = text
+    clipboard.set_text(text, -1)
+    log(f"Wayland → X11 ({len(text)} 字符)")
+    return False
+
+
+def watch_wayland():
+    # 每次 Wayland 剪贴板变化，wl-paste 都会拉起一次子命令；用 NUL 分隔逐条读回
+    proc = subprocess.Popen(
+        ["wl-paste", "--type", "text", "--watch", "sh", "-c", 'cat; printf "\\0"'],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.DEVNULL,
+    )
+    buf = b""
+    while True:
+        chunk = proc.stdout.read1(65536)
+        if not chunk:
+            break
+        buf += chunk
+        while b"\0" in buf:
+            item, buf = buf.split(b"\0", 1)
+            GLib.idle_add(on_wayland_text, item.decode("utf-8", "replace"))
+    log("wl-paste --watch 退出，桥接结束")
+    GLib.idle_add(Gtk.main_quit)
+
+
+clipboard.connect("owner-change", on_x11_owner_change)
+threading.Thread(target=watch_wayland, daemon=True).start()
+log("x11-clipboard-bridge 已启动")
+Gtk.main()
+sys.exit(1)

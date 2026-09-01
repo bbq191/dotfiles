@@ -181,6 +181,8 @@ for plugin in calculator emojiLauncher niriWindows; do
 done
 # DMS 后端：剪贴板历史 / 日历 / Spotlight 文件索引（包自带单元）
 systemctl --user enable --now cliphist.service dcal.service dsearch.service 2>/dev/null || true
+# X11↔Wayland 文本剪贴板桥接：xwayland-satellite 0.8.2 自带桥接会卡死（上游 #485），VMware 等 X11 应用靠它复制粘贴
+systemctl --user enable --now x11-clipboard-bridge.service
 # 用户级 tmpfiles：user-tmpfiles.d/cleanup.conf 靠它执行（preset 写着 enable，但本机实测默认是 disabled）
 systemctl --user enable --now systemd-tmpfiles-setup.service systemd-tmpfiles-clean.timer
 # USB 直连 reMarkable 时周期推送「网关/DNS 指向本机」配置（设备端不持久，靠定时器自愈）
