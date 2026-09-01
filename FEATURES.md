@@ -431,7 +431,7 @@ Satty：箭头 / 矩形 / 圆 / 文本 / 马赛克 / 荧光笔；右键即复制
 |------|------|
 | 网络管理 | NetworkManager（iwd 后端、OpenVPN 插件）；`NetworkManager-wait-online` 已 mask |
 | 网卡命名 | `10-wlan0.link` 按 MAC 固定 Wi-Fi 为 wlan0；`11-rmk0.link` 固定 reMarkable USB 网卡为 rmk0 |
-| 代理 | **mihomo**（Clash Meta）系统服务，`/etc/mihomo`：TUN mixed + fake-ip、mixed-port 6153、API 9090 + zashboard；规则集 MetaCubeX mrs（AI / GitHub / YouTube / Google / Apple / Microsoft / Telegram / 游戏 / 巴哈 / 广告 REJECT / 国内直连）；地区分组香港 / 台湾 / 日本 / 美国 / 新加坡；工作内网网段与 `iam.picc.com` 走内网 DNS 并排除路由 |
+| 代理 | **mihomo**（Clash Meta）系统服务，`/etc/mihomo`：TUN mixed + fake-ip、mixed-port 6153、API 9090 + zashboard；规则集 MetaCubeX mrs（AI / GitHub / YouTube / Google / Apple / Microsoft / Telegram / 游戏 / 巴哈 / 广告 REJECT / 国内直连）；地区分组香港 / 台湾 / 日本 / 美国 / 新加坡；工作内网网段与 `iam.picc.com` 走内网 DNS 并排除路由；`deepseek.com` 在 AI 规则集前抢先直连（国内 API，走 AI 代理绕境外又慢又飘，且 reMarkable 借道 NAT 上传大图会超时） |
 | 热点 / USB 翻墙开关 | `hotspot-internet` / `usb-internet` 脚本 + DMS 插件：on = 设备走 mihomo 分流；off = 强制直连不断网（改 flag 文件 + API 刷新 provider + 断存量连接，无需 root）。详见 README「网络共享」 |
 | DNS | systemd-resolved（mDNS 关闭防与 avahi 冲突）；mihomo DNS 监听 `0.0.0.0:1053` 供共享设备使用 |
 | 防火墙 | UFW；NM 防火墙后端 iptables（共享连接 NAT 同链）；`sysctl net.ipv4.ip_forward=1` |

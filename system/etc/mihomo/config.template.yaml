@@ -236,6 +236,11 @@ rules:
   - DOMAIN-SUFFIX,local,DIRECT
   - RULE-SET,private_ip,DIRECT,no-resolve
   - RULE-SET,private_domain,DIRECT
+  # DeepSeek 是国内直连 API：必须在 ai_domain 之前抢先走「国内」直连。
+  # 否则被 category-ai-!cn 匹配 → AI 代理(美/港) → 国内 API 绕道境外又慢又飘；
+  # 且 fake-ip 经 TUN 走代理时，reMarkable 设备(借本机 DNS+NAT)的大图上传直接超时
+  # (2026-08-30 cang-jie cardhw 真机实测：deepseek 180s 打满超时，dashscope 直连秒回)。
+  - DOMAIN-SUFFIX,deepseek.com,国内
   - RULE-SET,ai_domain,AI
   - RULE-SET,github_domain,Github
   - RULE-SET,youtube_domain,YouTube
