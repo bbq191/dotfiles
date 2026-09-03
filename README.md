@@ -33,7 +33,7 @@ cd ~/Projects/dotfiles
 8. GnuPG 迁移到 XDG 路径（`~/.local/share/gnupg`），生成 gpg-agent socket 单元 drop-in
 9. Maven 本地仓库迁移到 `~/.cache/maven/repository`
 10. SDKMAN 官方脚本安装到 `~/.local/share/sdkman`，fish 插件文件缺失时 `fisher update` 落地
-11. mihomo：从 rbw 取订阅 token 与面板密码渲染模板，与 `/etc/mihomo/config.yaml` 不同时才写入（`640 root:用户`）并重启服务，相同则只确保服务已启用；建 `/etc/mihomo/flags/`（归当前用户，供外网开关脚本写入）。rbw 未解锁或缺条目则跳过并提示
+11. mihomo：从 rbw 取完整订阅链接与面板密码渲染模板，与 `/etc/mihomo/config.yaml` 不同时才写入（`640 root:用户`）并重启服务，相同则只确保服务已启用；建 `/etc/mihomo/flags/`（归当前用户，供外网开关脚本写入）。rbw 未解锁或缺条目则跳过并提示
 
 ---
 
