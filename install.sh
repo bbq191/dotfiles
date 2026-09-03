@@ -259,8 +259,8 @@ fi
 
 # ── 11. mihomo 配置 ───────────────────────────────────────────────────────────
 # mihomo 以系统服务运行（mihomo-bin 自带 mihomo.service，-d /etc/mihomo）。
-# 模板 system/etc/mihomo/config.template.yaml 只缺订阅 token 和面板密码，
-# 两者从 rbw 取出后 sed 填入；flags/ 目录归本用户所有，供 hotspot-internet /
+# 模板 system/etc/mihomo/config.template.yaml 只缺完整订阅链接和面板密码，
+# 两者从 rbw 取出后 sed 填入（订阅链接含机场域名与 token，整条不进仓库）；flags/ 目录归本用户所有，供 hotspot-internet /
 # usb-internet 脚本（无 root）改写外网开关标志，mihomo 以 file rule-provider 读取。
 echo "[+] 生成 mihomo 配置..."
 sudo mkdir -p /etc/mihomo/flags
@@ -268,12 +268,12 @@ sudo chown "$USER:$USER" /etc/mihomo/flags
 for flag in hotspot-direct usb-direct; do
     [[ -f "/etc/mihomo/flags/$flag.yaml" ]] || printf 'payload: []\n' > "/etc/mihomo/flags/$flag.yaml"
 done
-if rbw get mihomo-proxy-token &>/dev/null && rbw get mihomo-secret &>/dev/null; then
-    MIHOMO_TOKEN=$(rbw get mihomo-proxy-token)
+if rbw get mihomo-sub-url &>/dev/null && rbw get mihomo-secret &>/dev/null; then
+    MIHOMO_SUB_URL=$(rbw get mihomo-sub-url)
     MIHOMO_SECRET=$(rbw get mihomo-secret)
-    TOKEN_ESC=$(printf '%s\n' "$MIHOMO_TOKEN" | sed 's/[\/&]/\\&/g')
+    SUB_URL_ESC=$(printf '%s\n' "$MIHOMO_SUB_URL" | sed 's/[\/&]/\\&/g')
     SECRET_ESC=$(printf '%s\n' "$MIHOMO_SECRET" | sed 's/[\/&]/\\&/g')
-    RENDERED=$(sed -e "s/__MIHOMO_TOKEN__/${TOKEN_ESC}/" \
+    RENDERED=$(sed -e "s/__MIHOMO_SUB_URL__/${SUB_URL_ESC}/" \
         -e "s/__MIHOMO_SECRET__/${SECRET_ESC}/" \
         "$DOTFILES/system/etc/mihomo/config.template.yaml")
     if [[ "$RENDERED" != "$(cat /etc/mihomo/config.yaml 2>/dev/null)" ]]; then
@@ -289,12 +289,12 @@ if rbw get mihomo-proxy-token &>/dev/null && rbw get mihomo-secret &>/dev/null; 
         echo "    /etc/mihomo/config.yaml 无变化，跳过"
     fi
 else
-    echo "    跳过：rbw 中未找到 mihomo-proxy-token 或 mihomo-secret，请手动添加后重新运行"
+    echo "    跳过：rbw 中未找到 mihomo-sub-url 或 mihomo-secret，请手动添加后重新运行"
 fi
 
 echo ""
 echo "完成。手动步骤："
-echo "  - mihomo：rbw add mihomo-proxy-token（订阅 token）和 rbw add mihomo-secret（面板密码）"
+echo "  - mihomo：rbw add mihomo-sub-url（完整订阅链接）和 rbw add mihomo-secret（面板密码）"
 echo "  - rbw：执行 'rbw register' 登录 Bitwarden"
 echo "  - SSH：将 SSH 私钥存入 Bitwarden（SSH Key 类型），rbw 解锁后执行 rbw-ssh-load 加载"
 echo "  - 字体：Maple Mono NF CN 与 pandoc 字体不在软件源，需手动放入 ~/.local/share/fonts（见 README）"

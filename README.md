@@ -45,7 +45,7 @@ cd ~/Projects/dotfiles
 |------|-------------|
 | 字体 | 软件源没有 Maple Mono：从 [subframe7536/maple-font](https://github.com/subframe7536/maple-font/releases) 下载 `MapleMono-NF-CN-unhinted.zip`，解压到 `~/.local/share/fonts/MapleMono/`，`fc-cache -f`。终端 / 编辑器 / GTK / Qt / DMS / fcitx5 全部指向该字体，缺失会整体回退成 DejaVu |
 | pandoc 字体 | `<leader>mp` 导出 PDF 依赖 `~/.local/share/fonts/remarkable-pandoc/` 下的 KF Readerly、LXGW WenKai（含 Mono）、KingHwaOldSong、NotoEmoji-Regular.ttf。`remarkable.tex` 以 `/home/afu/...` 绝对路径引用（fontspec 的 `Path=` 不展开 `~`，已实测），换用户名时改文件顶部三个 `\def` |
-| Bitwarden | `rbw register`，然后 `rbw unlock`；再 `rbw add mihomo-proxy-token`（订阅 token）、`rbw add mihomo-secret`（面板密码），重跑 `./install.sh` 或只执行其 mihomo 段生成配置 |
+| Bitwarden | `rbw register`，然后 `rbw unlock`；再 `rbw add mihomo-sub-url`（完整订阅链接）、`rbw add mihomo-secret`（面板密码），重跑 `./install.sh` 或只执行其 mihomo 段生成配置 |
 | SSH 密钥 | 在 Bitwarden 中存入 SSH Key 类型条目；`rbw unlock` 后执行 `rbw-ssh-load` 加载到 ssh-agent。之后 `git push/pull/fetch/clone` 会按需自动解锁并加载（`fish/functions/git.fish`） |
 | 壁纸 | 将图片放入 `~/Pictures/`，DMS Settings → Wallpaper 选择（或 `dms ipc call wallpaper set <路径>`）。换壁纸会触发整条 matugen 链（见 FEATURES「动态主题」） |
 | 明暗自动切换 | DMS Settings → Theme → 自动切换选 **按时间**（深色 19:30 → 07:00），并关闭"与夜间色温共用时段"。不要选"按位置"：dms-shell ≤1.5.3 的 `suncalc.go` 以 UTC 日期零点为基准算日出，东八区/东经 103° 的日出会落到 UTC 前一天，导致每天日出到 08:00 之间被判成夜间（配色跳回深色，调度循环每秒空转，上游 issue [#3179](https://github.com/AvengeMedia/DankMaterialShell/issues/3179)）。此设置存于 `~/.local/state/DankMaterialShell/session.json`，不入库 |
@@ -155,7 +155,7 @@ sudo systemctl daemon-reload && sudo systemctl restart linux-enable-ir-emitter.s
 ### mihomo 本体
 
 - 以**系统服务**运行：`mihomo.service`（mihomo-bin 自带），工作目录 `/etc/mihomo`。TUN（mixed 栈）+ fake-ip，混合端口 6153，API `127.0.0.1:9090`，面板 zashboard（`/etc/mihomo/ui`）
-- 配置模板 `system/etc/mihomo/config.template.yaml` 与实际配置只差两处占位符：订阅 token（`__MIHOMO_TOKEN__`，嵌在 URL 编码的订阅链接里）与面板密码（`__MIHOMO_SECRET__`），均从 rbw 取值。**改了规则/分组请改模板**，再重跑 `install.sh` 的 mihomo 段，避免 `/etc/mihomo/config.yaml` 与仓库漂移
+- 配置模板 `system/etc/mihomo/config.template.yaml` 与实际配置只差两处占位符：完整订阅链接（`__MIHOMO_SUB_URL__`，含机场域名与 token，整条存在 rbw 里不进仓库）与面板密码（`__MIHOMO_SECRET__`），均从 rbw 取值。**改了规则/分组请改模板**，再重跑 `install.sh` 的 mihomo 段，避免 `/etc/mihomo/config.yaml` 与仓库漂移
 - `config.yaml` 权限 `640 root:afu`：文件含订阅 token 与 API secret，只让 root 与本用户可读；`hotspot-internet`/`usb-internet` 以本用户读取 `secret:` 行调用 API
 
 ### 热点 / USB 直连设备的外网开关
