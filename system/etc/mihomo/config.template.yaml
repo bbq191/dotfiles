@@ -99,55 +99,55 @@ proxy-groups:
   - name: Telegram
     type: select
     proxies: [新加坡, 香港, 日本]
-    icon: "https://raw.githubusercontent.com/bbq191/my-rules/main/icons/Policy-Filter/Telegram.png"
+    icon: "https://raw.githubusercontent.com/Vbaethon/HOMOMIX/main/Icon/Color/Telegram.png"
 
   - name: 巴哈姆特
     type: select
     proxies: [台湾, 香港]
-    icon: "https://raw.githubusercontent.com/bbq191/my-rules/main/icons/Policy-Filter/Bahamut.png"
+    icon: "https://raw.githubusercontent.com/Vbaethon/HOMOMIX/main/Icon/Color/Bahamut.png"
 
   - name: Games
     type: select
     proxies: [香港, 日本, 新加坡]
-    icon: "https://raw.githubusercontent.com/bbq191/my-rules/main/icons/Policy-Filter/Games.png"
+    icon: "https://raw.githubusercontent.com/Vbaethon/HOMOMIX/main/Icon/Color/Game.png"
 
   # 流媒体
   - name: YouTube
     type: select
     proxies: [美国, 香港, 日本, 新加坡]
-    icon: "https://raw.githubusercontent.com/bbq191/my-rules/main/icons/Policy-Filter/YouTube.png"
+    icon: "https://raw.githubusercontent.com/Vbaethon/HOMOMIX/main/Icon/Color/YouTube.png"
 
   # 厂商
   - name: AI
     type: select
     proxies: [美国, 香港]
-    icon: "https://raw.githubusercontent.com/bbq191/my-rules/main/icons/Policy-Filter/AI.png"
+    icon: "https://raw.githubusercontent.com/Vbaethon/HOMOMIX/main/Icon/Color/AI.png"
 
   - name: Github
     type: select
     proxies: [香港, 美国, DIRECT]
-    icon: "https://raw.githubusercontent.com/bbq191/my-rules/main/icons/Policy-Filter/Github.png"
+    icon: "https://raw.githubusercontent.com/Vbaethon/HOMOMIX/main/Icon/Color/GitHub.png"
 
   - name: Apple
     type: select
     proxies: [美国, 香港, DIRECT]
-    icon: "https://raw.githubusercontent.com/bbq191/my-rules/main/icons/Policy-Filter/Apple.png"
+    icon: "https://raw.githubusercontent.com/Vbaethon/HOMOMIX/main/Icon/Color/Apple.png"
 
   - name: Microsoft
     type: select
     proxies: [美国, 香港, DIRECT]
-    icon: "https://raw.githubusercontent.com/bbq191/my-rules/main/icons/Policy-Filter/Microsoft.png"
+    icon: "https://raw.githubusercontent.com/Vbaethon/HOMOMIX/main/Icon/Color/Microsoft.png"
 
   - name: Google
     type: select
     proxies: [美国, 香港, 日本, 台湾]
-    icon: "https://raw.githubusercontent.com/bbq191/my-rules/main/icons/Policy-Filter/Google.png"
+    icon: "https://raw.githubusercontent.com/Vbaethon/HOMOMIX/main/Icon/Color/Google.png"
 
   #------- 分隔,下面是地区分组（url-test 自动选最低延迟）
   - name: 国内
     type: select
     proxies: [DIRECT, 全部节点]
-    icon: "https://raw.githubusercontent.com/bbq191/my-rules/main/icons/Policy-Country/CN.png"
+    icon: "https://raw.githubusercontent.com/Vbaethon/HOMOMIX/main/Icon/Color/China.png"
 
   - name: 香港
     type: select
@@ -157,7 +157,7 @@ proxy-groups:
     url: https://www.gstatic.com/generate_204
     interval: 180
     tolerance: 50
-    icon: "https://raw.githubusercontent.com/bbq191/my-rules/main/icons/Policy-Country/HK.png"
+    icon: "https://raw.githubusercontent.com/Vbaethon/HOMOMIX/main/Icon/Color/Hong_Kong.png"
 
   - name: 台湾
     type: select
@@ -167,7 +167,7 @@ proxy-groups:
     url: https://www.gstatic.com/generate_204
     interval: 180
     tolerance: 50
-    icon: "https://raw.githubusercontent.com/bbq191/my-rules/main/icons/Policy-Country/TW.png"
+    icon: "https://raw.githubusercontent.com/Vbaethon/HOMOMIX/main/Icon/Color/Taiwan_Province.png"
 
   - name: 日本
     type: select
@@ -177,7 +177,7 @@ proxy-groups:
     url: https://www.gstatic.com/generate_204
     interval: 180
     tolerance: 50
-    icon: "https://raw.githubusercontent.com/bbq191/my-rules/main/icons/Policy-Country/JP.png"
+    icon: "https://raw.githubusercontent.com/Vbaethon/HOMOMIX/main/Icon/Color/Japan.png"
 
   - name: 美国
     type: select
@@ -187,7 +187,7 @@ proxy-groups:
     url: https://www.gstatic.com/generate_204
     interval: 180
     tolerance: 50
-    icon: "https://raw.githubusercontent.com/bbq191/my-rules/main/icons/Policy-Country/US.png"
+    icon: "https://raw.githubusercontent.com/Vbaethon/HOMOMIX/main/Icon/Color/USA.png"
 
   - name: 新加坡
     type: select
@@ -197,21 +197,21 @@ proxy-groups:
     url: https://www.gstatic.com/generate_204
     interval: 180
     tolerance: 50
-    icon: "https://raw.githubusercontent.com/bbq191/my-rules/main/icons/Policy-Country/SG.png"
+    icon: "https://raw.githubusercontent.com/Vbaethon/HOMOMIX/main/Icon/Color/Singapore.png"
 
   - name: 其它地区
     type: select
     include-all: true
     exclude-type: direct
     filter: "(?i)^(?!.*(?:Expire|Traffic|失联|自动|最优|网站|地址|剩余|过期|时间|有效|🇭🇰|🇯🇵|🇺🇸|🇸🇬|🇨🇳|香港|hk|hongkong|台湾|tw|taiwan|日本|jp|japan|新|sg|singapore|美|us|unitedstates)).*"
-    icon: "https://raw.githubusercontent.com/bbq191/my-rules/main/icons/Policy-Country/Other.png"
+    icon: "https://raw.githubusercontent.com/Vbaethon/HOMOMIX/main/Icon/Color/Other.png"
 
   - name: 全部节点
     type: select
     include-all: true
     exclude-type: direct
     filter: "(?i)^(?!.*(?:失联|自动|最优|网站|地址|剩余|过期|时间|有效)).*"
-    icon: "https://raw.githubusercontent.com/bbq191/my-rules/main/icons/Policy-Country/All.png"
+    icon: "https://raw.githubusercontent.com/Vbaethon/HOMOMIX/main/Icon/Color/Global.png"
 
 rules:
   # 外网开关:flag 文件含 SRC-IP-CIDR 时,对应来源全部 DIRECT(不可翻墙但有网)。
