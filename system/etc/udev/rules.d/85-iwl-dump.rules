@@ -1,0 +1,2 @@
+# iwlwifi 固件崩溃产生 devcoredump 时落盘保存（内核 wireless 文档推荐做法）
+SUBSYSTEM=="devcoredump", ACTION=="add", RUN+="/usr/local/bin/iwl-fwdump"

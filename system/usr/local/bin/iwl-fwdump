@@ -1,0 +1,10 @@
+#!/bin/bash
+# 由 85-iwl-dump.rules 在 devcoredump 出现时调用，把 iwlwifi 固件 dump 保存到 /var/lib/iwlwifi-dumps
+DIR=/var/lib/iwlwifi-dumps
+mkdir -p "$DIR"
+for d in /sys/class/devcoredump/devcd*; do
+    [[ -e $d/data ]] || continue
+    out="$DIR/$(date +%Y%m%d-%H%M%S)-$(basename "$d").dump"
+    cat "$d/data" > "$out" && echo 1 > "$d/data"
+    logger -t iwl-fwdump "saved $out"
+done

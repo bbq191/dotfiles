@@ -1,0 +1,40 @@
+#!/bin/bash
+# 冷开机时 Intel BE200（iwlwifi/iwlmld）固件偶发在 CTDP_CONFIG_CMD 断言崩溃，
+# 崩溃后驱动/iwd 都不重试，wlan0 全程 unavailable，只能重启。
+# 本脚本在检测到该状态时就地复位网卡：先重载模块，不行再 PCI remove/rescan。
+#   无参数：仅在"wlan0 不可用 且 内核日志里有固件崩溃"时复位（开机自检用）
+#   --force：跳过检测直接复位（手动/验证用）
+set -u
+TAG=wifi-fw-reset
+log() { echo "$*"; logger -t "$TAG" -- "$*"; }
+
+wlan_state() { nmcli -g GENERAL.STATE device show wlan0 2>/dev/null | cut -d' ' -f1; }
+# NM 状态码 >=30（disconnected/connecting/connected）即可用
+healthy() { local s; s=$(wlan_state); [[ -n $s && $s -ge 30 ]]; }
+wait_healthy() { local i; for i in $(seq 1 "${1:-15}"); do healthy && return 0; sleep 1; done; return 1; }
+
+if [[ ${1:-} != --force ]]; then
+    if healthy; then log "wlan0 正常（state $(wlan_state)），无需复位"; exit 0; fi
+    if ! journalctl -k -b -q --grep='iwlwifi.*(Microcode SW error|cTDP command failed)' | grep -q .; then
+        log "wlan0 不可用但内核日志无固件崩溃记录，不复位（可能是 rfkill 等其他原因）"; exit 0
+    fi
+    log "检测到 iwlwifi 固件崩溃且 wlan0 不可用（state $(wlan_state)），开始复位"
+fi
+
+PCI=$(lspci -Dn -d 8086::0280 | cut -d' ' -f1 | head -1)
+[[ -z $PCI ]] && { log "找不到 Intel 无线网卡 PCI 设备"; exit 1; }
+
+log "第 1 级：重载 iwlmld/iwlwifi 模块"
+modprobe -r iwlmld iwlwifi 2>&1 | logger -t "$TAG"
+sleep 1
+modprobe iwlwifi
+if wait_healthy 15; then log "模块重载后 wlan0 恢复（state $(wlan_state)）"; exit 0; fi
+
+log "第 2 级：PCI remove/rescan $PCI"
+echo 1 > "/sys/bus/pci/devices/$PCI/remove"
+sleep 2
+echo 1 > /sys/bus/pci/rescan
+if wait_healthy 20; then log "PCI 重扫后 wlan0 恢复（state $(wlan_state)）"; exit 0; fi
+
+log "复位失败，wlan0 state $(wlan_state)；请查看 journalctl -k"
+exit 1

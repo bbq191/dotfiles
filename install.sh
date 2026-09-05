@@ -148,6 +148,11 @@ sudo cp "$DOTFILES/system/etc/systemd/network/10-wlan0.link" \
 # 固定 reMarkable USB 网卡名为 rmk0（NM profile remarkable-usb 按此名绑定）；MAC 随设备而变，见文件注释
 sudo cp "$DOTFILES/system/etc/systemd/network/11-rmk0.link" \
         /etc/systemd/network/
+# BE200 冷开机固件崩溃（CTDP_CONFIG_CMD 断言）自愈：开机延迟自检 + 就地复位；devcoredump 落盘供提 bug
+sudo install -Dm755 "$DOTFILES/system/usr/local/bin/wifi-fw-reset" /usr/local/bin/wifi-fw-reset
+sudo install -Dm755 "$DOTFILES/system/usr/local/bin/iwl-fwdump" /usr/local/bin/iwl-fwdump
+sudo install -Dm644 "$DOTFILES/system/etc/systemd/system/wifi-fw-reset.service" \
+        /etc/systemd/system/wifi-fw-reset.service
 # sysctl：ip_forward（热点/USB 共享）、min_free_kbytes；udev：IO 调度器覆盖、uuu 刷机 USB 权限
 sudo mkdir -p /etc/sysctl.d /etc/udev/rules.d
 sudo cp "$DOTFILES/system/etc/sysctl.d/"*.conf /etc/sysctl.d/
@@ -168,6 +173,7 @@ sudo systemctl daemon-reload
 # ollama 只部署 override（用户身份 + XDG 模型路径），不开机自启；需要时 systemctl start ollama
 sudo systemctl disable --now wpa_supplicant 2>/dev/null || true
 sudo systemctl enable --now iwd
+sudo systemctl enable wifi-fw-reset.service
 sudo systemctl enable --now keyd
 # IR 补光服务（howdy 人脸识别依赖）；新机器需先 sudo linux-enable-ir-emitter configure
 sudo systemctl enable linux-enable-ir-emitter.service

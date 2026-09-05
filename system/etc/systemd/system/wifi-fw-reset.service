@@ -1,0 +1,14 @@
+# 冷开机时 Intel BE200 固件偶发在 CTDP_CONFIG_CMD 断言崩溃，wlan0 全程 unavailable。
+# 开机后延迟检查一次，命中则就地复位网卡（见 /usr/local/bin/wifi-fw-reset），免去手动重启。
+[Unit]
+Description=Reset Intel BE200 Wi-Fi if firmware asserted at cold boot
+After=iwd.service NetworkManager.service systemd-udev-settle.service
+Wants=iwd.service NetworkManager.service
+
+[Service]
+Type=oneshot
+ExecStartPre=/bin/sleep 8
+ExecStart=/usr/local/bin/wifi-fw-reset
+
+[Install]
+WantedBy=multi-user.target
