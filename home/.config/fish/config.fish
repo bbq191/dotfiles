@@ -20,6 +20,11 @@ set -gx TEXMFVAR         $XDG_CACHE_HOME/texlive/texmf-var
 set -gx TEXMFCONFIG      $XDG_CONFIG_HOME/texlive/texmf-config
 set -gx GNUPGHOME        $XDG_DATA_HOME/gnupg
 set -gx GOPATH           $XDG_DATA_HOME/go   # go 平时不装，但 paru 编译 go 写的 AUR 包会临时装并写缓存，没这行会落到 ~/go
+set -gx CLAUDE_CONFIG_DIR $XDG_CONFIG_HOME/claude   # ~/.claude 与 ~/.claude.json 整体迁入（含会话记录、memory、插件）
+set -gx MINERU_TOOLS_CONFIG_JSON $XDG_CONFIG_HOME/mineru/mineru.json
+set -gx MODELSCOPE_CREDENTIALS_PATH $XDG_CONFIG_HOME/modelscope/credentials   # mineru-models-download 用到的 modelscope SDK
+set -gx TRITON_CACHE_DIR $XDG_CACHE_HOME/triton   # mineru 的 vllm/triton 编译内核缓存，默认 ~/.triton/cache
+set -gx WGETRC           $XDG_CONFIG_HOME/wgetrc  # 里面把 hsts 数据库指到 ~/.cache/wget-hsts
 
 # ── 环境变量 ──────────────────────────────────────────────────────────────────
 set -gx EDITOR nvim
