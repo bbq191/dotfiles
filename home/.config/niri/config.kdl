@@ -126,13 +126,12 @@ binds {
     Mod+Shift+Slash { show-hotkey-overlay; }
 
     // ── 应用启动 ──
-    Mod+Q { spawn "kitty"; }
-    Mod+E { spawn "thunar"; }
+    Mod+T { spawn "kitty"; }
     Mod+R { spawn "dms" "ipc" "call" "launcher" "toggle"; }
     Mod+B { spawn "xdg-open" "https://"; }   // 启动默认浏览器（读取 mimeapps.list，不硬编码具体浏览器）
 
     // ── 窗口管理 ──
-    Mod+C { close-window; }
+    Mod+Q { close-window; }
     Mod+V { toggle-window-floating; }
     Mod+Shift+V { switch-focus-between-floating-and-tiling; }
     Mod+P { switch-preset-column-width; }   // 循环列宽（1/3、1/2、2/3），近似 pseudo
@@ -252,10 +251,10 @@ window-rule {
     default-window-height { fixed 450; }
 }
 
-window-rule {
-    match app-id="^kitty$"
-    open-maximized true
-}
+// window-rule {
+//     match app-id="^kitty$"
+//     open-maximized true
+// }
 
 window-rule {
     // VRR 按需触发窗口（配合输出 variable-refresh-rate on-demand）
