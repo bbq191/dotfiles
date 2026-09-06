@@ -17,6 +17,9 @@ return {
         "lua", "vim", "vimdoc",
         "markdown", "markdown_inline",
         "bash", "dockerfile", "gitignore", "regex",
+        -- dotfiles 里实际编辑的：niri(kdl) / fish / DMS 插件(qml) / 各类 .conf / git 相关
+        "kdl", "fish", "qmljs", "qmldir", "ini",
+        "diff", "git_config", "gitcommit", "git_rebase", "ssh_config",
       }
       -- 缺的 parser 异步安装；已装的跳过
       local installed = {}
@@ -37,6 +40,35 @@ return {
       })
     end,
   },
+
+  -- 语法文本对象：af/if 函数、ac/ic 类、aa/ia 参数；]f/[f 跳函数
+  {
+    "nvim-treesitter/nvim-treesitter-textobjects",
+    branch = "main",
+    event = { "BufReadPost", "BufNewFile" },
+    dependencies = { "nvim-treesitter/nvim-treesitter" },
+    init = function() vim.g.no_plugin_maps = true end,
+    config = function()
+      require("nvim-treesitter-textobjects").setup({
+        select = { lookahead = true },
+        move = { set_jumps = true },
+      })
+      local select = require("nvim-treesitter-textobjects.select")
+      local move = require("nvim-treesitter-textobjects.move")
+      local function sel(lhs, query, desc)
+        vim.keymap.set({ "x", "o" }, lhs, function() select.select_textobject(query, "textobjects") end, { desc = desc })
+      end
+      sel("af", "@function.outer",  "Around function")
+      sel("if", "@function.inner",  "Inside function")
+      sel("ac", "@class.outer",     "Around class")
+      sel("ic", "@class.inner",     "Inside class")
+      sel("aa", "@parameter.outer", "Around argument")
+      sel("ia", "@parameter.inner", "Inside argument")
+      vim.keymap.set({ "n", "x", "o" }, "]f", function() move.goto_next_start("@function.outer", "textobjects") end, { desc = "Next function" })
+      vim.keymap.set({ "n", "x", "o" }, "[f", function() move.goto_previous_start("@function.outer", "textobjects") end, { desc = "Prev function" })
+    end,
+  },
+
   -- 彩虹括号（直接用 vim.treesitter，与 main 分支兼容）
   {
     "HiPhish/rainbow-delimiters.nvim",

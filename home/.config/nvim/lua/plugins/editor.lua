@@ -1,14 +1,9 @@
 return {
-  -- 自动补全括号，与 nvim-cmp 集成
+  -- 自动补全括号（函数补全后的括号由 blink.cmp 的 auto_brackets 负责）
   {
     "windwp/nvim-autopairs",
     event = "InsertEnter",
     opts = { check_ts = true },
-    config = function(_, opts)
-      require("nvim-autopairs").setup(opts)
-      local cmp_autopairs = require("nvim-autopairs.completion.cmp")
-      require("cmp").event:on("confirm_done", cmp_autopairs.on_confirm_done())
-    end,
   },
 
   -- TSX 标签自动补全（React 开发必备）
@@ -16,32 +11,6 @@ return {
     "windwp/nvim-ts-autotag",
     event = { "BufReadPost", "BufNewFile" },
     opts = {},
-  },
-
-  -- 文件树
-  {
-    "nvim-neo-tree/neo-tree.nvim",
-    branch = "v3.x",
-    cmd = "Neotree",
-    dependencies = {
-      "nvim-lua/plenary.nvim",
-      "nvim-tree/nvim-web-devicons",
-      "MunifTanjim/nui.nvim",
-    },
-    opts = {
-      window = { width = 30 },
-      filesystem = {
-        filtered_items = {
-          hide_dotfiles   = false,
-          hide_gitignored = false,
-        },
-        follow_current_file = { enabled = true },
-      },
-      -- 屏蔽在 Neovim 0.13-dev 某些构建上无效的 BufModifiedSet 事件
-      event_handlers = {
-        { event = "vim_buffer_modified_set", handler = function() end },
-      },
-    },
   },
 
   -- 快捷键提示
@@ -52,12 +21,13 @@ return {
       spec = {
         { "<leader>b", group = "Buffer" },
         { "<leader>c", group = "Code" },
+        { "<leader>e", desc = "Yazi (current file)" },
         { "<leader>d", group = "Diagnostic" },
-        { "<leader>f", group = "Find/Format" },
+        { "<leader>f", group = "Find" },
         { "<leader>h", group = "Git hunk" },
         { "<leader>m", group = "Markdown" },
         { "<leader>r", group = "Rename/Replace" },
-        { "<leader>t", group = "Terminal" },
+        { "<leader>t", group = "Terminal/Toggle" },
         { "<leader>y", group = "Yazi" },
       },
     },
@@ -72,7 +42,7 @@ return {
       { "<leader>yw", "<cmd>Yazi cwd<CR>", desc = "Open yazi (workspace)" },
     },
     opts = {
-      open_for_directories = false,
+      open_for_directories = true,   -- netrw 已禁用，nvim <dir> 直接进 yazi
       keymaps = {
         show_help = "<F1>",
       },
@@ -87,6 +57,7 @@ return {
       { "<leader>tt", "<cmd>ToggleTerm direction=float<CR>",      desc = "Float terminal" },
       { "<leader>th", "<cmd>ToggleTerm direction=horizontal<CR>", desc = "Horizontal terminal" },
       "<leader>tg",
+      "<leader>tc",
     },
     opts = {
       shade_terminals = false,
@@ -97,8 +68,8 @@ return {
       },
       on_open = function(term)
         vim.cmd("startinsert!")
-        -- 确保 Esc Esc 在该 buffer 上可靠触发（比全局 map 优先级更高）
-        vim.keymap.set("t", "<Esc><Esc>", "<C-\\><C-n>", { buffer = term.bufnr, noremap = true })
+        -- 确保 Alt-n 在该 buffer 上可靠触发（比全局 map 优先级更高）
+        vim.keymap.set("t", "<A-n>", "<C-\\><C-n>", { buffer = term.bufnr, noremap = true })
       end,
     },
     config = function(_, opts)
@@ -110,6 +81,14 @@ return {
         hidden = true,
       })
       vim.keymap.set("n", "<leader>tg", function() lazygit:toggle() end, { desc = "LazyGit" })
+      -- Claude Code：与 nvim 同一 cwd，收起后会话保活，下次弹出接着聊
+      local claude = Terminal:new({
+        cmd = "claude",
+        direction = "vertical",
+        size = function() return math.floor(vim.o.columns * 0.4) end,  -- 右侧 40% 宽
+        hidden = true,
+      })
+      vim.keymap.set("n", "<leader>tc", function() claude:toggle() end, { desc = "Claude Code" })
     end,
   },
 

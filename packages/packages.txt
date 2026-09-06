@@ -270,6 +270,8 @@ texlive-publishers
 # ── 开发 / 网络工具 ──
 github-cli
 shellcheck             # 脚本静态检查（install.sh / .local/bin）
+shfmt                  # nvim conform 格式化 sh/bash
+stylua                 # nvim conform 格式化 lua（本配置自身）
 uv
 cmake
 ninja

@@ -13,14 +13,4 @@ return {
     },
   },
 
-  -- 内联图片显示（kitty graphics protocol；SVG/PDF 经 imagemagick 栅格化）
-  -- snacks 是模块集合，这里只启用 image，其余模块保持默认关闭
-  {
-    "folke/snacks.nvim",
-    lazy = false,
-    priority = 1000,
-    opts = {
-      image = { enabled = true },
-    },
-  },
 }

@@ -1,18 +1,22 @@
 return {
-  -- Mason：LSP 二进制安装管理
+  -- Mason：LSP 二进制安装管理。按命令懒加载（常驻要加载整个 registry，约 20ms）；
+  -- 其 bin 目录前置 PATH 与服务端启用改由 core/lsp.lua 在启动时直接做。
   {
     "mason-org/mason.nvim",   -- 上游已从 williamboman 迁到 mason-org 组织
+    cmd = { "Mason", "MasonInstall", "MasonUninstall", "MasonUpdate", "MasonLog" },
     build = ":MasonUpdate",
-    opts = { ui = { border = "rounded" } },
+    opts = {},
   },
 
-  -- mason-lspconfig：用 LSP server 名字管理安装
-  -- automatic_enable = true（默认）：安装后自动调用 vim.lsp.enable()；v2 已移除 automatic_installation
-  -- 服务端配置从 lsp/*.lua 文件读取（Neovim 0.11+ runtimepath 机制）
+  -- mason-lspconfig：只保留 ensure_installed 的引导作用。
+  -- 加载时机：手动 :Mason / :LspInstall，或 core/lsp.lua 发现有服务端二进制缺失时（新机器首次启动）。
+  -- automatic_enable 关掉：vim.lsp.enable 由 core/lsp.lua 按 lsp/*.lua 文件名统一调用。
   {
     "mason-org/mason-lspconfig.nvim",
+    cmd = { "Mason", "LspInstall", "LspUninstall" },
     dependencies = { "mason-org/mason.nvim" },
     opts = {
+      automatic_enable = false,
       ensure_installed = {
         "basedpyright",
         "ruff",
@@ -20,29 +24,8 @@ return {
         "tailwindcss",
         "jsonls",
         "html",
+        "lua_ls",
       },
     },
-  },
-
-  -- cmp-nvim-lsp 提前加载，在任何 buffer 打开前设置全局 capabilities
-  -- 服务端启动时（BufReadPre）会读取这里的 capabilities，所以必须早于文件打开
-  {
-    "hrsh7th/cmp-nvim-lsp",
-    lazy = false,
-    config = function()
-      -- 全局 capabilities：所有服务端都受益于 nvim-cmp 的补全协议扩展
-      vim.lsp.config("*", {
-        capabilities = require("cmp_nvim_lsp").default_capabilities(),
-      })
-
-      -- 诊断显示样式
-      vim.diagnostic.config({
-        virtual_text  = { prefix = "●" },
-        float         = { border = "rounded" },
-        signs         = true,
-        underline     = true,
-        update_in_insert = false,
-      })
-    end,
   },
 }
