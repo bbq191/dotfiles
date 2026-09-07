@@ -12,14 +12,19 @@ return {
       local real_system = vim.system
       local session_file = vim.fs.joinpath(
         vim.env.XDG_STATE_HOME or vim.fs.joinpath(vim.env.HOME, ".local", "state"),
-        "DankMaterialShell", "session.json"
+        "DankMaterialShell",
+        "session.json"
       )
       local function dms_mode_from_session()
         local f = io.open(session_file, "r")
-        if not f then return nil end
+        if not f then
+          return nil
+        end
         local ok, data = pcall(vim.json.decode, f:read("*a"))
         f:close()
-        if not ok or type(data) ~= "table" or data.isLightMode == nil then return nil end
+        if not ok or type(data) ~= "table" or data.isLightMode == nil then
+          return nil
+        end
         return data.isLightMode and "light" or "dark"
       end
       vim.system = function(cmd, opts, on_exit)
@@ -27,8 +32,18 @@ return {
           local mode = dms_mode_from_session()
           if mode then
             local result = { code = 0, signal = 0, stdout = mode .. "\n", stderr = "" }
-            if on_exit then on_exit(result) end
-            return { wait = function() return result end, kill = function() end, is_closing = function() return true end }
+            if on_exit then
+              on_exit(result)
+            end
+            return {
+              wait = function()
+                return result
+              end,
+              kill = function() end,
+              is_closing = function()
+                return true
+              end,
+            }
           end
         end
         return real_system(cmd, opts, on_exit)

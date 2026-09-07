@@ -8,9 +8,12 @@ end
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not vim.uv.fs_stat(lazypath) then
   vim.fn.system({
-    "git", "clone", "--filter=blob:none",
+    "git",
+    "clone",
+    "--filter=blob:none",
     "https://github.com/folke/lazy.nvim.git",
-    "--branch=stable", lazypath,
+    "--branch=stable",
+    lazypath,
   })
 end
 vim.opt.rtp:prepend(lazypath)
@@ -22,7 +25,7 @@ require("core.lsp")
 require("lazy").setup("plugins", {
   change_detection = { notify = false },
   ui = { border = "rounded" },
-  rocks = { enabled = false },  -- 不用 luarocks，关掉避免 hererocks 错误
+  rocks = { enabled = false }, -- 不用 luarocks，关掉避免 hererocks 错误
   performance = {
     rtp = {
       -- gx 打开链接由 0.10+ 内置 vim.ui.open 承担，netrw 不再需要

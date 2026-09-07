@@ -1,17 +1,23 @@
-local aug = function(name) return vim.api.nvim_create_augroup("core_" .. name, { clear = true }) end
+local aug = function(name)
+  return vim.api.nvim_create_augroup("core_" .. name, { clear = true })
+end
 local autocmd = vim.api.nvim_create_autocmd
 
 -- 复制时高亮闪一下
 autocmd("TextYankPost", {
   group = aug("yank"),
-  callback = function() vim.hl.on_yank({ timeout = 150 }) end,
+  callback = function()
+    vim.hl.on_yank({ timeout = 150 })
+  end,
 })
 
 -- 重开文件回到上次光标位置（提交信息除外）
 autocmd("BufReadPost", {
   group = aug("last_pos"),
   callback = function(ev)
-    if vim.bo[ev.buf].filetype == "gitcommit" then return end
+    if vim.bo[ev.buf].filetype == "gitcommit" then
+      return
+    end
     local mark = vim.api.nvim_buf_get_mark(ev.buf, '"')
     local lines = vim.api.nvim_buf_line_count(ev.buf)
     if mark[1] > 0 and mark[1] <= lines then
@@ -52,8 +58,23 @@ autocmd("FileType", {
 autocmd("BufWritePre", {
   group = aug("mkdir"),
   callback = function(ev)
-    if ev.match:match("^%w+://") then return end
+    if ev.match:match("^%w+://") then
+      return
+    end
     local dir = vim.fn.fnamemodify(ev.match, ":p:h")
-    if vim.fn.isdirectory(dir) == 0 then vim.fn.mkdir(dir, "p") end
+    if vim.fn.isdirectory(dir) == 0 then
+      vim.fn.mkdir(dir, "p")
+    end
+  end,
+})
+
+-- 文件在外部被改（Claude Code 在内嵌终端里改代码时焦点从不离开 nvim，FocusGained 不会触发）：
+-- 进 buffer / 光标停顿 / 离开终端时主动 checktime，让 autoread 真正生效
+autocmd({ "FocusGained", "BufEnter", "CursorHold", "TermLeave", "TermClose" }, {
+  group = aug("checktime"),
+  callback = function()
+    if vim.fn.mode() ~= "c" and vim.fn.getcmdwintype() == "" then
+      vim.cmd("checktime")
+    end
   end,
 })

@@ -12,27 +12,56 @@ return {
       ts.setup({})
 
       local langs = {
-        "python", "typescript", "tsx", "javascript",
-        "html", "css", "json", "yaml", "toml",
-        "lua", "vim", "vimdoc",
-        "markdown", "markdown_inline",
-        "bash", "dockerfile", "gitignore", "regex",
+        "python",
+        "typescript",
+        "tsx",
+        "javascript",
+        "html",
+        "css",
+        "json",
+        "yaml",
+        "toml",
+        "lua",
+        "vim",
+        "vimdoc",
+        "markdown",
+        "markdown_inline",
+        "bash",
+        "dockerfile",
+        "gitignore",
+        "regex",
         -- dotfiles 里实际编辑的：niri(kdl) / fish / DMS 插件(qml) / 各类 .conf / git 相关
-        "kdl", "fish", "qmljs", "qmldir", "ini",
-        "diff", "git_config", "gitcommit", "git_rebase", "ssh_config",
+        "kdl",
+        "fish",
+        "qmljs",
+        "qmldir",
+        "ini",
+        "diff",
+        "git_config",
+        "gitcommit",
+        "git_rebase",
+        "ssh_config",
       }
       -- 缺的 parser 异步安装；已装的跳过
       local installed = {}
-      for _, l in ipairs(ts.get_installed("parsers")) do installed[l] = true end
-      local missing = vim.tbl_filter(function(l) return not installed[l] end, langs)
-      if #missing > 0 then ts.install(missing) end
+      for _, l in ipairs(ts.get_installed("parsers")) do
+        installed[l] = true
+      end
+      local missing = vim.tbl_filter(function(l)
+        return not installed[l]
+      end, langs)
+      if #missing > 0 then
+        ts.install(missing)
+      end
 
       -- 按 buffer 启用高亮 + treesitter 缩进（parser 不存在时静默跳过）
       vim.api.nvim_create_autocmd("FileType", {
         group = vim.api.nvim_create_augroup("ts_enable", { clear = true }),
         callback = function(ev)
           local lang = vim.treesitter.language.get_lang(ev.match)
-          if not lang then return end
+          if not lang then
+            return
+          end
           if pcall(vim.treesitter.start, ev.buf, lang) then
             vim.bo[ev.buf].indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
           end
@@ -47,7 +76,9 @@ return {
     branch = "main",
     event = { "BufReadPost", "BufNewFile" },
     dependencies = { "nvim-treesitter/nvim-treesitter" },
-    init = function() vim.g.no_plugin_maps = true end,
+    init = function()
+      vim.g.no_plugin_maps = true
+    end,
     config = function()
       require("nvim-treesitter-textobjects").setup({
         select = { lookahead = true },
@@ -56,16 +87,22 @@ return {
       local select = require("nvim-treesitter-textobjects.select")
       local move = require("nvim-treesitter-textobjects.move")
       local function sel(lhs, query, desc)
-        vim.keymap.set({ "x", "o" }, lhs, function() select.select_textobject(query, "textobjects") end, { desc = desc })
+        vim.keymap.set({ "x", "o" }, lhs, function()
+          select.select_textobject(query, "textobjects")
+        end, { desc = desc })
       end
-      sel("af", "@function.outer",  "Around function")
-      sel("if", "@function.inner",  "Inside function")
-      sel("ac", "@class.outer",     "Around class")
-      sel("ic", "@class.inner",     "Inside class")
+      sel("af", "@function.outer", "Around function")
+      sel("if", "@function.inner", "Inside function")
+      sel("ac", "@class.outer", "Around class")
+      sel("ic", "@class.inner", "Inside class")
       sel("aa", "@parameter.outer", "Around argument")
       sel("ia", "@parameter.inner", "Inside argument")
-      vim.keymap.set({ "n", "x", "o" }, "]f", function() move.goto_next_start("@function.outer", "textobjects") end, { desc = "Next function" })
-      vim.keymap.set({ "n", "x", "o" }, "[f", function() move.goto_previous_start("@function.outer", "textobjects") end, { desc = "Prev function" })
+      vim.keymap.set({ "n", "x", "o" }, "]f", function()
+        move.goto_next_start("@function.outer", "textobjects")
+      end, { desc = "Next function" })
+      vim.keymap.set({ "n", "x", "o" }, "[f", function()
+        move.goto_previous_start("@function.outer", "textobjects")
+      end, { desc = "Prev function" })
     end,
   },
 

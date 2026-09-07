@@ -4,10 +4,10 @@ return {
     event = { "BufReadPre", "BufNewFile" },
     opts = {
       signs = {
-        add          = { text = "▎" },
-        change       = { text = "▎" },
-        delete       = { text = "" },
-        topdelete    = { text = "" },
+        add = { text = "▎" },
+        change = { text = "▎" },
+        delete = { text = "" },
+        topdelete = { text = "" },
         changedelete = { text = "▎" },
       },
       current_line_blame_opts = { delay = 500 },
@@ -17,17 +17,27 @@ return {
           vim.keymap.set(mode, l, r, { buffer = bufnr, desc = desc })
         end
         -- next_hunk/prev_hunk 已废弃，统一走 nav_hunk
-        map("n", "]h", function() gs.nav_hunk("next") end, "Next hunk")
-        map("n", "[h", function() gs.nav_hunk("prev") end, "Prev hunk")
-        map("n", "<leader>hs", gs.stage_hunk,   "Stage hunk")       -- 已 stage 的 hunk 再按一次即撤销
-        map("n", "<leader>hr", gs.reset_hunk,   "Reset hunk")
-        map("v", "<leader>hs", function() gs.stage_hunk({ vim.fn.line("."), vim.fn.line("v") }) end, "Stage selection")
-        map("v", "<leader>hr", function() gs.reset_hunk({ vim.fn.line("."), vim.fn.line("v") }) end, "Reset selection")
+        map("n", "]h", function()
+          gs.nav_hunk("next")
+        end, "Next hunk")
+        map("n", "[h", function()
+          gs.nav_hunk("prev")
+        end, "Prev hunk")
+        map("n", "<leader>hs", gs.stage_hunk, "Stage hunk") -- 已 stage 的 hunk 再按一次即撤销
+        map("n", "<leader>hr", gs.reset_hunk, "Reset hunk")
+        map("v", "<leader>hs", function()
+          gs.stage_hunk({ vim.fn.line("."), vim.fn.line("v") })
+        end, "Stage selection")
+        map("v", "<leader>hr", function()
+          gs.reset_hunk({ vim.fn.line("."), vim.fn.line("v") })
+        end, "Reset selection")
         map("n", "<leader>hS", gs.stage_buffer, "Stage buffer")
         map("n", "<leader>hp", gs.preview_hunk, "Preview hunk")
-        map("n", "<leader>hb", function() gs.blame_line({ full = true }) end, "Blame line")
+        map("n", "<leader>hb", function()
+          gs.blame_line({ full = true })
+        end, "Blame line")
         map("n", "<leader>hd", gs.diffthis, "Diff this")
-        map("n", "<leader>tb", gs.toggle_current_line_blame, "Toggle line blame")
+        map("n", "<leader>hl", gs.toggle_current_line_blame, "Toggle line blame")
       end,
     },
   },

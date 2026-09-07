@@ -9,8 +9,7 @@ return {
       { "<leader>mr", "<cmd>RenderMarkdown toggle<CR>", desc = "Markdown render toggle" },
     },
     opts = {
-      latex = { enabled = false },   -- 不装 latex parser，关掉以消除 checkhealth 警告
+      latex = { enabled = false }, -- 不装 latex parser，关掉以消除 checkhealth 警告
     },
   },
-
 }

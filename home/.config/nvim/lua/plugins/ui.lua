@@ -20,20 +20,30 @@ return {
   --   picker    只用其 ui_select：code action 等选择列表用浮窗（telescope 仍是主 picker）
   --   input     vim.ui.input 浮窗（rename 输入框）
   --   words     光标标识符的 LSP 引用高亮，]] / [[ 跳引用
+  --   terminal  内嵌终端（替代 toggleterm）：右侧 Claude / 底部 shell / 浮窗 shell 各自独立、可同时开，按键见 core/keymaps.lua
+  --   lazygit   浮窗 lazygit，主题跟随当前 colorscheme，e 键在本 nvim 实例里打开文件
   {
     "folke/snacks.nvim",
     lazy = false,
     priority = 1000,
     opts = {
-      image     = { enabled = true },
-      notifier  = { enabled = true, timeout = 2500 },
-      indent    = { enabled = true },
+      image = { enabled = true },
+      notifier = { enabled = true, timeout = 2500 },
+      indent = { enabled = true },
       bufdelete = { enabled = true },
-      bigfile   = { enabled = true },
+      bigfile = { enabled = true },
       quickfile = { enabled = true },
-      picker    = { enabled = true, ui_select = true },   -- enabled 是 UIEnter 时 setup 的门控
-      input     = { enabled = true },
-      words     = { enabled = true },
+      picker = { enabled = true, ui_select = true }, -- enabled 是 UIEnter 时 setup 的门控
+      input = { enabled = true },
+      words = { enabled = true },
+      terminal = {
+        win = {
+          -- 去掉 snacks 默认的"双击 Esc 回 normal"：它靠 200ms 计时器判断，会吃掉 Claude Code 里
+          -- Esc Esc（回溯菜单）的第二下；退 normal 统一用全局的 Alt-n
+          keys = { term_normal = false },
+        },
+      },
+      lazygit = { enabled = true },
     },
   },
 
@@ -43,10 +53,10 @@ return {
     event = "VeryLazy",
     opts = {
       options = {
-        theme             = "auto",   -- 自动解析到 lua/lualine/themes/dms.lua（base46 动态主题）
-        globalstatus      = true,
+        theme = "auto", -- 自动解析到 lua/lualine/themes/dms.lua（base46 动态主题）
+        globalstatus = true,
         component_separators = "|",
-        section_separators  = { left = "", right = "" },
+        section_separators = { left = "", right = "" },
       },
       sections = {
         lualine_a = { "mode" },
@@ -73,12 +83,12 @@ return {
 
   -- 颜色码内联预览（Tailwind 开发用得上）
   {
-    "catgoose/nvim-colorizer.lua",   -- NvChad 仓库已归档，维护迁到 catgoose
+    "catgoose/nvim-colorizer.lua", -- NvChad 仓库已归档，维护迁到 catgoose
     event = { "BufReadPost", "BufNewFile" },
     opts = {
       user_default_options = {
         tailwind = true,
-        css      = true,
+        css = true,
       },
     },
   },

@@ -2,7 +2,7 @@ return {
   -- Mason：LSP 二进制安装管理。按命令懒加载（常驻要加载整个 registry，约 20ms）；
   -- 其 bin 目录前置 PATH 与服务端启用改由 core/lsp.lua 在启动时直接做。
   {
-    "mason-org/mason.nvim",   -- 上游已从 williamboman 迁到 mason-org 组织
+    "mason-org/mason.nvim", -- 上游已从 williamboman 迁到 mason-org 组织
     cmd = { "Mason", "MasonInstall", "MasonUninstall", "MasonUpdate", "MasonLog" },
     build = ":MasonUpdate",
     opts = {},

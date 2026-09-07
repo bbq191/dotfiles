@@ -250,13 +250,15 @@ fcitx5 的 `XMODIFIERS` / `QT_IM_MODULE` / `SDL_IM_MODULE` 在 `environment.d/fc
 
 ## 编辑器（Neovim）
 
-`neovim-nightly-bin`（0.13-dev）+ **Lazy.nvim**；luarocks 关闭；fnm 的 node 注入 PATH 供 Mason 用。
+`neovim-nightly-bin`（0.13-dev）+ **Lazy.nvim**；luarocks 关闭；fnm 的 node 注入 PATH 供 Mason 用。启动约 45 ms：`colors/dms.lua` 里的 `dms ipc` 同步调用（100 ms）被 `colorscheme.lua` 拦截改读 DMS 的 `session.json`；mason、LuaSnip、blink 等全部懒加载，常驻只有 base46 / snacks / treesitter / mini.icons。
 
 ### 主题
 
-`AvengeMedia/base46` + matugen 生成的 `colors/dms.lua`：github_light/dark 向壁纸主色调和，透明背景透出 kitty 0.85；lualine 主题 `_base46("dms")`；nvim-notify 背景动态取 base00 兜底。文件变化自动热重载。
+`AvengeMedia/base46` + matugen 生成的 `colors/dms.lua`：github_light/dark 向壁纸主色调和，透明背景透出 kitty 0.85；lualine 主题 `_base46("dms")`。文件变化自动热重载。`colors/dms.lua` 在 `.styluaignore` 里，不参与格式化。
 
-### LSP（Mason 自动安装，配置在 `lsp/*.lua`，Neovim 0.11+ 机制）
+### LSP（配置在 `lsp/*.lua`，Neovim 0.11+ 机制）
+
+`core/lsp.lua` 启动时把 mason 的 bin 前置 PATH，并按 `lsp/` 下的文件名统一 `vim.lsp.enable`；发现二进制缺失才加载 mason-lspconfig 跑 `ensure_installed`（新机器引导）。
 
 | 语言 | 服务器 |
 |------|--------|
@@ -264,54 +266,52 @@ fcitx5 的 `XMODIFIERS` / `QT_IM_MODULE` / `SDL_IM_MODULE` 在 `environment.d/fc
 | TS / JS | `ts_ls`（相对路径 import） |
 | Tailwind | `tailwindcss`（`className=` 正则） |
 | JSON / HTML | `jsonls` / `html` |
+| Lua | `lua_ls`（本配置自身，runtime 全部加入 library） |
 
-诊断：`●` 内联、圆角浮窗、插入模式不更新。`gr*` 系列用 Neovim 内置（grr / gra / grn / gri）。
+诊断：`●` 内联、按严重度排序、插入模式不更新；浮窗边框由全局 `winborder=rounded` 统一。LSP 按键只在 `LspAttach` 时按 buffer 绑定，纯文本里按 `K` 不报错。
 
 ### 格式化（conform，保存触发，3s 超时）
 
-Python → `ruff_format` + `ruff_organize_imports`；TS/JS/TSX/JSX/JSON/YAML/HTML/CSS/Markdown → Prettier。
+Python → `ruff_format` + `ruff_organize_imports`；TS/JS/TSX/JSX/JSON/YAML/HTML/CSS → Prettier；Lua → stylua；fish → `fish_indent`；sh/bash → shfmt。Markdown 不在保存时格式化（prettier 会改写列表符号），只在 `<leader>cf` 手动触发。
 
-### 补全（nvim-cmp）
+### 补全（blink.cmp）
 
-LSP → LuaSnip（friendly-snippets）→ 路径 → buffer（≥3 字符）。`Ctrl+K/J` 选择，`Tab`/`S-Tab` 选择或跳 snippet，`CR` 确认（不自动选中），`Ctrl+E` 关闭，`Ctrl+Space` 手动触发。
+LSP → 路径 → LuaSnip（friendly-snippets）→ buffer（≥3 字符），Rust fuzzy 预编译二进制。`Ctrl+K/J` 选择，`Tab`/`S-Tab` 选择或跳 snippet，`CR` 确认（不自动选中），`Ctrl+E` 关闭，`Ctrl+Space` 手动触发；输入参数时显示函数签名。
 
 ### 插件
 
 | 插件 | 功能 |
 |------|------|
+| snacks.nvim | image（Markdown 内联图片，kitty graphics protocol）/ notifier / indent / bufdelete / bigfile / quickfile / picker（只做 `vim.ui.select`）/ input / words（`]]` `[[` 跳引用）/ terminal / lazygit |
 | nvim-autopairs / nvim-ts-autotag | 括号、TSX/HTML 标签自动补全 |
 | nvim-surround | `ys` / `ds` / `cs` |
 | flash.nvim | `s` 跳转，`S` Treesitter 跳转 |
-| grug-far | `<leader>rf` 跨文件替换，`<leader>rw` 替换光标词 / 选区（预览 + 逐个确认） |
-| neo-tree | `<leader>e`，宽 30，显示隐藏与 gitignored 文件，跟随当前文件 |
-| which-key | `<leader>b/c/d/f/h/m/r/t/y` 分组 |
-| yazi.nvim | `<leader>yy` 当前文件 / `<leader>yw` 工作区 |
-| toggleterm | `<leader>tt` 浮动 / `<leader>th` 水平 / `<leader>tg` LazyGit，`Esc Esc` 退出终端模式 |
-| Treesitter（`main` 分支）+ rainbow-delimiters | 18 个 parser 由插件按需编译（需 `tree-sitter-cli`）；高亮与缩进在 `FileType` 时用内置 `vim.treesitter.start()` 启用；彩虹括号。`main` 分支已移除增量选择，`<C-Space>` 不再有该功能 |
-| Telescope（fzf-native） | `<leader>ff/fg/fb/fr/fs/fd`（含隐藏文件） |
-| gitsigns | `]h` / `[h`，`<leader>hs/hr/hS/hp/hb/hd` |
-| render-markdown.nvim | Markdown 编辑器内渲染（标题/列表/代码块/表格美化，光标行还原源码），`<leader>mr` 开关；latex 支持已关（未装 parser） |
-| snacks.nvim（仅 image 模块） | Markdown 内联显示图片（kitty graphics protocol）；SVG/PDF 经 imagemagick 栅格化 |
-| lualine / bufferline / indent-blankline / nvim-notify / colorizer / mini.icons | UI |
+| grug-far | 跨文件替换（预览 + 逐个确认） |
+| yazi.nvim | 文件管理器；`nvim <目录>` 直接进 yazi（netrw 已禁用） |
+| which-key | `<leader>` 分组提示，`<leader>?` 看本 buffer 按键 |
+| Treesitter（`main` 分支）+ textobjects + rainbow-delimiters | parser 由插件按需编译（需 `tree-sitter-cli`），覆盖 kdl / fish / qml / ini / git 等 dotfiles 用到的类型；高亮与缩进在 `FileType` 时用内置 `vim.treesitter.start()` 启用；`af/if` `ac/ic` `aa/ia` 文本对象，`]f` `[f` 跳函数 |
+| Telescope（fzf-native） | 查找（含隐藏文件） |
+| gitsigns | hunk 操作与 blame |
+| render-markdown.nvim | Markdown 编辑器内渲染（光标行还原源码）；latex 支持已关（未装 parser） |
+| lualine / bufferline / colorizer / mini.icons | UI；mini.icons 模拟 nvim-web-devicons 接口，不装第二份图标库 |
 
-### 核心键位（`<leader> = Space`）
+自动行为（`core/autocmds.lua`）：复制高亮、重开文件回到上次位置、窗口缩放自动均分、help/quickfix 按 `q` 关闭、Markdown 自动软换行与拼写检查（中文不标红）、保存自动建父目录、外部改动自动重载（Claude 在内嵌终端改文件时焦点不离开 nvim，靠 BufEnter/CursorHold 触发 `checktime`）。
 
-| 键位 | 功能 |
-|------|------|
-| `<leader>w` / `q` / `Q` | 保存 / 退出 / 全部强退 |
-| `<leader>fm` | 格式化 |
-| `<leader>ca` / `rn` | Code Action / 重命名 |
-| `K` / `gd` / `gD` | Hover / 定义 / 类型定义 |
-| `[d` / `]d` / `<leader>de` | 诊断跳转 / 浮窗 |
-| `<leader>s` / `<leader>S` | 光标词全文件替换（直接 / 逐个确认） |
-| `<S-h>` / `<S-l>` / `<leader>bd` / `<leader>bo` | Buffer 切换 / 关闭 / 关闭其他 |
-| `Ctrl+H/J/K/L` / `Ctrl+方向` | 窗口跳转 / 调整大小 |
-| `v` 模式 `<` `>` / `J` `K` | 缩进保持选中 / 移动行 |
-| `<leader>p` | 粘贴不覆盖寄存器 |
-| `<A-z>` | 切换自动换行 |
-| `<Esc>` | 清除搜索高亮 |
-| `<leader>mp` | Markdown → PDF（见下） |
-| `<leader>mr` | Markdown 编辑器内渲染开关（render-markdown.nvim） |
+### 核心键位（`<leader> = Space`，前缀即分组）
+
+| 前缀 | 分组 | 键位 |
+|------|------|------|
+| `b` | Buffer | `bd` 关闭（保留分屏）/ `bo` 关闭其他；`S-h` / `S-l` 按标签顺序切换 |
+| `c` | Code | `ca` Code Action / `cr` 重命名 / `cf` 格式化 / `cd` 当前行诊断 / `ci` inlay hints 开关；`K` / `gd` / `gD` Hover / 定义 / 类型定义；`[d` `]d` 内置诊断跳转 |
+| `e` `E` | 文件管理器 | 当前文件 / 工作区（yazi） |
+| `f` | Find | `ff` 文件 / `fg` 全文 / `fb` buffer / `fr` 最近 / `fs` 符号 / `fd` 诊断 / `fh` 帮助 / `fk` 按键 / `f/` 当前文件内 / `f.` 恢复上次 |
+| `h` | Git hunk | `hs` stage（再按撤销）/ `hr` 还原 / `hS` stage 整个文件 / `hp` 预览 / `hb` blame / `hd` diff / `hl` 行内 blame 开关；`]h` `[h` 跳 hunk；v 模式 `hs` `hr` 按选区 |
+| `m` | Markdown | `mp` 导出 PDF（见下）/ `mr` 渲染开关 |
+| `r` | Replace | `rs` 光标词替换（当前文件，实时预览，末尾补 `c` 逐个确认）/ `rw` 光标词或选区（跨文件）/ `rf` 跨文件搜索替换 |
+| `t` | Terminal | `tc` 右侧 Claude Code（40%）/ `th` 底部 shell / `tt` 浮窗 shell / `tg` lazygit；三者独立可同开，再按一次收起，进程保活 |
+| 单键 | | `w` 保存 / `q` 退出 / `Q` 全部退出（未保存会确认）/ `p` 粘贴不覆盖寄存器 / `?` 本 buffer 按键 |
+
+终端模式：`Alt+N` 退到 normal，`Alt+H/J/K/L` 直接跳窗，normal 下 `q` 收起该终端；不用 `Esc Esc`，避免与 Claude Code 的回溯菜单冲突。其他：`Ctrl+H/J/K/L` 窗口跳转、`Ctrl+方向` 调整大小、v 模式 `<` `>` 缩进保持选中、`Alt+J/K` 移动行、`Alt+Z` 自动换行、`Esc` 清搜索高亮。
 
 ### Markdown → PDF（reMarkable 纸感）
 

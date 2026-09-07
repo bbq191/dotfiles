@@ -7,15 +7,17 @@ return {
       {
         "nvim-telescope/telescope-fzf-native.nvim",
         build = "make",
-        cond = function() return vim.fn.executable("make") == 1 end,
+        cond = function()
+          return vim.fn.executable("make") == 1
+        end,
       },
     },
     opts = {
       defaults = {
-        prompt_prefix   = "  ",
+        prompt_prefix = "  ",
         selection_caret = " ",
-        border          = true,
-        borderchars     = { "─", "│", "─", "│", "╭", "╮", "╯", "╰" },
+        border = true,
+        borderchars = { "─", "│", "─", "│", "╭", "╮", "╯", "╰" },
         -- 半透明背景与 kitty blur 协同
         winblend = 10,
         mappings = {
@@ -28,8 +30,8 @@ return {
         },
       },
       pickers = {
-        find_files   = { hidden = true },
-        live_grep    = { additional_args = { "--hidden" } },
+        find_files = { hidden = true },
+        live_grep = { additional_args = { "--hidden" } },
       },
     },
     config = function(_, opts)

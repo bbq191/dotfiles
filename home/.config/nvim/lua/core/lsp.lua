@@ -30,7 +30,10 @@ if #missing > 0 then
     pattern = "VeryLazy",
     once = true,
     callback = function()
-      vim.notify("LSP 二进制缺失: " .. table.concat(missing, ", ") .. "，正在通过 Mason 安装", vim.log.levels.WARN)
+      vim.notify(
+        "LSP 二进制缺失: " .. table.concat(missing, ", ") .. "，正在通过 Mason 安装",
+        vim.log.levels.WARN
+      )
       require("lazy").load({ plugins = { "mason-lspconfig.nvim" } })
     end,
   })
@@ -50,10 +53,14 @@ vim.api.nvim_create_autocmd("LspAttach", {
     map("n", "gd", vim.lsp.buf.definition, "Go to definition")
     map("n", "gD", vim.lsp.buf.type_definition, "Type definition")
     map("n", "<leader>ca", vim.lsp.buf.code_action, "Code action")
-    map("n", "<leader>rn", vim.lsp.buf.rename, "Rename")
+    map("n", "<leader>cr", vim.lsp.buf.rename, "Rename symbol")
     -- snacks.words：在光标标识符的引用间跳转
-    map("n", "]]", function() Snacks.words.jump(vim.v.count1) end, "Next reference")
-    map("n", "[[", function() Snacks.words.jump(-vim.v.count1) end, "Prev reference")
+    map("n", "]]", function()
+      Snacks.words.jump(vim.v.count1)
+    end, "Next reference")
+    map("n", "[[", function()
+      Snacks.words.jump(-vim.v.count1)
+    end, "Prev reference")
 
     if client and client:supports_method("textDocument/inlayHint") then
       map("n", "<leader>ci", function()
