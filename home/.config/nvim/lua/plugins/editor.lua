@@ -60,6 +60,11 @@ return {
       "<leader>tc",
     },
     opts = {
+      -- size 只能在这里按方向给（Terminal:new 不认 size 字段，会退回默认 12 列）
+      size = function(term)
+        if term.direction == "vertical" then return math.floor(vim.o.columns * 0.4) end
+        return 12
+      end,
       shade_terminals = false,
       start_in_insert = true,
       float_opts = {
@@ -84,11 +89,19 @@ return {
       -- Claude Code：与 nvim 同一 cwd，收起后会话保活，下次弹出接着聊
       local claude = Terminal:new({
         cmd = "claude",
-        direction = "vertical",
-        size = function() return math.floor(vim.o.columns * 0.4) end,  -- 右侧 40% 宽
+        direction = "vertical",   -- 右侧 40% 宽，宽度见上面的 size
         hidden = true,
       })
-      vim.keymap.set("n", "<leader>tc", function() claude:toggle() end, { desc = "Claude Code" })
+      vim.keymap.set("n", "<leader>tc", function()
+        -- toggleterm 会把新终端塞进已开的终端窗口里再分（横向堆叠，浮窗时甚至开不出来），
+        -- 所以打开 Claude 前先收起其他终端，保证它永远是右侧独立一栏
+        if not claude:is_open() then
+          for _, t in pairs(require("toggleterm.terminal").get_all(true)) do
+            if t ~= claude and t:is_open() then t:close() end
+          end
+        end
+        claude:toggle()
+      end, { desc = "Claude Code" })
     end,
   },
 
