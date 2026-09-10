@@ -40,6 +40,7 @@ cryptsetup
 cups-pk-helper
 device-mapper
 diffutils
+direnv                  # fish 钩子见 fish/conf.d/direnv.fish
 dmidecode
 dmraid
 dms-shell
@@ -84,6 +85,7 @@ gvfs-smb
 hdparm
 hwdetect
 hwinfo
+hyperfine               # 命令行 benchmark
 # niri + DMS 桌面（壁纸/锁屏/idle/polkit/Alt+Tab 均由 DMS 接管）
 niri
 xwayland-satellite
@@ -186,6 +188,7 @@ sudo
 switcheroo-control
 sysfsutils
 tcpdump
+tealdeer                # tldr 命令；cachyos-fish-config 的隐式依赖，这里显式声明意图
 telegram-desktop
 texinfo
 thunar
@@ -229,8 +232,6 @@ zoxide
 adw-gtk-theme          # GTK3 主题（gtk-3.0/settings.ini 与 dconf 指向 adw-gtk3，吃 DMS matugen 配色）
 qt5ct
 qt6ct                  # QT_QPA_PLATFORMTHEME=qt5ct:qt6ct，Qt 应用读 matugen 配色与字体
-zathura
-zathura-pdf-mupdf      # 默认 PDF 阅读器（mimeapps.list），matugen 模板动态配色
 python-qrcode
 # ── 截图 / 录屏 / 文件 ──
 wf-recorder            # niri Super+Alt+A 区域录屏
@@ -310,5 +311,5 @@ debtap                 # 把 deb 转成 pacman 包（蓝信 com.picc.lanxin 即�
 ffuf-bin
 lazysql-bin
 reqable-bin
-wechat                 # 微信（AUR wechat，portable 沙箱）；取代 wechat-universal-bwrap
+wechat-bin             # 微信；裸跑，见 ~/.local/bin/wechat 包装脚本（本机文件，不入库）
 # com.picc.lanxin      # 蓝信（人保 e 办）：无 AUR 包，用 debtap 转换官方 deb 后 pacman -U 安装

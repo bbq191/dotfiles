@@ -1,11 +1,11 @@
 [Default Applications]
-application/pdf=org.pwmt.zathura.desktop
-application/vnd.comicbook+zip=org.pwmt.zathura.desktop
-application/vnd.comicbook-rar=org.pwmt.zathura.desktop
-application/x-bzpdf=org.pwmt.zathura.desktop
-application/x-ext-pdf=org.pwmt.zathura.desktop
+application/epub+zip=calibre-ebook-viewer.desktop
+application/vnd.comicbook+zip=calibre-ebook-viewer.desktop
+application/vnd.comicbook-rar=calibre-ebook-viewer.desktop
+application/x-cb7=calibre-ebook-viewer.desktop
+application/x-cbc=calibre-ebook-viewer.desktop
 application/x-gnome-saved-search=thunar.desktop
-application/x-gzpdf=org.pwmt.zathura.desktop
+application/x-mobipocket-ebook=calibre-ebook-viewer.desktop
 application/xhtml+xml=brave-browser-nightly.desktop
 image/avif=satty.desktop
 image/bmp=satty.desktop
@@ -13,6 +13,7 @@ image/gif=satty.desktop
 image/jpeg=satty.desktop
 image/png=satty.desktop
 image/svg+xml=satty.desktop
+image/vnd.djvu=calibre-ebook-viewer.desktop
 image/webp=satty.desktop
 inode/directory=thunar.desktop
 text/html=brave-browser-nightly.desktop
@@ -25,21 +26,23 @@ x-scheme-handler/claude-cli=claude-code-url-handler.desktop
 x-scheme-handler/http=brave-browser-nightly.desktop
 x-scheme-handler/https=brave-browser-nightly.desktop
 x-scheme-handler/unknown=brave-browser-nightly.desktop
+application/lrf=calibre-lrfviewer.desktop
 
 [Added Associations]
+application/epub+zip=calibre-ebook-viewer.desktop;
 application/json=org.neovim.nvim.desktop;
-application/pdf=org.pwmt.zathura.desktop;
-application/vnd.comicbook+zip=org.pwmt.zathura.desktop;
-application/vnd.comicbook-rar=org.pwmt.zathura.desktop;
-application/x-bzpdf=org.pwmt.zathura.desktop;
-application/x-ext-pdf=org.pwmt.zathura.desktop;
-application/x-gzpdf=org.pwmt.zathura.desktop;
+application/vnd.comicbook+zip=calibre-ebook-viewer.desktop;
+application/vnd.comicbook-rar=calibre-ebook-viewer.desktop;
+application/x-cb7=calibre-ebook-viewer.desktop;
+application/x-cbc=calibre-ebook-viewer.desktop;
+application/x-mobipocket-ebook=calibre-ebook-viewer.desktop;
 image/avif=satty.desktop;
 image/bmp=satty.desktop;
 image/gif=satty.desktop;
 image/jpeg=satty.desktop;
 image/png=satty.desktop;
 image/svg+xml=satty.desktop;
+image/vnd.djvu=calibre-ebook-viewer.desktop;
 image/webp=satty.desktop;
 x-scheme-handler/calendar=dms-open.desktop;
 
