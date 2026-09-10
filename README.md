@@ -203,7 +203,6 @@ nmcli con add type ethernet ifname rmk0 con-name remarkable-usb \
 
 换壁纸或切明暗时，DMS（`runUserMatugenTemplates = true`）会在跑完自家模板后直接执行 matugen 默认用户配置 `~/.config/matugen/config.toml`，其中：
 - `papirus-folders.sh`：把主色 HSV 色相映射到 papirus-folders 颜色名，`sudo papirus-folders -C` 同步三套 Papirus（`sudoers.d/papirus-folders` 免密）
-- `zathura`：生成 `~/.config/zathura/dank-colors`
 
 不需要任何额外的 path/service 或脚本——早期的 `dms-user-matugen.path` + `apply-user-templates.sh` 链路已删除（会让 papirus 重复跑两遍，且不感知明暗切换）。
 
@@ -249,7 +248,7 @@ __GLX_VENDOR_LIBRARY_NAME=nvidia
 ELECTRON_OZONE_PLATFORM_HINT=auto   # 仅用户会话
 ```
 
-内屏的 DRM connector 名会在 eDP-1/eDP-2 间漂移：面板走 NVIDIA（MUX 独显直连），但 i915 开机时会先为自己空着的 DDI A 占住 eDP-1 约 1.5s 再释放，而 eDP-N 编号是跨显卡的全局计数器，nvidia-drm 注册早于或晚于这次释放就分别得到 eDP-1 或 eDP-2（initramfs 预载 nvidia 模块也挡不住，nvidia-drm 自身初始化耗时不定）。因此 `config.kdl` 的 output 块按 `"AU Optronics 0x96B1 Unknown"`（厂商 型号 序列号）匹配，不写连接器名；DMS 生成的 `dms/outputs.kdl` 仍按连接器名写，被前者覆盖，`monitors.json` 里两个 eDP 名各留一份相同的 profile 以免 DMS 反复新建。
+内屏的 DRM connector 名会在 eDP-1/eDP-2 间漂移：面板走 NVIDIA（MUX 独显直连），但 i915 开机时会先为自己空着的 DDI A 占住 eDP-1 约 1.5s 再释放，而 eDP-N 编号是跨显卡的全局计数器，nvidia-drm 注册早于或晚于这次释放就分别得到 eDP-1 或 eDP-2（initramfs 预载 nvidia 模块也挡不住，nvidia-drm 自身初始化耗时不定）。因此 `config.kdl` 的 output 块按 `"AU Optronics 0x96B1 Unknown"`（厂商 型号 序列号）匹配，不写连接器名；DMS 生成的 `dms/outputs.kdl` 仍按连接器名写，被前者覆盖，`monitors.json` 里两个 eDP 名各留一份相同的 profile 以免 DMS 反复新建。niri 对同一输出只取第一个匹配块整体生效、不跨块合并字段，所以 DMS 设置里改这块屏幕的任何选项（目前是热区开关）都要手动同步到 `config.kdl` 那个块，否则设置界面显示的和实际生效的会不一致。
 
 内核参数（`/etc/kernel/cmdline`，含根分区 UUID 故不入库）额外带 `nvidia-drm.modeset=1 nvidia-drm.fbdev=1`；initramfs 由 chwd 生成的 `mkinitcpio.conf.d/10-chwd.conf` 预载 nvidia 四个模块。新机器由 CachyOS 安装器 / chwd 自动写入，只需核对。
 
@@ -277,13 +276,12 @@ dotfiles/
 │   ├── .config/
 │   │   ├── niri/                # 合成器主配置 + DMS 托管的 dms/*.kdl（勿手改）
 │   │   ├── DankMaterialShell/   # monitors.json、插件启用记录、自研插件（hotspotInternet / usbInternet）
-│   │   ├── matugen/             # config.toml + 用户模板（papirus-folders、zathura），由 DMS 直接执行
+│   │   ├── matugen/             # config.toml + 用户模板（papirus-folders），由 DMS 直接执行
 │   │   ├── systemd/user/        # remarkable-usb-share.{service,timer}、x11-clipboard-bridge.service、gpg/ssh-agent drop-in
 │   │   ├── fish/                # config.fish、conf.d（sdkman、rustup）、functions（git 拦截、obsync）
 │   │   ├── kitty/               # kitty.conf + matugen 生成的 dank-theme/dank-tabs
 │   │   ├── nvim/                # Lazy.nvim；colors/dms.lua 为 matugen 生成的 base46 主题
 │   │   ├── yazi/                # 文件管理器（gvfs 插件、SFTP vfs）
-│   │   ├── zathura/             # PDF 阅读器 + matugen 配色
 │   │   ├── pandoc/              # reMarkable 纸感 PDF 导出（defaults / tex 头 / lua 过滤器）
 │   │   ├── mpv/                 # gpu-next + uosc（AUR mpv-uosc，script= 显式加载）+ 剪贴板播放
 │   │   ├── lazygit/  satty/  btop/  fastfetch/  starship.toml
@@ -328,7 +326,7 @@ dotfiles/
 
 ## 维护提示
 
-- 换壁纸或切明暗后 `kitty/dank-*.conf`、`nvim/colors/dms.lua`、`niri/dms/colors.kdl`、`zathura/dank-colors`、`qt5ct|qt6ct/colors/matugen.conf` 会被 matugen 重写，产生「主题重生成」差异，属正常；提交时顺手一起提交即可
+- 换壁纸或切明暗后 `kitty/dank-*.conf`、`nvim/colors/dms.lua`、`niri/dms/colors.kdl`、`qt5ct|qt6ct/colors/matugen.conf` 会被 matugen 重写，产生「主题重生成」差异，属正常；提交时顺手一起提交即可
 - `niri/dms/*.kdl` 由 DMS Settings 写入，改布局请在 DMS 设置里改；`config.kdl` 只放 DMS 不管的项
 - 升级出现 `.pacnew`（`pam.d/sudo`、`pam.d/greetd`、`howdy/config.ini` 尤其要看）用 `pacdiff` 合并，不要整文件覆盖
 - 修改 mihomo 规则时改 `system/etc/mihomo/config.template.yaml`，别只改 `/etc/mihomo/config.yaml`

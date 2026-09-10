@@ -110,7 +110,7 @@ fcitx5 的 `XMODIFIERS` / `QT_IM_MODULE` / `SDL_IM_MODULE` 在 `environment.d/fc
 
 ### 窗口规则
 
-- 自动浮动：thunar、nautilus、blueman-manager、blueberry、nm-connection-editor、wechat、蓝信、Telegram、satty、quickshell（DMS 设置窗）、steam_app_default、dankcalendar、Lutris
+- 自动浮动：thunar、nautilus、wechat、蓝信、Telegram、satty、quickshell（DMS 设置窗）、steam_app_default、dankcalendar、Lutris
 - mpv：浮动，默认 800×450，VRR 触发
 - `steam_app_*`：VRR 触发
 - kitty：打开即列最大化
@@ -180,9 +180,8 @@ fcitx5 的 `XMODIFIERS` / `QT_IM_MODULE` / `SDL_IM_MODULE` 在 `environment.d/fc
 **用户模板**（`runUserMatugenTemplates = true`，`~/.config/matugen/config.toml`）：
 
 - `papirus-folders.sh`：主色 HSV 色相映射到 papirus-folders 颜色名，`sudo papirus-folders -C` 同步 Papirus / Dark / Light 三套（sudoers 免密）
-- `zathura`：生成 `zathura/dank-colors`，含重染色板
 
-**触发链路**：DMS 换壁纸 / 切明暗 → `dms matugen generate --run-user-templates`（`Theme.qml`，`regenSystemThemes`）→ 渲染 DMS 内置模板后，直接执行 `~/.config/matugen/config.toml` 里的用户模板，明暗模式随 DMS 当前值。实测：换壁纸后 5 秒内 zathura 配色与 Papirus 文件夹色即更新，无需任何 systemd path/service。
+**触发链路**：DMS 换壁纸 / 切明暗 → `dms matugen generate --run-user-templates`（`Theme.qml`，`regenSystemThemes`）→ 渲染 DMS 内置模板后，直接执行 `~/.config/matugen/config.toml` 里的用户模板，明暗模式随 DMS 当前值。实测：换壁纸后 5 秒内 Papirus 文件夹色即更新，无需任何 systemd path/service。
 
 `nvim/colors/dms.lua` 自带 `uv.fs_event` 监听自身与 `settings.json`，文件变化即热重载主题。
 
@@ -197,7 +196,7 @@ fcitx5 的 `XMODIFIERS` / `QT_IM_MODULE` / `SDL_IM_MODULE` 在 `environment.d/fc
 ### 字体 / 外观
 
 - Maple Mono NF CN 11pt，四种字重
-- 透明度 0.85（`Ctrl+Shift+A m/l` 运行时调），无标题栏，内边距 10，光标块状不闪烁
+- 透明度 0.95（`Ctrl+Shift+A m/l` 运行时调），无标题栏，内边距 10，光标块状不闪烁
 - 配色 **matugen 动态生成**（`dank-theme.conf` / `dank-tabs.conf`，随壁纸与明暗）
 - 标签栏 powerline（≥2 个标签才显示）
 - 选中即复制到系统剪贴板；Ctrl+点击开 URL；右键粘贴选区已禁用（误触频发）
@@ -233,6 +232,9 @@ fcitx5 的 `XMODIFIERS` / `QT_IM_MODULE` / `SDL_IM_MODULE` 在 `environment.d/fc
 | **fnm** | Node 版本管理，进入含 `.nvmrc` / `.node-version` 目录自动切换 |
 | **SDKMAN** | `sdk` 命令（fisher 插件 `reitzig/sdkman-for-fish`），装在 `~/.local/share/sdkman` |
 | **rustup / cargo** | `conf.d/rustup.fish` 加载 `$CARGO_HOME/env.fish`（minimal profile） |
+| **direnv** | `conf.d/direnv.fish` 挂钩子；项目目录放 `.envrc`，`direnv allow` 授权后自动加载/卸载环境变量。原生遵循 XDG（`$XDG_CONFIG_HOME/direnv/direnv.toml`），无需额外配置 |
+| **tldr（tealdeer）** | 命令速查手册，`tldr <命令>`；缓存在 `$XDG_CACHE_HOME/tealdeer`，`tldr --update` 更新 |
+| **hyperfine** | 命令行 benchmark，`hyperfine 'cmd1' 'cmd2'` 对比耗时；无持久化配置 |
 
 ### 环境变量（XDG）
 
@@ -254,7 +256,7 @@ fcitx5 的 `XMODIFIERS` / `QT_IM_MODULE` / `SDL_IM_MODULE` 在 `environment.d/fc
 
 ### 主题
 
-`AvengeMedia/base46` + matugen 生成的 `colors/dms.lua`：github_light/dark 向壁纸主色调和，透明背景透出 kitty 0.85；lualine 主题 `_base46("dms")`。文件变化自动热重载。`colors/dms.lua` 在 `.styluaignore` 里，不参与格式化。
+`AvengeMedia/base46` + matugen 生成的 `colors/dms.lua`：github_light/dark 向壁纸主色调和，透明背景透出 kitty 0.95；lualine 主题 `_base46("dms")`。文件变化自动热重载。`colors/dms.lua` 在 `.styluaignore` 里，不参与格式化。
 
 ### LSP（配置在 `lsp/*.lua`，Neovim 0.11+ 机制）
 
@@ -326,7 +328,7 @@ LSP → 路径 → LuaSnip（friendly-snippets）→ buffer（≥3 字符），R
 ### Yazi
 
 - 面板 1:2:4；图片预览 lanczos3、512MB 缓存；目录优先、自然排序、显示软链目标、size 行模式
-- 打开规则：文本 / JSON → nvim（`org.neovim.nvim.desktop` 覆盖版在 kitty 里启动，供 xdg-open / Thunar 用）；图片 → satty（可直接标注）→ xdg-open；视频 → mpv；音频 → xdg-open；PDF → xdg-open（zathura）；压缩包 → 7z / unzip 解压；兜底先 nvim
+- 打开规则：文本 / JSON → nvim（`org.neovim.nvim.desktop` 覆盖版在 kitty 里启动，供 xdg-open / Thunar 用）；图片 → satty（可直接标注）→ xdg-open；视频 → mpv；音频 → xdg-open；PDF → xdg-open（Brave 内置查看器，zathura 已卸载）；电子书 / 漫画（epub/mobi/djvu/cbz/cbr/cb7/cbc）→ xdg-open（calibre-ebook-viewer）；压缩包 → 7z / unzip 解压；兜底先 nvim
 - 配色 `theme.toml` 为静态 Tokyo Night（不随 matugen）
 
 | 键位 | 功能 |
@@ -344,9 +346,9 @@ LSP → 路径 → LuaSnip（friendly-snippets）→ buffer（≥3 字符），R
 
 浮动窗口；归档插件；缩略图已在偏好里关掉（`misc-thumbnail-mode=NEVER`，tumbler 装着但不出图）；自定义动作「Open Terminal Here」（`exo-open`，终端由 `xdg-terminals.list` 指向 kitty）。xfconf 的 `thunar.xml` 随窗口几何频繁改写，不入库。
 
-### Zathura
+### 电子书 / PDF 阅读
 
-默认 PDF / 漫画阅读器：matugen 配色、`y` 复制到系统剪贴板、best-fit、`Ctrl+R` 按主题重染（暗色下读白底 PDF）。
+zathura 已卸载（不再维护配色模板），PDF 默认交给 Brave 内置查看器；epub / mobi / djvu / 漫画压缩包（cbz / cbr / cb7 / cbc）默认用 calibre-ebook-viewer 打开，微信改裸跑 wechat-bin 后顺带把 Calibre 定位成纯书库管理 + 阅读器角色。
 
 ---
 
@@ -420,7 +422,7 @@ Satty：箭头 / 矩形 / 圆 / 文本 / 马赛克 / 荧光笔；右键即复制
 
 ## Git 工作流
 
-- **LazyGit**：Neovim `<leader>tg`、Yazi `Ctrl+G`；Tokyo Night 配色（静态），Nerd Font v3，delta 分页
+- **LazyGit**：Neovim `<leader>tg`、Yazi `Ctrl+G`；界面配色 Tokyo Night（静态，`config.yml` 的 `gui.theme`），Nerd Font v3；diff 渲染用 `delta --paging=never`，不带 `--light`/`--dark`，跟普通 `git diff` 一样自动探测终端背景，跟着 DMS 明暗切换走，不用手动同步
 - **git-delta**：`core.pager=delta`、`interactive.diffFilter`，`git diff/log/show/blame` 语法高亮 + 行号，`n`/`N` 跨文件跳转；`merge.conflictStyle=zdiff3`、`diff.colorMoved`。需要并排时 `git -c delta.side-by-side=true diff`
 - **Meld**：图形化 diff / merge
 - 全局 `git/ignore`：`.claude/`、`CLAUDE.md`、`GEMINI.md`、`.gitignore`（AI 辅助文件不进项目仓库）
