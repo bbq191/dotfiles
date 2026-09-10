@@ -49,7 +49,7 @@ return {
         return real_system(cmd, opts, on_exit)
       end
 
-      -- transparency：Normal 等背景置 NONE，透出 kitty 的 0.85 透明背景
+      -- transparency：Normal 等背景置 NONE，透出 kitty 的 0.95 透明背景
       require("base46").setup({ transparency = true })
       vim.cmd.colorscheme("dms")
     end,
