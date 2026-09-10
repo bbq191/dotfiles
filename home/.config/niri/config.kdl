@@ -9,13 +9,19 @@
 // 按厂商/型号匹配而非连接器名：面板走 NVIDIA（MUX 独显直连），但 i915 开机时会先为自己
 // 空着的 DDI A 占住 eDP-1 约 1.5s 再释放，eDP-N 编号又是跨显卡的全局计数器，
 // 于是 nvidia-drm 注册早晚不同就会得到 eDP-1 或 eDP-2。此块在 include dms/outputs.kdl
-// 之前，niri 取首个匹配，故 DMS 生成的同屏配置始终被此块覆盖
+// 之前，niri 取首个匹配（整块覆盖，不跨块合并字段），故 DMS 生成的同屏配置（outputs.kdl
+// 里的 "eDP-1"）永远不生效——DMS 设置里改的任何这块屏幕的选项，都要手动同步到这里
 output "AU Optronics 0x96B1 Unknown" {
     mode "2560x1600@300.000"
     scale 1.0
     // 按需 VRR：仅当匹配 variable-refresh-rate 窗口规则的窗口（mpv、Steam 游戏）
     // 显示时启用，避免桌面场景 VRR 降刷新率导致光标卡顿（NVIDIA 已知问题）
     variable-refresh-rate on-demand=true
+    // DMS 设置里关闭了左上角热区（outputs.kdl 同步生成了这块，但被本块整体覆盖，
+    // 必须手动跟着写一份，否则热区实际仍是默认开启，跟 DMS 设置显示的不一致）
+    hot-corners {
+        off
+    }
 }
 
 ///////////////
@@ -240,7 +246,7 @@ binds {
 // 文件对话框居中：niri 浮窗默认居中打开，无需单独规则
 
 window-rule {
-    match app-id="^(thunar|org\\.gnome\\.Nautilus|blueman-manager|blueberry|nm-connection-editor|wechat|com\\.picc\\.lanxin|org\\.telegram\\.desktop|com\\.gabm\\.satty|org\\.quickshell|steam_app_default|com\\.danklinux\\.dankcalendar|net\\.lutris\\.Lutris)$"
+    match app-id="^(thunar|org\\.gnome\\.Nautilus|wechat|com\\.picc\\.lanxin|org\\.telegram\\.desktop|com\\.gabm\\.satty|org\\.quickshell|steam_app_default|com\\.danklinux\\.dankcalendar|net\\.lutris\\.Lutris)$"
     open-floating true
 }
 
