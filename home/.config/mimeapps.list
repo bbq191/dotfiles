@@ -1,10 +1,17 @@
 [Default Applications]
 application/epub+zip=calibre-ebook-viewer.desktop
+application/msword=abiword.desktop
+application/rtf=abiword.desktop
 application/vnd.comicbook+zip=calibre-ebook-viewer.desktop
 application/vnd.comicbook-rar=calibre-ebook-viewer.desktop
+application/vnd.oasis.opendocument.spreadsheet=org.gnumeric.gnumeric.desktop
+application/vnd.oasis.opendocument.text=abiword.desktop
+application/vnd.openxmlformats-officedocument.spreadsheetml.sheet=org.gnumeric.gnumeric.desktop
+application/vnd.openxmlformats-officedocument.wordprocessingml.document=abiword.desktop
+application/vnd.ms-excel=org.gnumeric.gnumeric.desktop
 application/x-cb7=calibre-ebook-viewer.desktop
 application/x-cbc=calibre-ebook-viewer.desktop
-application/x-gnome-saved-search=thunar.desktop
+application/x-gnome-saved-search=org.gnome.Nautilus.desktop
 application/x-mobipocket-ebook=calibre-ebook-viewer.desktop
 application/xhtml+xml=brave-browser-nightly.desktop
 image/avif=satty.desktop
@@ -15,7 +22,8 @@ image/png=satty.desktop
 image/svg+xml=satty.desktop
 image/vnd.djvu=calibre-ebook-viewer.desktop
 image/webp=satty.desktop
-inode/directory=thunar.desktop
+inode/directory=org.gnome.Nautilus.desktop
+text/csv=org.gnumeric.gnumeric.desktop
 text/html=brave-browser-nightly.desktop
 text/plain=org.neovim.nvim.desktop
 text/x-python=org.neovim.nvim.desktop
@@ -31,8 +39,15 @@ application/lrf=calibre-lrfviewer.desktop
 [Added Associations]
 application/epub+zip=calibre-ebook-viewer.desktop;
 application/json=org.neovim.nvim.desktop;
+application/msword=abiword.desktop;
+application/rtf=abiword.desktop;
 application/vnd.comicbook+zip=calibre-ebook-viewer.desktop;
 application/vnd.comicbook-rar=calibre-ebook-viewer.desktop;
+application/vnd.oasis.opendocument.spreadsheet=org.gnumeric.gnumeric.desktop;
+application/vnd.oasis.opendocument.text=abiword.desktop;
+application/vnd.openxmlformats-officedocument.spreadsheetml.sheet=org.gnumeric.gnumeric.desktop;
+application/vnd.openxmlformats-officedocument.wordprocessingml.document=abiword.desktop;
+application/vnd.ms-excel=org.gnumeric.gnumeric.desktop;
 application/x-cb7=calibre-ebook-viewer.desktop;
 application/x-cbc=calibre-ebook-viewer.desktop;
 application/x-mobipocket-ebook=calibre-ebook-viewer.desktop;
@@ -44,6 +59,7 @@ image/png=satty.desktop;
 image/svg+xml=satty.desktop;
 image/vnd.djvu=calibre-ebook-viewer.desktop;
 image/webp=satty.desktop;
+text/csv=org.gnumeric.gnumeric.desktop;
 x-scheme-handler/calendar=dms-open.desktop;
 
 [Removed Associations]

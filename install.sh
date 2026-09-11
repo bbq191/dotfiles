@@ -88,10 +88,12 @@ git -C "$DOTFILES" restore home/
 # Rime 增强词库：克隆 Iorest/rime-dict → opencc 转简体 → 编译（见 ~/.local/bin/rime-dict-sync）
 rime-dict-sync --no-restart || echo "    rime-dict-sync 失败（网络？），稍后手动执行"
 
-# dconf：niri 下没有 xsettings daemon，纯 GTK3 程序（如 Thunar）不读 gtk-3.0/settings.ini，
+# dconf：niri 下没有 xsettings daemon，纯 GTK3 程序（如 AbiWord/Gnumeric）不读 gtk-3.0/settings.ini，
 # 而是直接吃 org.gnome.desktop.interface 这份 dconf 状态，必须单独同步字号/主题
 echo "[+] 应用 dconf 设置..."
 dconf load /org/gnome/desktop/interface/ < "$DOTFILES/system/dconf/interface.ini"
+# Nautilus 不用配置文件，偏好（默认列表视图/窗口尺寸）全存在自己的 dconf 路径下
+dconf load /org/gnome/nautilus/ < "$DOTFILES/system/dconf/nautilus.ini"
 
 # ── 5. 应用系统配置（需要 sudo）────────────────────────────────────────────────
 echo "[+] 应用系统配置..."
@@ -199,6 +201,8 @@ mkdir -p "$HOME/.local/share/wine"
 mkdir -p "$HOME/.local/share/ollama/models"
 mkdir -p "$HOME/.cache/ssh"
 chmod 700 "$HOME/.cache/ssh"
+# 部分工具不会自己创建缺失的父目录（gdb/sqlite3 历史文件、npm/readline 配置文件），提前建好
+mkdir -p "$HOME/.local/state/gdb" "$HOME/.config/npm" "$HOME/.config/readline" "$HOME/.config/java"
 
 # ── 8. GnuPG XDG 迁移 ────────────────────────────────────────────────────────
 echo "[+] 配置 GnuPG XDG 路径..."

@@ -26,7 +26,7 @@ cd ~/Projects/dotfiles
 1. 安装 paru（AUR helper）和 stow
 2. 通过 paru 安装 `packages/packages.txt` 中**尚未安装**的软件包（`pacman -T` 筛选；不升级已装包，升级用 `paru -Syu`）
 3. fnm 安装 Node LTS（已有默认版本则跳过），全局 npm 安装 `@google/gemini-cli` 与 `@mermaid-js/mermaid-cli`（pandoc 渲染 mermaid 用；命令已存在则跳过）
-4. stow 将 `home/` 链接到 `$HOME`（随后 `rime-dict-sync` 拉取 Iorest 增强词库、转简体、编译）：目标位置已有的实体文件按仓库清单逐个备份为 `*.bak-<时间戳>`（已经通过上级目录链接指向仓库的文件会跳过），旧的绝对路径链接原地重建为相对链接；随后 `dconf load` 同步 GTK 字体/主题（Thunar 等纯 GTK3 程序不读 `settings.ini`）
+4. stow 将 `home/` 链接到 `$HOME`（随后 `rime-dict-sync` 拉取 Iorest 增强词库、转简体、编译）：目标位置已有的实体文件按仓库清单逐个备份为 `*.bak-<时间戳>`（已经通过上级目录链接指向仓库的文件会跳过），旧的绝对路径链接原地重建为相对链接；随后 `dconf load` 同步 GTK 字体/主题（AbiWord/Gnumeric 等纯 GTK3 程序不读 `settings.ini`）、Nautilus 偏好
 5. 复制 `system/etc`、`system/usr/local/bin` 到系统：resolved / ollama drop-in / NVIDIA modprobe / greetd NVIDIA 覆盖 / tmpfiles（THP、howdy 权限）/ PAM（dankshell、sudo、greetd、polkit-1）/ howdy-libguard 与 pacman 钩子 / sudoers（papirus-folders）/ NetworkManager（iwd 后端、iptables 防火墙后端）/ `.link` 网卡命名（wlan0、rmk0）/ BE200 冷开机固件崩溃自愈（wifi-fw-reset + iwl-fwdump）/ sysctl（ip_forward、min_free_kbytes）/ udev（IO 调度器、uuu）/ keyd / snapper；并 mask `NetworkManager-wait-online`
 6. 启用 systemd 服务：系统级 iwd、wifi-fw-reset、keyd、linux-enable-ir-emitter（ollama 只装 override，不自启）；`dms plugins install` 拉取三个第三方启动器插件（calculator / emojiLauncher / niriWindows）；用户级 ssh-agent.socket、dms、cliphist、dcal、dsearch、remarkable-usb-share.timer、systemd-tmpfiles-setup（否则 `user-tmpfiles.d/cleanup.conf` 不生效，本机实测默认 disabled）
 7. 初始化目录（wine prefix、ollama 模型、ssh ControlPath）
@@ -288,7 +288,7 @@ dotfiles/
 │   │   ├── fcitx5/              # Rime + wechat 主题
 │   │   ├── fontconfig/  gtk-3.0/  gtk-4.0/  qt5ct/  qt6ct/   # 字体与主题
 │   │   ├── environment.d/       # fcitx5 / gnupg / maven 环境变量
-│   │   ├── git/  maven/  gemini/  danksearch/  dankcal/  Thunar/
+│   │   ├── git/  maven/  gemini/  danksearch/  dankcal/
 │   │   └── mimeapps.list  user-dirs.dirs  user-dirs.locale  xdg-terminals.list  user-tmpfiles.d/
 │   ├── .local/bin/              # hotspot-internet、usb-internet、remarkable-usb-share、x11-clipboard-bridge、rime-dict-sync、rbw-ssh-load、git-credential-rbw、wine-setup-fonts
 │   ├── .local/share/            # applications/*.desktop（蓝信、nvim 在 kitty 中打开）、fcitx5/rime/（*.custom.yaml、rime_ice_ext.dict.yaml）、rustup/settings.toml

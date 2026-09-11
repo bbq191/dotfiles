@@ -68,7 +68,6 @@ LIBVA_DRIVER_NAME=nvidia            # VA-API 硬解
 GBM_BACKEND=nvidia-drm              # Wayland 渲染后端
 __GLX_VENDOR_LIBRARY_NAME=nvidia
 ELECTRON_OZONE_PLATFORM_HINT=auto   # Electron 应用走 Wayland
-SAL_USE_VCLPLUGIN=gtk3              # LibreOffice 用 GTK3 前端，吃 adw-gtk3 + matugen 配色
 QT_QPA_PLATFORMTHEME=qt5ct:qt6ct    # Qt 应用读 qt5ct/qt6ct 的字体与配色
 ```
 fcitx5 的 `XMODIFIERS` / `QT_IM_MODULE` / `SDL_IM_MODULE` 在 `environment.d/fcitx5.conf`。
@@ -82,8 +81,8 @@ fcitx5 的 `XMODIFIERS` / `QT_IM_MODULE` / `SDL_IM_MODULE` 在 `environment.d/fc
 | 快捷键 | 功能 |
 |--------|------|
 | `Super + Shift + /` | 热键浮层 |
-| `Super + Q` / `E` / `R` / `B` | Kitty / Thunar / DMS 启动器 / 默认浏览器（`xdg-open https://`） |
-| `Super + C` | 关闭窗口 |
+| `Super + T` / `R` / `B` | Kitty / DMS 启动器 / 默认浏览器（`xdg-open https://`）；文件管理器（Nautilus）没有专属键位，从启动器/DMS 面板打开 |
+| `Super + Q` | 关闭窗口 |
 | `Super + V` / `Super + Shift + V` | 切换浮动 / 在浮动与平铺层间切焦点 |
 | `Super + P` | 循环预设列宽 |
 | `Super + -` / `=` | 列宽 ±10%；加 `Shift` 调窗口高度 |
@@ -110,7 +109,7 @@ fcitx5 的 `XMODIFIERS` / `QT_IM_MODULE` / `SDL_IM_MODULE` 在 `environment.d/fc
 
 ### 窗口规则
 
-- 自动浮动：thunar、nautilus、wechat、蓝信、Telegram、satty、quickshell（DMS 设置窗）、steam_app_default、dankcalendar、Lutris
+- 自动浮动：nautilus、wechat、蓝信、Telegram、satty、quickshell（DMS 设置窗）、steam_app_default、dankcalendar、Lutris
 - mpv：浮动，默认 800×450，VRR 触发
 - `steam_app_*`：VRR 触发
 - kitty：打开即列最大化
@@ -272,9 +271,9 @@ fcitx5 的 `XMODIFIERS` / `QT_IM_MODULE` / `SDL_IM_MODULE` 在 `environment.d/fc
 
 诊断：`●` 内联、按严重度排序、插入模式不更新；浮窗边框由全局 `winborder=rounded` 统一。LSP 按键只在 `LspAttach` 时按 buffer 绑定，纯文本里按 `K` 不报错。
 
-### 格式化（conform，保存触发，3s 超时）
+### 格式化（conform，手动触发）
 
-Python → `ruff_format` + `ruff_organize_imports`；TS/JS/TSX/JSX/JSON/YAML/HTML/CSS → Prettier；Lua → stylua；fish → `fish_indent`；sh/bash → shfmt。Markdown 不在保存时格式化（prettier 会改写列表符号），只在 `<leader>cf` 手动触发。
+Python → `ruff_format` + `ruff_organize_imports`；TS/JS/TSX/JSX/JSON/YAML/HTML/CSS → Prettier；Lua → stylua；fish → `fish_indent`；sh/bash → shfmt。不再保存时自动格式化，统一 `<leader>cf` 手动触发。
 
 ### 补全（blink.cmp）
 
@@ -328,7 +327,7 @@ LSP → 路径 → LuaSnip（friendly-snippets）→ buffer（≥3 字符），R
 ### Yazi
 
 - 面板 1:2:4；图片预览 lanczos3、512MB 缓存；目录优先、自然排序、显示软链目标、size 行模式
-- 打开规则：文本 / JSON → nvim（`org.neovim.nvim.desktop` 覆盖版在 kitty 里启动，供 xdg-open / Thunar 用）；图片 → satty（可直接标注）→ xdg-open；视频 → mpv；音频 → xdg-open；PDF → xdg-open（Brave 内置查看器，zathura 已卸载）；电子书 / 漫画（epub/mobi/djvu/cbz/cbr/cb7/cbc）→ xdg-open（calibre-ebook-viewer）；压缩包 → 7z / unzip 解压；兜底先 nvim
+- 打开规则：文本 / JSON → nvim（`org.neovim.nvim.desktop` 覆盖版在 kitty 里启动，供 xdg-open / Nautilus 用）；图片 → satty（可直接标注）→ xdg-open；视频 → mpv；音频 → xdg-open；PDF → xdg-open（Brave 内置查看器，zathura 已卸载）；电子书 / 漫画（epub/mobi/djvu/cbz/cbr/cb7/cbc）→ xdg-open（calibre-ebook-viewer）；Office 文档（docx/doc/rtf/odt → AbiWord，xlsx/xls/ods/csv → Gnumeric）→ xdg-open；压缩包 → 7z / unzip 解压；兜底先 nvim
 - 配色 `theme.toml` 为静态 Tokyo Night（不随 matugen）
 
 | 键位 | 功能 |
@@ -342,13 +341,17 @@ LSP → 路径 → LuaSnip（friendly-snippets）→ buffer（≥3 字符），R
 | `g r` / `g u` / `g n` / `g m` / ``` `` ``` | gvfs 插件：挂载并跳转 / 卸载 / 添加挂载 / 跳到已挂载 / 跳回挂载前目录（FTP/SMB/MTP 等，密码存 gnome-keyring；`gvfs.private` 不入库） |
 | 任务面板 `Esc` / `x` | 关闭 / 取消 |
 
-### Thunar
+### Nautilus
 
-浮动窗口；归档插件；缩略图已在偏好里关掉（`misc-thumbnail-mode=NEVER`，tumbler 装着但不出图）；自定义动作「Open Terminal Here」（`exo-open`，终端由 `xdg-terminals.list` 指向 kitty）。xfconf 的 `thunar.xml` 随窗口几何频繁改写，不入库。
+取代 Thunar 作为 `inode/directory` 默认打开程序；本是 `xdg-desktop-portal-gnome` 的隐式依赖，零额外体积。浮动窗口；归档走 File Roller（同样已在系统里，压缩格式默认关联已经指向它，无需手配）；GTK4/libadwaita 原生跟 `adw-gtk3` + Papirus + matugen 这套配色链天然一致，比 Thunar 那套 GTK3 主题更贴。偏好（列表视图、窗口尺寸）不落配置文件，走 dconf，见 `system/dconf/nautilus.ini` + `install.sh` 的 `dconf load`。
 
 ### 电子书 / PDF 阅读
 
 zathura 已卸载（不再维护配色模板），PDF 默认交给 Brave 内置查看器；epub / mobi / djvu / 漫画压缩包（cbz / cbr / cb7 / cbc）默认用 calibre-ebook-viewer 打开，微信改裸跑 wechat-bin 后顺带把 Calibre 定位成纯书库管理 + 阅读器角色。
+
+### Office 文档
+
+LibreOffice 太重换成了 AbiWord（字处理）+ Gnumeric（表格），二者都是原生 GTK3，同样吃 `adw-gtk3` 配色。`mimeapps.list` 显式关联：docx/doc/rtf/odt → AbiWord，xlsx/xls/ods/csv → Gnumeric。演示文稿（pptx/ppt/odp）没配，AbiWord/Gnumeric 系没有对应的幻灯片编辑器，唯一像样的选择是把整个 LibreOffice 装回来（只为 Impress），暂时按下不表，等真有需要再评估。
 
 ---
 

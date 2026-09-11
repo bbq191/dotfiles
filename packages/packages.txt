@@ -1,3 +1,4 @@
+abiword                 # 轻量字处理，代替 LibreOffice Writer；docx/doc/rtf/odt 关联见 mimeapps.list
 accountsservice
 alsa-firmware
 alsa-plugins
@@ -75,6 +76,7 @@ git-delta
 greetd
 git-lfs
 gnome-keyring
+gnumeric                # 轻量表格，代替 LibreOffice Calc；xlsx/xls/ods/csv 关联见 mimeapps.list
 grim
 gst-libav
 gst-plugin-pipewire
@@ -135,6 +137,7 @@ mesa-utils
 mkinitcpio
 mpv
 mtools
+nautilus                # 文件管理器，代替 Thunar；本是 xdg-desktop-portal-gnome 的隐式依赖，这里转显式声明并接管默认文件管理器
 neovim-nightly-bin
 networkmanager
 networkmanager-openvpn
@@ -191,8 +194,6 @@ tcpdump
 tealdeer                # tldr 命令；cachyos-fish-config 的隐式依赖，这里显式声明意图
 telegram-desktop
 texinfo
-thunar
-thunar-archive-plugin
 tree-sitter
 tree-sitter-cli        # nvim-treesitter main 分支编译 parser 必需（tree-sitter 只是库）
 ttf-bitstream-vera
@@ -240,8 +241,6 @@ jq                     # hotspot-internet / usb-internet 脚本解析 mihomo API
 stow
 zip
 # ── 办公 / 笔记 / 传输 ──
-libreoffice-fresh
-libreoffice-fresh-zh-cn
 obsidian               # fish obsync 函数同步 ~/Documents/ikate 笔记库
 localsend
 # ── pandoc → PDF（nvim <leader>mp，reMarkable 纸感导出）──

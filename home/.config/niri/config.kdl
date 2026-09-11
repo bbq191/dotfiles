@@ -36,8 +36,6 @@ environment {
     "__GLX_VENDOR_LIBRARY_NAME" "nvidia"
     // ── Electron（VS Code 等）──
     ELECTRON_OZONE_PLATFORM_HINT "auto"
-    // ── LibreOffice：强制 GTK3 前端，吃 adw-gtk3 + dank-colors 主题链 ──
-    SAL_USE_VCLPLUGIN "gtk3"
     // ── Qt 应用读取 qt5ct/qt6ct 的字体与主题配置（冒号分隔，各 Qt 大版本各取各的）──
     QT_QPA_PLATFORMTHEME "qt5ct:qt6ct"
 }
@@ -246,7 +244,7 @@ binds {
 // 文件对话框居中：niri 浮窗默认居中打开，无需单独规则
 
 window-rule {
-    match app-id="^(thunar|org\\.gnome\\.Nautilus|wechat|com\\.picc\\.lanxin|org\\.telegram\\.desktop|com\\.gabm\\.satty|org\\.quickshell|steam_app_default|com\\.danklinux\\.dankcalendar|net\\.lutris\\.Lutris)$"
+    match app-id="^(org\\.gnome\\.Nautilus|wechat|com\\.picc\\.lanxin|org\\.telegram\\.desktop|com\\.gabm\\.satty|org\\.quickshell|steam_app_default|com\\.danklinux\\.dankcalendar|net\\.lutris\\.Lutris)$"
     open-floating true
 }
 
