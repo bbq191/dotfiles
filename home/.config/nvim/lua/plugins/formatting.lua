@@ -24,13 +24,7 @@ return {
         sh = { "shfmt" },
         bash = { "shfmt" },
       },
-      -- markdown 不自动格式化：prettier 会改写列表符号和换行，笔记类文件只在 <leader>cf 手动触发
-      format_on_save = function(bufnr)
-        if vim.bo[bufnr].filetype == "markdown" then
-          return nil
-        end
-        return { timeout_ms = 3000, lsp_format = "fallback" }
-      end,
+      -- 不自动保存时格式化：统一走 <leader>cf 手动触发（core/keymaps.lua）
     },
   },
 }
