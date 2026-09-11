@@ -12,3 +12,9 @@ require("gvfs"):setup({
   save_password_autoconfirm = true,
   input_position = { "center", y = 0, w = 60 },
 })
+
+-- ── Git 状态列 ──────────────────────────────────────────────
+-- 文件/目录名右侧显示 git 状态符号（M/A/D/? 等），fetcher 注册在 yazi.toml
+require("git"):setup({
+  order = 1500,
+})

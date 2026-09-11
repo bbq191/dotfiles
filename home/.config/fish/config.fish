@@ -1,6 +1,13 @@
 source /usr/share/cachyos-fish-config/cachyos-config.fish
 # ↑ 已包含：eza/bat/grep 别名、fastfetch 欢迎、~/.local/bin PATH、!! !$ 历史补全
 
+# ── ls/ll/la/lt 加 --git：每个文件/目录名后多一列 git 状态（M/N/D/I 等），仅在 git 仓库内显示 ─────
+# 覆盖 cachyos-config.fish 里的同名 alias，必须放在 source 之后才生效
+alias ls='eza -al --color=always --group-directories-first --icons=always --git'
+alias la='eza -a --color=always --group-directories-first --icons=always --git'
+alias ll='eza -l --color=always --group-directories-first --icons=always --git'
+alias lt='eza -aT --color=always --group-directories-first --icons=always --git'
+
 # ── XDG 基础目录（必须显式定义，systemd/fish 不会自动 export）──────────────────
 set -gx XDG_DATA_HOME $HOME/.local/share
 set -gx XDG_CONFIG_HOME $HOME/.config

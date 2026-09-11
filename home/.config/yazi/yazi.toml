@@ -71,3 +71,13 @@ suppress_preload = false
 
 [log]
 enabled = false
+
+[[plugin.prepend_fetchers]]
+url   = "*"
+run   = "git"
+group = "git"
+
+[[plugin.prepend_fetchers]]
+url   = "*/"
+run   = "git"
+group = "git"
