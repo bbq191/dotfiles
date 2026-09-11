@@ -81,7 +81,7 @@ fcitx5 的 `XMODIFIERS` / `QT_IM_MODULE` / `SDL_IM_MODULE` 在 `environment.d/fc
 | 快捷键 | 功能 |
 |--------|------|
 | `Super + Shift + /` | 热键浮层 |
-| `Super + T` / `R` / `B` | Kitty / DMS 启动器 / 默认浏览器（`xdg-open https://`）；文件管理器（Nautilus）没有专属键位，从启动器/DMS 面板打开 |
+| `Super + T` / `E` / `R` / `B` | Kitty / Nautilus / DMS 启动器 / 默认浏览器（`xdg-open https://`） |
 | `Super + Q` | 关闭窗口 |
 | `Super + V` / `Super + Shift + V` | 切换浮动 / 在浮动与平铺层间切焦点 |
 | `Super + P` | 循环预设列宽 |

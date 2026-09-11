@@ -131,6 +131,7 @@ binds {
 
     // ── 应用启动 ──
     Mod+T { spawn "kitty"; }
+    Mod+E { spawn "nautilus"; }
     Mod+R { spawn "dms" "ipc" "call" "launcher" "toggle"; }
     Mod+B { spawn "xdg-open" "https://"; }   // 启动默认浏览器（读取 mimeapps.list，不硬编码具体浏览器）
 
