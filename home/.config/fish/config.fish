@@ -2,29 +2,36 @@ source /usr/share/cachyos-fish-config/cachyos-config.fish
 # ↑ 已包含：eza/bat/grep 别名、fastfetch 欢迎、~/.local/bin PATH、!! !$ 历史补全
 
 # ── XDG 基础目录（必须显式定义，systemd/fish 不会自动 export）──────────────────
-set -gx XDG_DATA_HOME    $HOME/.local/share
-set -gx XDG_CONFIG_HOME  $HOME/.config
-set -gx XDG_CACHE_HOME   $HOME/.cache
-set -gx XDG_STATE_HOME   $HOME/.local/state
+set -gx XDG_DATA_HOME $HOME/.local/share
+set -gx XDG_CONFIG_HOME $HOME/.config
+set -gx XDG_CACHE_HOME $HOME/.cache
+set -gx XDG_STATE_HOME $HOME/.local/state
 
 # ── XDG 路径规范 ──────────────────────────────────────────────────────────────
-set -gx CARGO_HOME       $HOME/.local/share/cargo
-set -gx RUSTUP_HOME      $HOME/.local/share/rustup
-set -gx PYENV_ROOT       $HOME/.local/share/pyenv
+set -gx CARGO_HOME $HOME/.local/share/cargo
+set -gx RUSTUP_HOME $HOME/.local/share/rustup
+set -gx PYENV_ROOT $HOME/.local/share/pyenv
 set -gx npm_config_cache $HOME/.cache/npm
-set -gx CUDA_CACHE_PATH  $HOME/.cache/nvidia
-set -gx WINEPREFIX       $HOME/.local/share/wine
-set -gx GEMINI_CLI_HOME  $XDG_CONFIG_HOME/gemini
-set -gx TEXMFHOME        $XDG_DATA_HOME/texmf
-set -gx TEXMFVAR         $XDG_CACHE_HOME/texlive/texmf-var
-set -gx TEXMFCONFIG      $XDG_CONFIG_HOME/texlive/texmf-config
-set -gx GNUPGHOME        $XDG_DATA_HOME/gnupg
-set -gx GOPATH           $XDG_DATA_HOME/go   # go 平时不装，但 paru 编译 go 写的 AUR 包会临时装并写缓存，没这行会落到 ~/go
-set -gx CLAUDE_CONFIG_DIR $XDG_CONFIG_HOME/claude   # ~/.claude 与 ~/.claude.json 整体迁入（含会话记录、memory、插件）
+set -gx CUDA_CACHE_PATH $HOME/.cache/nvidia
+set -gx WINEPREFIX $HOME/.local/share/wine
+set -gx GEMINI_CLI_HOME $XDG_CONFIG_HOME/gemini
+set -gx TEXMFHOME $XDG_DATA_HOME/texmf
+set -gx TEXMFVAR $XDG_CACHE_HOME/texlive/texmf-var
+set -gx TEXMFCONFIG $XDG_CONFIG_HOME/texlive/texmf-config
+set -gx GNUPGHOME $XDG_DATA_HOME/gnupg
+set -gx GOPATH $XDG_DATA_HOME/go # go 平时不装，但 paru 编译 go 写的 AUR 包会临时装并写缓存，没这行会落到 ~/go
+set -gx CLAUDE_CONFIG_DIR $XDG_CONFIG_HOME/claude # ~/.claude 与 ~/.claude.json 整体迁入（含会话记录、memory、插件）
 set -gx MINERU_TOOLS_CONFIG_JSON $XDG_CONFIG_HOME/mineru/mineru.json
-set -gx MODELSCOPE_CREDENTIALS_PATH $XDG_CONFIG_HOME/modelscope/credentials   # mineru-models-download 用到的 modelscope SDK
-set -gx TRITON_CACHE_DIR $XDG_CACHE_HOME/triton   # mineru 的 vllm/triton 编译内核缓存，默认 ~/.triton/cache
-set -gx WGETRC           $XDG_CONFIG_HOME/wgetrc  # 里面把 hsts 数据库指到 ~/.cache/wget-hsts
+set -gx MODELSCOPE_CREDENTIALS_PATH $XDG_CONFIG_HOME/modelscope/credentials # mineru-models-download 用到的 modelscope SDK
+set -gx TRITON_CACHE_DIR $XDG_CACHE_HOME/triton # mineru 的 vllm/triton 编译内核缓存，默认 ~/.triton/cache
+set -gx WGETRC $XDG_CONFIG_HOME/wgetrc # 里面把 hsts 数据库指到 ~/.cache/wget-hsts
+set -gx _JAVA_OPTIONS "-Djava.util.prefs.userRoot=$XDG_CONFIG_HOME/java" # 只搬得动 Preferences API 用的 .userPrefs；~/.java/fonts 字体缓存是硬编码路径，搬不走
+set -gx GOMODCACHE $XDG_CACHE_HOME/go/mod # 不设的话缺省落进 GOPATH/pkg/mod，跟着 GOPATH 分离 cache/data
+set -gx GDBHISTFILE $XDG_STATE_HOME/gdb/history # gdbinit 本身 11.1 起已自动认 XDG_CONFIG_HOME/gdb/gdbinit，只有历史记录还需要这行
+set -gx SQLITE_HISTORY $XDG_STATE_HOME/sqlite_history # sqliterc 同理 3.44 起自动认 XDG_CONFIG_HOME/sqlite3/sqliterc
+set -gx INPUTRC $XDG_CONFIG_HOME/readline/inputrc
+set -gx NPM_CONFIG_USERCONFIG $XDG_CONFIG_HOME/npm/npmrc
+set -gx NODE_REPL_HISTORY $XDG_DATA_HOME/node_repl_history
 
 # ── 环境变量 ──────────────────────────────────────────────────────────────────
 set -gx EDITOR nvim
