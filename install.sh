@@ -107,7 +107,7 @@ sudo mkdir -p /etc/modprobe.d
 sudo cp "$DOTFILES/system/etc/modprobe.d/nvidia-local.conf" \
         /etc/modprobe.d/
 sudo mkdir -p /etc/greetd
-# config.toml 本身由 `dms greeter enable`/`dms greeter sync` 生成管理（见下方手动步骤），
+# config.toml 本身由 `dms-greeter enable`/`dms-greeter sync` 生成管理（见下方手动步骤），
 # 这里只放 wrapper 每次启动都会 include、且不受 sync 覆盖的 NVIDIA 环境变量扩展点
 sudo cp "$DOTFILES/system/etc/greetd/niri_overrides.kdl" \
         /etc/greetd/
@@ -309,6 +309,6 @@ echo "  - rbw：执行 'rbw register' 登录 Bitwarden"
 echo "  - SSH：将 SSH 私钥存入 Bitwarden（SSH Key 类型），rbw 解锁后执行 rbw-ssh-load 加载"
 echo "  - 字体：Maple Mono NF CN 与 pandoc 字体不在软件源，需手动放入 ~/.local/share/fonts（见 README）"
 echo "  - 壁纸：DMS Settings → Wallpaper 中设置（或 dms ipc call wallpaper set <路径>）"
-echo "  - 登录界面：dms greeter enable && dms greeter sync"
+echo "  - 登录界面：dms-greeter enable && dms-greeter sync"
 echo "  - 人脸识别：sudo linux-enable-ir-emitter configure，然后 sudo howdy add（见 README）"
 echo "  - 热点/USB 共享：nmcli 重建 Hotspot / remarkable-usb 连接（见 README「网络共享」）"

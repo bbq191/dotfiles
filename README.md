@@ -49,7 +49,7 @@ cd ~/Projects/dotfiles
 | SSH 密钥 | 在 Bitwarden 中存入 SSH Key 类型条目；`rbw unlock` 后执行 `rbw-ssh-load` 加载到 ssh-agent。之后 `git push/pull/fetch/clone` 会按需自动解锁并加载（`fish/functions/git.fish`） |
 | 壁纸 | 将图片放入 `~/Pictures/`，DMS Settings → Wallpaper 选择（或 `dms ipc call wallpaper set <路径>`）。换壁纸会触发整条 matugen 链（见 FEATURES「动态主题」） |
 | 明暗自动切换 | DMS Settings → Theme → 自动切换选 **按时间**（深色 19:30 → 07:00），并关闭"与夜间色温共用时段"。不要选"按位置"：dms-shell ≤1.5.3 的 `suncalc.go` 以 UTC 日期零点为基准算日出，东八区/东经 103° 的日出会落到 UTC 前一天，导致每天日出到 08:00 之间被判成夜间（配色跳回深色，调度循环每秒空转，上游 issue [#3179](https://github.com/AvengeMedia/DankMaterialShell/issues/3179)）。此设置存于 `~/.local/state/DankMaterialShell/session.json`，不入库 |
-| 登录界面 | `dms greeter enable && dms greeter sync`：生成 `/etc/greetd/config.toml` 与 `/etc/greetd/niri/{config,dms}.kdl`（分辨率/缩放读自 `monitors.json`，壁纸/主题与锁屏同步）。改显示器配置后需重新 `dms greeter sync`；NVIDIA 环境变量在 `niri_overrides.kdl`，不受 sync 覆盖 |
+| 登录界面 | `dms-greeter enable && dms-greeter sync`：生成 `/etc/greetd/config.toml` 与 `/etc/greetd/niri/{config,dms}.kdl`（分辨率/缩放读自 `monitors.json`，壁纸/主题与锁屏同步）。改显示器配置后需重新 `dms-greeter sync`；NVIDIA 环境变量在 `niri_overrides.kdl`，不受 sync 覆盖 |
 | 人脸识别 | 见下方「人脸识别（howdy）」 |
 | Claude Code | 官方原生安装：`curl -fsSL https://claude.ai/install.sh \| bash`（装到 `~/.local/share/claude`，`~/.local/bin/claude` 为链接），然后 `claude` 登录；`~/.claude` 不在仓库 |
 | Gemini CLI | `gemini` 首次运行登录（`GEMINI_CLI_HOME=~/.config/gemini`，系统提示词 `GEMINI.md` 在仓库） |
@@ -230,7 +230,7 @@ nmcli con add type ethernet ifname rmk0 con-name remarkable-usb \
 | `etc/sysctl.d/99-custom.conf` | `vm.min_free_kbytes=512M`，内存压力下减少卡顿 |
 | `etc/udev/rules.d/60-ioschedulers.rules` | 覆盖 cachyos-settings：NVMe `none`、SATA SSD `mq-deadline`（本机无 HDD） |
 | `etc/udev/rules.d/70-uuu.rules` | NXP uuu 刷机工具的 USB `uaccess`（reMarkable recovery 模式）；uuu 本体未装，需要时 AUR `mfgtools-uuu` |
-| `etc/greetd/niri_overrides.kdl` | 登录界面 niri 的 NVIDIA 环境变量扩展点；`config.toml`、`niri/{config,dms}.kdl` 由 `dms greeter sync` 生成，不入库 |
+| `etc/greetd/niri_overrides.kdl` | 登录界面 niri 的 NVIDIA 环境变量扩展点；`config.toml`、`niri/{config,dms}.kdl` 由 `dms-greeter sync` 生成，不入库 |
 | `etc/keyd/default.conf` | capslock ↔ leftcontrol 互换，仅作用于 DELL 外接键盘（`[ids] 0d62:9abc`，`sudo keyd list-keyboards` 查 id） |
 | `etc/snapper/configs/root` | Btrfs 根分区快照策略：只做 pacman pre/post 编号快照（上限 50），不开 timeline |
 | `etc/NetworkManager/conf.d/wifi-backend.conf` | Wi-Fi 后端 iwd（`wpa_supplicant` 被 disable） |
@@ -316,7 +316,7 @@ dotfiles/
 | `~/.ollama/` | 设备密钥 |
 | `/etc/howdy/` | 人脸模型；`sudo howdy add` 重录 |
 | `/etc/linux-enable-ir-emitter/` | IR 补光参数（机器专属）；`sudo linux-enable-ir-emitter configure` |
-| `/etc/greetd/config.toml`、`/etc/greetd/niri/` | `dms greeter enable && dms greeter sync` 生成 |
+| `/etc/greetd/config.toml`、`/etc/greetd/niri/` | `dms-greeter enable && dms-greeter sync` 生成 |
 | `~/.local/share/fonts/` | Maple Mono、pandoc 字体，手动放置 |
 | DMS 第三方插件（calculator、emojiLauncher、niriWindows） | `install.sh` 用 `dms plugins install` 拉取（内含 git 仓库）；`plugin_settings.json` 记录了启用状态 |
 | `~/.config/DankMaterialShell/settings.json` | DMS 运行时设置，随操作频繁变化（主题、字体、通知等在 FEATURES 有记录） |
