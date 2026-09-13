@@ -55,6 +55,9 @@ input {
         tap
         natural-scroll
         accel-profile "flat"
+        accel-speed 0.0
+        // 打字时临时屏蔽触摸板，防误触（DMS Settings → Mouse & Touchpad 同步过来的，见 dms/input.kdl）
+        dwt
         // 外接鼠标插入时自动禁用触摸板（替代 touchpad-auto.sh + udev 监听）
         disabled-on-external-mouse
     }
@@ -62,6 +65,7 @@ input {
     mouse {
         natural-scroll
         accel-profile "flat"
+        accel-speed 0.0
     }
 
     // 点击才聚焦（niri 默认不启用 focus-follows-mouse）
@@ -287,3 +291,5 @@ include "dms/windowrules.kdl"
 include "dms/cursor.kdl"
 include "dms/outputs.kdl"
 include "dms/wpblur.kdl"
+// dms/input.kdl 不 include：内容（accel-speed/dwt）已手动合并进上面的 input {} 块，
+// 跟自定义的 disabled-on-external-mouse/xkb layout 放一起维护，避免两个 input {} 打架

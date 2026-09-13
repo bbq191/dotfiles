@@ -55,7 +55,7 @@
 - **滚动平铺**（列式无限横向画布）。边框 / 焦点环宽 4、圆角 5、窗口间距由 DMS 托管（`dms/layout.kdl`，DMS Settings → Compositor & Layout 调整）；屏幕边缘留白 `struts 6`（`config.kdl`）
 - 预设列宽 1/3 → 1/2 → 2/3，默认 1/2；背景透明（DMS 壁纸绘制在 backdrop 层）
 - 壁纸 / 锁屏 / 空闲管理 / polkit / 通知 / Alt+Tab 样式全部由 DMS 接管（`dms.service` 随 graphical-session 自启）
-- 触摸板：tap、自然滚动、flat 加速，外接鼠标插入自动禁用（niri 内置 `disabled-on-external-mouse`）；鼠标自然滚动 + flat
+- 触摸板：tap、自然滚动、flat 加速、打字时屏蔽（dwt），外接鼠标插入自动禁用（niri 内置 `disabled-on-external-mouse`）；鼠标自然滚动 + flat。这两块原样手写在 `config.kdl`，DMS Settings → Mouse & Touchpad 生成的 `dms/input.kdl` 只作存档、不 include（避免两个 `input {}` 打架），改了 UI 设置记得手动同步过来
 - VRR `on-demand`：仅 mpv / Steam 游戏窗口显示时启用，避免桌面场景 NVIDIA VRR 光标卡顿
 - XWayland 由 xwayland-satellite 透明支持
 - 独立便签工作区 `scratch`，`workspace-auto-back-and-forth` 使 `Mod+S` 再按返回
