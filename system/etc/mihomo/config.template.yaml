@@ -212,6 +212,7 @@ rules:
   - RULE-SET,hotspot_direct,DIRECT
   - RULE-SET,usb_direct,DIRECT
   # 工作内网 IP
+  - IP-CIDR,192.236.234.220/32,DIRECT
   #- IP-CIDR,30.0.0.0/8,DIRECT
   #- IP-CIDR,40.0.0.0/8,DIRECT
 
