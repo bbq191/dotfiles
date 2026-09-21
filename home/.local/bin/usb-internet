@@ -3,7 +3,7 @@
 # on  = 设备走 mihomo 完整分流，可翻墙；
 # off = 设备强制 DIRECT（经有线直连出去），国内可用、被墙的不通——不断网。
 #
-# 网络接入本身与本开关无关：remarkable-usb-share.timer 常开，设备一插上就被
+# 网络接入本身与本开关无关：remarkable-usb-share.service（事件驱动常驻）常开，设备一插上就被
 # 推送「网关/DNS 指向本机」的配置（enabled 用户单元，开机自动拉起）。
 # 本脚本只改写 mihomo 的 flag 文件（payload 含 SRC-IP-CIDR = off）并调 API
 # 刷新 provider + 断存量连接。无需 root、无需 SSH 上设备；状态重启后保持。

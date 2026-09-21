@@ -1,6 +1,12 @@
 [Unit]
-Description=Provision USB-connected reMarkable device to route via mihomo
+Description=Provision USB-connected reMarkable device to route via mihomo (event-driven)
 
 [Service]
-Type=oneshot
-ExecStart=%h/.local/bin/remarkable-usb-share
+# 常驻，阻塞在 `ip monitor` 上等 rmk0 事件（设备重启/重插拔）再推送配置；取代原 remarkable-usb-share.timer 的 45s 轮询。
+Type=simple
+ExecStart=%h/.local/bin/remarkable-usb-watch
+Restart=on-failure
+RestartSec=15
+
+[Install]
+WantedBy=default.target

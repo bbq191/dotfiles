@@ -1,10 +1,12 @@
 #!/bin/bash
 # 自动为 USB 直连的 reMarkable 类设备(10.11.99.1)配置经本机 mihomo 上网。
 # 设备 /etc 是易失 overlay + A/B 根分区,重启后配置会丢,由本脚本在 USB 在线时自动重推。
-# 由 remarkable-usb-share.timer 周期调用;设备不在线或已配置时为空转。
+# 由 remarkable-usb-watch（事件驱动：rmk0 链路/地址事件时调用，见该脚本头注）调用，也可手动跑。
+# 退出码：0=已配置或本次推送成功；1=设备不可达（ping 不通）；255=ssh 连不上（设备刚重启 sshd 还没起）——
+# 调用方据此决定是否重试。已配置时幂等空转，不产生任何设备侧变化。
 DEV=10.11.99.1
 
-ping -c1 -W1 "$DEV" >/dev/null 2>&1 || exit 0
+ping -c1 -W1 "$DEV" >/dev/null 2>&1 || exit 1
 
 ssh -o BatchMode=yes -o ConnectTimeout=3 -o StrictHostKeyChecking=accept-new "root@$DEV" '
 # 已配置(含 v3 标记)则直接退出(幂等)

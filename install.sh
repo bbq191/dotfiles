@@ -193,8 +193,10 @@ systemctl --user enable --now cliphist.service dcal.service dsearch.service 2>/d
 systemctl --user enable --now x11-clipboard-bridge.service
 # 用户级 tmpfiles：user-tmpfiles.d/cleanup.conf 靠它执行（preset 写着 enable，但本机实测默认是 disabled）
 systemctl --user enable --now systemd-tmpfiles-setup.service systemd-tmpfiles-clean.timer
-# USB 直连 reMarkable 时周期推送「网关/DNS 指向本机」配置（设备端不持久，靠定时器自愈）
-systemctl --user enable --now remarkable-usb-share.timer
+# USB 直连 reMarkable 时推送「网关/DNS 指向本机」配置（设备端 /etc 不持久）。事件驱动：常驻服务阻塞在
+# `ip monitor` 上，设备重启/重插拔（rmk0 链路/地址事件）才推送，不再每 45s 轮询。旧版是 .timer，顺手停掉。
+systemctl --user disable --now remarkable-usb-share.timer 2>/dev/null || true
+systemctl --user enable --now remarkable-usb-share.service
 
 # ── 7. 目录初始化 ─────────────────────────────────────────────────────────────
 mkdir -p "$HOME/.local/share/wine"

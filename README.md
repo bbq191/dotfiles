@@ -28,7 +28,7 @@ cd ~/Projects/dotfiles
 3. fnm 安装 Node LTS（已有默认版本则跳过），全局 npm 安装 `@google/gemini-cli` 与 `@mermaid-js/mermaid-cli`（pandoc 渲染 mermaid 用；命令已存在则跳过）
 4. stow 将 `home/` 链接到 `$HOME`（随后 `rime-dict-sync` 拉取 Iorest 增强词库、转简体、编译）：目标位置已有的实体文件按仓库清单逐个备份为 `*.bak-<时间戳>`（已经通过上级目录链接指向仓库的文件会跳过），旧的绝对路径链接原地重建为相对链接；随后 `dconf load` 同步 GTK 字体/主题（AbiWord/Gnumeric 等纯 GTK3 程序不读 `settings.ini`）、Nautilus 偏好
 5. 复制 `system/etc`、`system/usr/local/bin` 到系统：resolved / ollama drop-in / NVIDIA modprobe / greetd NVIDIA 覆盖 / tmpfiles（THP、howdy 权限）/ PAM（dankshell、sudo、greetd、polkit-1）/ howdy-libguard 与 pacman 钩子 / sudoers（papirus-folders）/ NetworkManager（iwd 后端、iptables 防火墙后端）/ `.link` 网卡命名（wlan0、rmk0）/ BE200 冷开机固件崩溃自愈（wifi-fw-reset + iwl-fwdump）/ sysctl（ip_forward、min_free_kbytes）/ udev（IO 调度器、uuu）/ keyd / snapper；并 mask `NetworkManager-wait-online`
-6. 启用 systemd 服务：系统级 iwd、wifi-fw-reset、keyd、linux-enable-ir-emitter（ollama 只装 override，不自启）；`dms plugins install` 拉取三个第三方启动器插件（calculator / emojiLauncher / niriWindows）；用户级 ssh-agent.socket、dms、cliphist、dcal、dsearch、remarkable-usb-share.timer、systemd-tmpfiles-setup（否则 `user-tmpfiles.d/cleanup.conf` 不生效，本机实测默认 disabled）
+6. 启用 systemd 服务：系统级 iwd、wifi-fw-reset、keyd、linux-enable-ir-emitter（ollama 只装 override，不自启）；`dms plugins install` 拉取三个第三方启动器插件（calculator / emojiLauncher / niriWindows）；用户级 ssh-agent.socket、dms、cliphist、dcal、dsearch、remarkable-usb-share.service（事件驱动常驻）、systemd-tmpfiles-setup（否则 `user-tmpfiles.d/cleanup.conf` 不生效，本机实测默认 disabled）
 7. 初始化目录（wine prefix、ollama 模型、ssh ControlPath）
 8. GnuPG 迁移到 XDG 路径（`~/.local/share/gnupg`），生成 gpg-agent socket 单元 drop-in
 9. Maven 本地仓库迁移到 `~/.cache/maven/repository`
@@ -193,7 +193,7 @@ nmcli con add type ethernet ifname rmk0 con-name remarkable-usb \
   ipv4.method manual ipv4.addresses 10.11.99.2/24 ipv4.never-default yes ipv6.method disabled
 ```
 
-- 设备端 `/etc` 是易失 overlay，重启就丢配置：`remarkable-usb-share.timer`（30s 后起，每 45s）调用 `~/.local/bin/remarkable-usb-share`，设备在线时 SSH 推送「网关/DNS 指向 10.11.99.2:1053」的 `systemd-networkd` drop-in（幂等，已配置即空转）。设备端需已放好本机公钥（`ssh root@10.11.99.1` 免密）
+- 设备端 `/etc` 是易失 overlay，重启就丢配置：事件驱动的常驻服务 `remarkable-usb-share.service`（`~/.local/bin/remarkable-usb-watch` 阻塞在 `ip monitor` 上，rmk0 出现/重建即触发；启动时设备已在线推一次，30 分钟无事件兜底核对一次，设备刚重启 sshd 未起则每 5s 重试至多 3 分钟）调用 `~/.local/bin/remarkable-usb-share`，SSH 推送「网关/DNS 指向 10.11.99.2:1053」的 `systemd-networkd` drop-in（幂等，已配置即空转）。设备端需已放好本机公钥（`ssh root@10.11.99.1` 免密）
 - mihomo `dns.listen 0.0.0.0:1053`、`allow-lan`、`bind-address "*"` 使设备可把本机当 DNS/网关；设备常在的 Wi-Fi 对明文 53 有过滤，脚本还写了公共 DoT 兜底（仅 USB 不在时用到）
 - `99-firewall.conf` 把 NM 防火墙后端定为 iptables，与 ufw 同一套链，共享连接的 NAT 才能正常出网
 
@@ -277,7 +277,7 @@ dotfiles/
 │   │   ├── niri/                # 合成器主配置 + DMS 托管的 dms/*.kdl（勿手改）
 │   │   ├── DankMaterialShell/   # monitors.json、插件启用记录、自研插件（hotspotInternet / usbInternet）
 │   │   ├── matugen/             # config.toml + 用户模板（papirus-folders），由 DMS 直接执行
-│   │   ├── systemd/user/        # remarkable-usb-share.{service,timer}、x11-clipboard-bridge.service、gpg/ssh-agent drop-in
+│   │   ├── systemd/user/        # remarkable-usb-share.service、x11-clipboard-bridge.service、gpg/ssh-agent drop-in
 │   │   ├── fish/                # config.fish、conf.d（sdkman、rustup）、functions（git 拦截、obsync）
 │   │   ├── kitty/               # kitty.conf + matugen 生成的 dank-theme/dank-tabs
 │   │   ├── nvim/                # Lazy.nvim；colors/dms.lua 为 matugen 生成的 base46 主题
@@ -290,7 +290,7 @@ dotfiles/
 │   │   ├── environment.d/       # fcitx5 / gnupg / maven 环境变量
 │   │   ├── git/  maven/  gemini/  danksearch/  dankcal/
 │   │   └── mimeapps.list  user-dirs.dirs  user-dirs.locale  xdg-terminals.list  user-tmpfiles.d/
-│   ├── .local/bin/              # hotspot-internet、usb-internet、remarkable-usb-share、x11-clipboard-bridge、rime-dict-sync、rbw-ssh-load、git-credential-rbw、wine-setup-fonts
+│   ├── .local/bin/              # hotspot-internet、usb-internet、remarkable-usb-share、remarkable-usb-watch、x11-clipboard-bridge、rime-dict-sync、rbw-ssh-load、git-credential-rbw、wine-setup-fonts
 │   ├── .local/share/            # applications/*.desktop（蓝信、nvim 在 kitty 中打开）、fcitx5/rime/（*.custom.yaml、rime_ice_ext.dict.yaml）、rustup/settings.toml
 │   └── .ssh/config
 ├── system/

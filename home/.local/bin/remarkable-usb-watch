@@ -1,0 +1,56 @@
+#!/bin/bash
+# 事件驱动地把 reMarkable(10.11.99.1) 的网关/DNS 配置推到设备上（取代原 remarkable-usb-share.timer 每 45s 轮询）。
+#
+# 为什么不轮询：设备 /etc 是易失 overlay，只有「设备重启 / 重新插拔」才会丢配置；而这两件事都会让 USB CDC
+# 网卡在本机重新枚举（内核日志里 usb 3-1 重新出现、rmk0 重建、NM 重新给 10.11.99.2/24），产生 netlink 事件。
+# 所以只需阻塞在 `ip monitor` 上，事件来了再推一次，空闲时本机与设备都零唤醒（旧方案设备每 45s 起一个 dropbear）。
+#
+# 行为：
+#   · 启动时：rmk0 已有 10.11.99.x 地址（设备已在线）才推一次，不在线不做无谓重试。
+#   · rmk0 的链路/地址事件：去抖 2s 后推送；设备刚重启 sshd 还没起，remarkable-usb-share 会失败，
+#     这里最多每 5s 重试 36 次（3 分钟）。3 分钟仍不通就放弃，等下一次事件。
+#   · 兜底：30 分钟没有任何事件，单次核对一遍（万一漏了事件）；设备不在线是常态，不重试。
+# 幂等：remarkable-usb-share 已配置即直接退出 0，不产生任何设备侧变化，所以不会因自己引起事件循环。
+#
+# 环境变量（测试用，缺省即生产值）：RM_USB_SHARE（推送脚本）、RM_USB_IFACE、RM_USB_EVENTS_CMD、
+# RM_USB_FALLBACK_SECS、RM_USB_TRIES、RM_USB_STEP_SECS。
+SHARE="${RM_USB_SHARE:-$HOME/.local/bin/remarkable-usb-share}"
+IFACE="${RM_USB_IFACE:-rmk0}"
+EVENTS_CMD="${RM_USB_EVENTS_CMD:-ip -o monitor link address}"
+FALLBACK="${RM_USB_FALLBACK_SECS:-1800}"
+TRIES="${RM_USB_TRIES:-36}"
+STEP="${RM_USB_STEP_SECS:-5}"
+
+provision() {
+  local i
+  for ((i = 1; i <= TRIES; i++)); do
+    if "$SHARE"; then
+      echo "device configured (try $i)"
+      return 0
+    fi
+    sleep "$STEP"
+  done
+  echo "device not reachable after $TRIES tries; waiting for the next event" >&2
+  return 1
+}
+
+# 只关心 rmk0 的行；--line-buffered 保证事件即时到达。
+events() { $EVENTS_CMD | grep --line-buffered -F "$IFACE"; }
+
+if ip -br addr show "$IFACE" 2>/dev/null | grep -q '10\.11\.99\.'; then
+  provision || true
+fi
+
+while true; do
+  read -r -t "$FALLBACK" _line
+  rc=$?
+  if [ "$rc" -eq 0 ]; then
+    while read -r -t 2 _; do :; done # 去抖：链路 up / 地址 add 通常连着来
+    provision || true
+  elif [ "$rc" -gt 128 ]; then
+    "$SHARE" || true
+  else
+    echo "event source ended" >&2
+    exit 1
+  fi
+done < <(events)
