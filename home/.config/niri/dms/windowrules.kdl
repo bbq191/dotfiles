@@ -1,8 +1,33 @@
 // DMS Window Rules - Managed by DankMaterialShell
 // Do not edit manually - changes may be overwritten
 
-// @id=dms-floating-windows @name=DMS Floating Windows
+// @id=wr_1789442271494019434 @name=brave-nngceckbapebfimnlniiiahkandclblb-Default
+window-rule {
+    match app-id="^brave-nngceckbapebfimnlniiiahkandclblb-Default$"
+    open-floating true
+}
+
+// @id=wr_1789442928399681616 @name=org.gnome.Nautilus
+window-rule {
+    match app-id="^org.gnome.Nautilus$"
+    default-column-width { fixed 800; }
+    default-window-height { fixed 800; }
+}
+
+// @id=wr_1789630104045728445 @name=com.danklinux.dms
 window-rule {
     match app-id="^com.danklinux.dms$"
+    open-floating true
+}
+
+// @id=wr_1789630116448924617 @name=localsend
+window-rule {
+    match app-id="^localsend$"
+    open-floating true
+}
+
+// @id=wr_1790030831851924867 @name=reManager
+window-rule {
+    match app-id="^reManager$"
     open-floating true
 }

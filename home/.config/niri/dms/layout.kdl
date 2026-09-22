@@ -4,17 +4,19 @@
 // ! PLACE YOUR CUSTOM CONFIGURATION ELSEWHERE !
 
 layout {
+    gaps 4
+
     border {
-        width 4
+        width 2
     }
 
     focus-ring {
-        width 4
+        width 2
     }
 }
 
 window-rule {
-    geometry-corner-radius 5
+    geometry-corner-radius 10
     clip-to-geometry true
     tiled-state true
     draw-border-with-background false
@@ -22,6 +24,7 @@ window-rule {
 
 layer-rule {
     exclude namespace="^dms:bar$"
+    exclude namespace="^dms:dankisland$"
     background-effect {
         xray false
     }
