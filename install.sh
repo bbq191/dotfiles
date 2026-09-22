@@ -97,76 +97,59 @@ dconf load /org/gnome/nautilus/ < "$DOTFILES/system/dconf/nautilus.ini"
 
 # ── 5. 应用系统配置（需要 sudo）────────────────────────────────────────────────
 echo "[+] 应用系统配置..."
-sudo mkdir -p /etc/systemd/resolved.conf.d
-sudo cp "$DOTFILES/system/etc/systemd/resolved.conf.d/no-mdns.conf" \
-        /etc/systemd/resolved.conf.d/
-sudo mkdir -p /etc/systemd/system/ollama.service.d
-sudo cp "$DOTFILES/system/etc/systemd/system/ollama.service.d/override.conf" \
-        /etc/systemd/system/ollama.service.d/
-sudo mkdir -p /etc/modprobe.d
-sudo cp "$DOTFILES/system/etc/modprobe.d/nvidia-local.conf" \
-        /etc/modprobe.d/
-sudo mkdir -p /etc/greetd
+# 部署单个文件到系统路径：install -D 自动建父目录，免去每处重复 mkdir -p；
+# 内容未变时跳过写入并返回非 0，供下面「只有真的变了才重启/reload」的判断用
+deploy() {
+    local src="$DOTFILES/$1" dest="$2" mode="${3:-644}"
+    sudo cmp -s "$src" "$dest" 2>/dev/null && return 1
+    sudo install -Dm"$mode" "$src" "$dest"
+}
+
+deploy system/etc/systemd/resolved.conf.d/no-mdns.conf /etc/systemd/resolved.conf.d/no-mdns.conf
+deploy system/etc/systemd/system/ollama.service.d/override.conf /etc/systemd/system/ollama.service.d/override.conf
+deploy system/etc/modprobe.d/nvidia-local.conf /etc/modprobe.d/nvidia-local.conf
 # config.toml 本身由 `dms-greeter enable`/`dms-greeter sync` 生成管理（见下方手动步骤），
 # 这里只放 wrapper 每次启动都会 include、且不受 sync 覆盖的 NVIDIA 环境变量扩展点
-sudo cp "$DOTFILES/system/etc/greetd/niri_overrides.kdl" \
-        /etc/greetd/
-sudo mkdir -p /etc/tmpfiles.d
-sudo cp "$DOTFILES/system/etc/tmpfiles.d/thp.conf" \
-        /etc/tmpfiles.d/
-sudo cp "$DOTFILES/system/etc/tmpfiles.d/howdy-permissions.conf" \
-        /etc/tmpfiles.d/
+deploy system/etc/greetd/niri_overrides.kdl /etc/greetd/niri_overrides.kdl
+deploy system/etc/tmpfiles.d/thp.conf /etc/tmpfiles.d/thp.conf
+deploy system/etc/tmpfiles.d/howdy-permissions.conf /etc/tmpfiles.d/howdy-permissions.conf
 sudo systemd-tmpfiles --create /etc/tmpfiles.d/howdy-permissions.conf
 # PAM：howdy 人脸识别接入 DMS 锁屏/sudo/greetd 登录。
-# sudo 归 pambase 包管理，覆盖后上游更新会生成 .pacnew，需留意合并
-sudo cp "$DOTFILES/system/etc/pam.d/dankshell" /etc/pam.d/
-sudo cp "$DOTFILES/system/etc/pam.d/sudo" /etc/pam.d/
-# greetd 归 greetd 包管理，覆盖后上游更新会生成 .pacnew，需留意合并
-sudo cp "$DOTFILES/system/etc/pam.d/greetd" /etc/pam.d/
+# sudo/greetd 分别归 pambase/greetd 包管理，覆盖后上游更新会生成 .pacnew，需留意合并
+deploy system/etc/pam.d/dankshell /etc/pam.d/dankshell
+deploy system/etc/pam.d/sudo /etc/pam.d/sudo
+deploy system/etc/pam.d/greetd /etc/pam.d/greetd
 # polkit 图形提权走 howdy（Arch 默认 PAM 在 /usr/lib/pam.d，这里是 /etc 覆盖）
-sudo cp "$DOTFILES/system/etc/pam.d/polkit-1" /etc/pam.d/
+deploy system/etc/pam.d/polkit-1 /etc/pam.d/polkit-1
 # howdy 守护：pacman 事务后若 howdy-compare 缺共享库，自动禁用 howdy，
 # 防止 pam_howdy 崩溃污染 sudo/polkit 密码回退把人锁在门外（库补回后自动恢复）
-sudo install -Dm755 "$DOTFILES/system/usr/local/bin/howdy-libguard" \
-        /usr/local/bin/howdy-libguard
-sudo install -Dm644 "$DOTFILES/system/etc/pacman.d/hooks/50-howdy-libguard.hook" \
-        /etc/pacman.d/hooks/50-howdy-libguard.hook
-sudo mkdir -p /etc/sudoers.d
-sudo cp "$DOTFILES/system/etc/sudoers.d/papirus-folders" \
-        /etc/sudoers.d/
-sudo chmod 0440 /etc/sudoers.d/papirus-folders
-sudo mkdir -p /etc/NetworkManager/conf.d
+deploy system/usr/local/bin/howdy-libguard /usr/local/bin/howdy-libguard 755
+deploy system/etc/pacman.d/hooks/50-howdy-libguard.hook /etc/pacman.d/hooks/50-howdy-libguard.hook
+deploy system/etc/sudoers.d/papirus-folders /etc/sudoers.d/papirus-folders 440
+
 NM_CHANGED=0
 for f in wifi-backend.conf 99-firewall.conf; do
-    cmp -s "$DOTFILES/system/etc/NetworkManager/conf.d/$f" "/etc/NetworkManager/conf.d/$f" || NM_CHANGED=1
+    deploy "system/etc/NetworkManager/conf.d/$f" "/etc/NetworkManager/conf.d/$f" && NM_CHANGED=1
 done
-sudo cp "$DOTFILES/system/etc/NetworkManager/conf.d/wifi-backend.conf" \
-        "$DOTFILES/system/etc/NetworkManager/conf.d/99-firewall.conf" \
-        /etc/NetworkManager/conf.d/
 # 固定 Wi-Fi 网卡名为 wlan0（iwlwifi 固件崩溃恢复后接口名会漂移成 wlan1）
-sudo mkdir -p /etc/systemd/network
-sudo cp "$DOTFILES/system/etc/systemd/network/10-wlan0.link" \
-        /etc/systemd/network/
+deploy system/etc/systemd/network/10-wlan0.link /etc/systemd/network/10-wlan0.link
 # 固定 reMarkable USB 网卡名为 rmk0（NM profile remarkable-usb 按此名绑定）；MAC 随设备而变，见文件注释
-sudo cp "$DOTFILES/system/etc/systemd/network/11-rmk0.link" \
-        /etc/systemd/network/
+deploy system/etc/systemd/network/11-rmk0.link /etc/systemd/network/11-rmk0.link
 # BE200 冷开机固件崩溃（CTDP_CONFIG_CMD 断言）自愈：开机延迟自检 + 就地复位；devcoredump 落盘供提 bug
-sudo install -Dm755 "$DOTFILES/system/usr/local/bin/wifi-fw-reset" /usr/local/bin/wifi-fw-reset
-sudo install -Dm755 "$DOTFILES/system/usr/local/bin/iwl-fwdump" /usr/local/bin/iwl-fwdump
-sudo install -Dm644 "$DOTFILES/system/etc/systemd/system/wifi-fw-reset.service" \
-        /etc/systemd/system/wifi-fw-reset.service
+deploy system/usr/local/bin/wifi-fw-reset /usr/local/bin/wifi-fw-reset 755
+deploy system/usr/local/bin/iwl-fwdump /usr/local/bin/iwl-fwdump 755
+deploy system/etc/systemd/system/wifi-fw-reset.service /etc/systemd/system/wifi-fw-reset.service
 # sysctl：ip_forward（热点/USB 共享）、min_free_kbytes；udev：IO 调度器覆盖、uuu 刷机 USB 权限
-sudo mkdir -p /etc/sysctl.d /etc/udev/rules.d
-sudo cp "$DOTFILES/system/etc/sysctl.d/"*.conf /etc/sysctl.d/
+for f in "$DOTFILES"/system/etc/sysctl.d/*.conf; do
+    deploy "system/etc/sysctl.d/$(basename "$f")" "/etc/sysctl.d/$(basename "$f")"
+done
 sudo sysctl -q --system
-sudo cp "$DOTFILES/system/etc/udev/rules.d/"*.rules /etc/udev/rules.d/
+for f in "$DOTFILES"/system/etc/udev/rules.d/*.rules; do
+    deploy "system/etc/udev/rules.d/$(basename "$f")" "/etc/udev/rules.d/$(basename "$f")"
+done
 sudo udevadm control --reload
-sudo mkdir -p /etc/keyd
-sudo cp "$DOTFILES/system/etc/keyd/default.conf" \
-        /etc/keyd/
-sudo mkdir -p /etc/snapper/configs
-sudo cp "$DOTFILES/system/etc/snapper/configs/root" \
-        /etc/snapper/configs/
+deploy system/etc/keyd/default.conf /etc/keyd/default.conf
+deploy system/etc/snapper/configs/root /etc/snapper/configs/root
 sudo systemctl mask NetworkManager-wait-online.service
 
 # ── 6. systemd 服务 ───────────────────────────────────────────────────────────

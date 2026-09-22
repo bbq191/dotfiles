@@ -5,7 +5,7 @@ CachyOS · niri · DankMaterialShell · Wayland · NVIDIA 个人配置。
 - `home/`：用 stow 链接到 `$HOME` 的用户配置与脚本
 - `system/`：需要 sudo 复制到 `/etc`、`/usr/local/bin` 的系统配置（含 mihomo 配置模板）
 - `packages/packages.txt`：软件包清单（官方源 + AUR，paru 统一安装；支持 `pkg  # 说明` 行内注释）
-- `install.sh`：一键部署脚本；`FEATURES.md`：各组件功能与键位说明
+- `install.sh` / `uninstall.sh`：一键部署 / 卸载脚本；`FEATURES.md`：各组件功能与键位说明
 
 ## 新机器部署
 
@@ -34,6 +34,21 @@ cd ~/Projects/dotfiles
 9. Maven 本地仓库迁移到 `~/.cache/maven/repository`
 10. SDKMAN 官方脚本安装到 `~/.local/share/sdkman`，fish 插件文件缺失时 `fisher update` 落地
 11. mihomo：从 rbw 取完整订阅链接与面板密码渲染模板，与 `/etc/mihomo/config.yaml` 不同时才写入（`640 root:用户`）并重启服务，相同则只确保服务已启用；建 `/etc/mihomo/flags/`（归当前用户，供外网开关脚本写入）。rbw 未解锁或缺条目则跳过并提示
+
+### 卸载
+
+```bash
+./uninstall.sh
+```
+
+按 install.sh 的逆序撤销：停用本仓库添加的 systemd 服务 → 删除 `system/` 对应复制到 `/etc` 的纯附加配置 → `stow -D` 取消 `home/` 的符号链接。执行前会列出将要做/不做的事并要求确认。
+
+![install.sh 与 uninstall.sh 的对称关系](docs/diagrams/install-uninstall.svg)
+
+三类改动**不会**自动撤销，脚本结束时会打印对应的手动步骤：
+- **PAM 文件**（`sudo`、`greetd`）：由 pambase / greetd 包管理，覆盖后直接删除不对，需要 `pacman -S <包名> --overwrite <路径>` 找回包自带版本
+- **已安装的软件包**：`packages/packages.txt` 里多是通用工具，批量卸载影响面不可控，需要自行判断
+- **GnuPG / Maven / SDKMAN 的 XDG 数据迁移**：这些是数据搬家，不是配置覆盖，自动回滚有误删密钥/缓存的风险
 
 ---
 
@@ -159,6 +174,8 @@ sudo systemctl daemon-reload && sudo systemctl restart linux-enable-ir-emitter.s
 - `config.yaml` 权限 `640 root:afu`：文件含订阅 token 与 API secret，只让 root 与本用户可读；`hotspot-internet`/`usb-internet` 以本用户读取 `secret:` 行调用 API
 
 ### 热点 / USB 直连设备的外网开关
+
+![热点/USB 外网开关与 mihomo 分流逻辑](docs/diagrams/network-sharing.svg)
 
 两条 `RULE-SET,…_direct,DIRECT` 置顶于 rules，各读一个本地 file rule-provider：
 
@@ -298,7 +315,9 @@ dotfiles/
 │   ├── etc/                     # 见「系统配置说明」
 │   └── usr/local/bin/howdy-libguard
 ├── packages/packages.txt
+├── docs/diagrams/               # README 中引用的 SVG 图示
 ├── install.sh
+├── uninstall.sh
 ├── README.md
 └── FEATURES.md
 ```
@@ -330,6 +349,6 @@ dotfiles/
 - `niri/dms/*.kdl` 由 DMS Settings 写入，改布局请在 DMS 设置里改；`config.kdl` 只放 DMS 不管的项
 - 升级出现 `.pacnew`（`pam.d/sudo`、`pam.d/greetd`、`howdy/config.ini` 尤其要看）用 `pacdiff` 合并，不要整文件覆盖
 - 修改 mihomo 规则时改 `system/etc/mihomo/config.template.yaml`，别只改 `/etc/mihomo/config.yaml`
-- 重跑 `install.sh` 是安全的：包只装缺失的，NetworkManager / mihomo / gpg-agent 只在对应配置真的变化时才重启；Node / npm 全局包 / fisher 插件也只在缺失时安装，不做升级。系统升级仍走 `paru -Syu`
+- 重跑 `install.sh` 是安全的：包只装缺失的，系统配置文件用 `deploy()` 按内容比对，未变化则跳过写入；NetworkManager / mihomo / gpg-agent 只在对应配置真的变化时才重启；Node / npm 全局包 / fisher 插件也只在缺失时安装，不做升级。系统升级仍走 `paru -Syu`
 - 输入法词库：增删 Iorest 分库改 `home/.local/share/fcitx5/rime/rime_ice_ext.dict.yaml` 的 `import_tables`，然后 `rime-dict-sync`（也用它拉取词库更新）；`~/.local/share/fcitx5/rime/iorest/` 是生成物，不提交
 - nvim 插件切主分支或迁仓库时配置**不会报错只会静默失效**（treesitter、conform 都发生过），`Lazy update` 后看一眼 breaking changes，或在插件源码里 grep `deprecated`
