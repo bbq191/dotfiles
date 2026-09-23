@@ -1,0 +1,17 @@
+#!/bin/sh
+# smartd_warning.sh 插件：把 SMART 告警转成桌面通知，不走邮件（本机没有 MTA）。
+# 由 smartd.conf 里 `-m '@notify-desktop' -M exec .../smartd_warning.sh` 触发；
+# @notify-desktop 会在发邮件前被摘掉，剩余地址列表为空，wrapper 就不会再尝试发信
+# （见 smartd_warning.sh 里 `test -n "$SMARTD_ADDRESS" || exit 0`）。
+#
+# smartd 以 root 运行，插件继承 root 身份，要接到 afu 的会话总线才能弹通知：
+# root 用 sudo -u 切到 afu 不需要密码（PAM pam_rootok，root 本身就有权限）。
+# DMS/Quickshell 在会话总线上注册了 org.freedesktop.Notifications，notify-send
+# 打过去即可，跟桌面环境自带的通知系统集成，不用额外装通知程序。
+TARGET_USER=afu
+RUNTIME_DIR="/run/user/$(id -u "$TARGET_USER")"
+
+exec sudo -u "$TARGET_USER" \
+    DBUS_SESSION_BUS_ADDRESS="unix:path=$RUNTIME_DIR/bus" \
+    notify-send --urgency=critical --app-name=smartd \
+    "${SMARTD_SUBJECT:-SMART 告警}" "${SMARTD_MESSAGE:-（无详细信息）}"

@@ -67,6 +67,7 @@ done
 drop /etc/keyd/default.conf
 drop /etc/snapper/configs/root
 drop /etc/smartd.conf
+drop /usr/share/smartmontools/smartd_warning.d/notify-desktop
 drop /etc/mihomo/config.yaml
 sudo rm -rf /etc/mihomo/flags
 

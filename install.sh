@@ -165,6 +165,10 @@ deploy system/etc/snapper/configs/root /etc/snapper/configs/root
 # 磁盘健康监控：smartmontools 已在软件包清单里，之前只装了没启用，等于零监控
 deploy system/etc/smartd.conf /etc/smartd.conf
 SMARTD_CHANGED=$DEPLOY_CHANGED
+# SMART 告警桌面通知插件（sudo -u afu 打到 DMS 会话总线，见文件内注释）
+deploy system/usr/share/smartmontools/smartd_warning.d/notify-desktop \
+    /usr/share/smartmontools/smartd_warning.d/notify-desktop 755
+(( DEPLOY_CHANGED )) && SMARTD_CHANGED=1
 sudo systemctl mask NetworkManager-wait-online.service
 
 # ── 6. systemd 服务 ───────────────────────────────────────────────────────────

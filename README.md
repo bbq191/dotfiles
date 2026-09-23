@@ -258,7 +258,8 @@ nmcli con add type ethernet ifname rmk0 con-name remarkable-usb \
 | `etc/tmpfiles.d/thp.conf` | Transparent Huge Pages 改为 `madvise`（默认 always 会周期性延迟抖动） |
 | `etc/tmpfiles.d/howdy-permissions.conf` | 授予 video 组读取 howdy 配置/模型 |
 | `etc/pacman.d/hooks/50-howdy-libguard.hook` + `usr/local/bin/howdy-libguard` | 包事务后校验 howdy 共享库，缺库自动禁用 / 补回自动恢复 |
-| `etc/smartd.conf` | NVMe 盘（`/dev/nvme0n1`）SMART 健康监控：全量属性/自检/错误日志，温度超 70℃/80℃ 分别记警告/严重（最初设的 45/55℃ 部署后实测本机空载就有 49℃，一启用就误报，已改成更贴近实际的档位），每天短自检、每周六长自检；没配邮件/桌面通知，异常看 `journalctl -u smartd` |
+| `etc/smartd.conf` | NVMe 盘（`/dev/nvme0n1`）SMART 健康监控：全量属性/自检/错误日志，温度超 70℃/80℃ 分别记警告/严重（最初设的 45/55℃ 部署后实测本机空载就有 49℃，一启用就误报，已改成更贴近实际的档位），每天短自检、每周六长自检；异常同时记 journal（`journalctl -u smartd`）和弹桌面通知（见下一行） |
+| `usr/share/smartmontools/smartd_warning.d/notify-desktop` | smartd 告警走 smartmontools 自带插件机制（`-m '@notify-desktop' -M exec smartd_warning.sh`，不发邮件本机没 MTA）转成桌面通知：root 身份的 smartd 用 `sudo -u afu`（免密，pam_rootok）接到 DMS/Quickshell 的会话总线，`notify-send` 打过去；已实测通知能弹出 |
 | `etc/sudoers.d/papirus-folders` | wheel 免密执行 papirus-folders（matugen 主题同步） |
 | `etc/pam.d/dankshell` `sudo` `greetd` `polkit-1` | howdy 人脸识别接入 DMS 锁屏 / sudo / greetd 登录 / polkit 图形提权（greetd 还接 gnome-keyring 自动解锁）；dankshell 的密码回退不带 `nullok`，空密码账户无法解锁 |
 | `etc/sysctl.d/99-ip-forward.conf` | `net.ipv4.ip_forward=1`，热点 / USB 共享上网的内核转发 |
