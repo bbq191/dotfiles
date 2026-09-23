@@ -98,20 +98,26 @@ dconf load /org/gnome/nautilus/ < "$DOTFILES/system/dconf/nautilus.ini"
 # ── 5. 应用系统配置（需要 sudo）────────────────────────────────────────────────
 echo "[+] 应用系统配置..."
 # 部署单个文件到系统路径：install -D 自动建父目录，免去每处重复 mkdir -p；
-# 内容未变时跳过写入并返回非 0，供下面「只有真的变了才重启/reload」的判断用
+# 内容未变时跳过写入。总是返回 0——大多数调用处是裸调用，"没变化"是正常结果，
+# 不能让它在 set -e 下当成命令失败把整个脚本退出（踩过这个坑：重跑时几乎所有
+# 文件都没变化，第一个裸调用一 return 1 脚本就静默退出，跟没跑一样）。
+# 少数几处（NM、mihomo override）需要知道有没有变化，看 DEPLOY_CHANGED。
 deploy() {
     local src="$DOTFILES/$1" dest="$2" mode="${3:-644}"
-    sudo cmp -s "$src" "$dest" 2>/dev/null && return 1
-    sudo install -Dm"$mode" "$src" "$dest"
+    if sudo cmp -s "$src" "$dest" 2>/dev/null; then
+        DEPLOY_CHANGED=0
+    else
+        sudo install -Dm"$mode" "$src" "$dest"
+        DEPLOY_CHANGED=1
+    fi
 }
 
 deploy system/etc/systemd/resolved.conf.d/no-mdns.conf /etc/systemd/resolved.conf.d/no-mdns.conf
 deploy system/etc/systemd/system/ollama.service.d/override.conf /etc/systemd/system/ollama.service.d/override.conf
 # mihomo-bin 自带单元的 CapabilityBoundingSet 比实际需要的宽（见文件内注释），
 # 用 drop-in 收紧；只有变了才在下面步骤 11 重启（改能力集不重启不生效）
-MIHOMO_OVERRIDE_CHANGED=0
-deploy system/etc/systemd/system/mihomo.service.d/override.conf /etc/systemd/system/mihomo.service.d/override.conf \
-    && MIHOMO_OVERRIDE_CHANGED=1
+deploy system/etc/systemd/system/mihomo.service.d/override.conf /etc/systemd/system/mihomo.service.d/override.conf
+MIHOMO_OVERRIDE_CHANGED=$DEPLOY_CHANGED
 deploy system/etc/modprobe.d/nvidia-local.conf /etc/modprobe.d/nvidia-local.conf
 # config.toml 本身由 `dms-greeter enable`/`dms-greeter sync` 生成管理（见下方手动步骤），
 # 这里只放 wrapper 每次启动都会 include、且不受 sync 覆盖的 NVIDIA 环境变量扩展点
@@ -134,7 +140,8 @@ deploy system/etc/sudoers.d/papirus-folders /etc/sudoers.d/papirus-folders 440
 
 NM_CHANGED=0
 for f in wifi-backend.conf 99-firewall.conf; do
-    deploy "system/etc/NetworkManager/conf.d/$f" "/etc/NetworkManager/conf.d/$f" && NM_CHANGED=1
+    deploy "system/etc/NetworkManager/conf.d/$f" "/etc/NetworkManager/conf.d/$f"
+    if (( DEPLOY_CHANGED )); then NM_CHANGED=1; fi
 done
 # 固定 Wi-Fi 网卡名为 wlan0（iwlwifi 固件崩溃恢复后接口名会漂移成 wlan1）
 deploy system/etc/systemd/network/10-wlan0.link /etc/systemd/network/10-wlan0.link
