@@ -268,6 +268,7 @@ fcitx5 的 `XMODIFIERS` / `QT_IM_MODULE` / `SDL_IM_MODULE` 在 `environment.d/fc
 | Tailwind | `tailwindcss`（`className=` 正则） |
 | JSON / HTML | `jsonls` / `html` |
 | Lua | `lua_ls`（本配置自身，runtime 全部加入 library） |
+| Bash | `bashls`（仓库里 install.sh/uninstall.sh 等大量自维护 shell 脚本，之前只有 shfmt 格式化没有实时诊断） |
 
 诊断：`●` 内联、按严重度排序、插入模式不更新；浮窗边框由全局 `winborder=rounded` 统一。LSP 按键只在 `LspAttach` 时按 buffer 绑定，纯文本里按 `K` 不报错。
 
@@ -333,6 +334,7 @@ LSP → 路径 → LuaSnip（friendly-snippets）→ buffer（≥3 字符），R
 | 键位 | 功能 |
 |------|------|
 | `e` | Neovim 编辑（阻塞） |
+| `Space` 多选 + `r` | 重命名；多选多个文件时批量重命名，用 `$EDITOR` 编辑文件名列表（`bulk-rename` 专用 opener，见 `yazi.toml`） |
 | `Ctrl+G` | 当前目录 lazygit |
 | `Ctrl+T` | 当前目录开新 kitty 窗口 |
 | `Y` / `y y` / `y n` / `y d` | 复制完整路径到剪贴板 / yank / 复制文件名 / 复制目录 |
@@ -511,7 +513,7 @@ Satty：箭头 / 矩形 / 圆 / 文本 / 马赛克 / 荧光笔；右键即复制
 | Btrfs 快照 | snapper 仅 pacman 前后编号快照（上限 50，重要 15），timeline 关闭；`snapper-cleanup.timer` 清理；`limine-snapper-sync` 进启动菜单 |
 | 异地/离线备份 | 快照防不了盘物理损坏/失窃：`backup-home`（restic）按需备份 `~/Documents`、`~/Projects` 到外接盘，见 README「备份」 |
 | 键盘 | keyd：capslock ↔ leftcontrol，仅 DELL 外接键盘（内置键盘不换） |
-| 网络启动 | mask `NetworkManager-wait-online`；Wi-Fi 后端 iwd |
+| 网络启动 | mask `NetworkManager-wait-online`；Wi-Fi 后端 iwd；`iwd.service.d/override.conf` 加 `After=cachyos-iw-set-regdomain.service` 消掉抢跑查询 regdom 的内核 WARN |
 | 日志 / 固件 / 镜像 | logrotate、fwupd、cachyos-rate-mirrors |
 | $HOME 清洁 | XDG 环境变量 + `user-tmpfiles.d/cleanup.conf` |
 | 硬盘 | `fstrim.timer`；IO 调度器 NVMe `none` / SATA SSD `mq-deadline`（udev 覆盖）；`smartd` 监控 NVMe 健康（温度阈值 + 每日短自检/每周长自检，异常弹桌面通知，见 README「系统配置说明」） |

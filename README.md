@@ -27,7 +27,7 @@ cd ~/Projects/dotfiles
 2. 通过 paru 安装 `packages/packages.txt` 中**尚未安装**的软件包（`pacman -T` 筛选；不升级已装包，升级用 `paru -Syu`）
 3. fnm 安装 Node LTS（已有默认版本则跳过），全局 npm 安装 `@google/gemini-cli` 与 `@mermaid-js/mermaid-cli`（pandoc 渲染 mermaid 用；命令已存在则跳过）
 4. stow 将 `home/` 链接到 `$HOME`（随后 `rime-dict-sync` 拉取 Iorest 增强词库、转简体、编译）：目标位置已有的实体文件按仓库清单逐个备份为 `*.bak-<时间戳>`（已经通过上级目录链接指向仓库的文件会跳过），旧的绝对路径链接原地重建为相对链接；随后 `dconf load` 同步 GTK 字体/主题（AbiWord/Gnumeric 等纯 GTK3 程序不读 `settings.ini`）、Nautilus 偏好
-5. 复制 `system/etc`、`system/usr/local/bin` 到系统：resolved / ollama drop-in / mihomo 能力收紧 drop-in / NVIDIA modprobe / greetd NVIDIA 覆盖 / tmpfiles（THP、howdy 权限）/ PAM（dankshell、sudo、greetd、polkit-1）/ howdy-libguard 与 pacman 钩子 / sudoers（papirus-folders）/ NetworkManager（iwd 后端、iptables 防火墙后端）/ `.link` 网卡命名（wlan0、rmk0）/ BE200 冷开机固件崩溃自愈（wifi-fw-reset + iwl-fwdump）/ sysctl（ip_forward、min_free_kbytes）/ udev（IO 调度器、uuu）/ keyd / snapper / smartd（NVMe 健康监控）；并 mask `NetworkManager-wait-online`
+5. 复制 `system/etc`、`system/usr/local/bin` 到系统：resolved / ollama drop-in / mihomo 能力收紧 drop-in / iwd 启动顺序 drop-in / NVIDIA modprobe / greetd NVIDIA 覆盖 / tmpfiles（THP、howdy 权限）/ PAM（dankshell、sudo、greetd、polkit-1）/ howdy-libguard 与 pacman 钩子 / sudoers（papirus-folders）/ NetworkManager（iwd 后端、iptables 防火墙后端）/ `.link` 网卡命名（wlan0、rmk0）/ BE200 冷开机固件崩溃自愈（wifi-fw-reset + iwl-fwdump）/ sysctl（ip_forward、min_free_kbytes）/ udev（IO 调度器、uuu）/ keyd / snapper / smartd（NVMe 健康监控 + 桌面通知插件）；并 mask `NetworkManager-wait-online`
 6. 启用 systemd 服务：系统级 iwd、wifi-fw-reset、keyd、smartd、linux-enable-ir-emitter（ollama 只装 override，不自启）；`dms plugins install` 拉取三个第三方启动器插件（calculator / emojiLauncher / niriWindows）；用户级 ssh-agent.socket、dms、cliphist、dcal、dsearch、remarkable-usb-share.service（事件驱动常驻）、systemd-tmpfiles-setup（否则 `user-tmpfiles.d/cleanup.conf` 不生效，本机实测默认 disabled）
 7. 初始化目录（wine prefix、ollama 模型、ssh ControlPath）
 8. GnuPG 迁移到 XDG 路径（`~/.local/share/gnupg`），生成 gpg-agent socket 单元 drop-in
@@ -93,7 +93,7 @@ cd ~/Projects/dotfiles
 
 按需手动运行，没做成定时任务：外接盘不会一直插着，定时任务在盘不在时只会白白失败。
 
-**未实测**：restic 不在这台机器已安装的软件（`packages.txt` 已加，需要 `sudo pacman -S restic` 或重跑 `install.sh`），沙箱环境里也没有交互式 sudo 装它，所以完整的 `restic init` → `backup` → `forget --prune` 流程没能跑通验证，只验证了外接盘挂载（`udisksctl mount` 实测成功，挂载点 `/run/media/afu/afu`）和脚本本身的语法/shellcheck。首次使用请留意实际输出。
+**未实测**：restic 已经装上了（`packages.txt` 已加并在后续 `install.sh` 运行中确认安装），但完整的 `restic init` → `backup` → `forget --prune` 流程还没有实际跑过一遍——已验证的只是外接盘挂载（`udisksctl mount` 实测成功，挂载点 `/run/media/afu/afu`）和脚本本身的语法/shellcheck。首次使用请留意实际输出，尤其是 `restic init` 的密码确认交互。
 
 ---
 
@@ -250,7 +250,7 @@ nmcli con add type ethernet ifname rmk0 con-name remarkable-usb \
 | `etc/mihomo/config.template.yaml` | mihomo 配置模板（占位符见上文） |
 | `etc/systemd/resolved.conf.d/no-mdns.conf` | 禁用 systemd-resolved 的 mDNS（避免与 avahi 冲突） |
 | `etc/systemd/system/ollama.service.d/override.conf` | ollama 以 afu 用户运行，模型在 `~/.local/share/ollama/models`（系统单元里 `%h` 是 root 家目录，路径只能写死） |
-| `etc/systemd/system/mihomo.service.d/override.conf` | 收紧 mihomo-bin 自带单元过宽的 `CapabilityBoundingSet`（去掉 `SYS_PTRACE`/`SYS_TIME`/`DAC_OVERRIDE`/`DAC_READ_SEARCH`，只留 TUN 代理实际要用的 `NET_ADMIN`/`NET_RAW`/`NET_BIND_SERVICE`）；改动没能在部署环境实测，应用后请确认代理仍正常，回滚见文件内注释 |
+| `etc/systemd/system/mihomo.service.d/override.conf` | 收紧 mihomo-bin 自带单元过宽的 `CapabilityBoundingSet`（去掉 `SYS_PTRACE`/`SYS_TIME`/`DAC_OVERRIDE`/`DAC_READ_SEARCH`，只留 TUN 代理实际要用的 `NET_ADMIN`/`NET_RAW`/`NET_BIND_SERVICE`）；已部署并实测确认（`systemctl show mihomo -p CapabilityBoundingSet` 核实生效，代理正常），回滚见文件内注释 |
 | `etc/systemd/network/10-wlan0.link` `11-rmk0.link` | 按 MAC 固定 Wi-Fi / reMarkable USB 网卡名（wlan0 / rmk0） |
 | `etc/systemd/system/iwd.service.d/override.conf` | `After=cachyos-iw-set-regdomain.service`：消掉 iwd 抢跑查询 regdom 触发的内核 WARN（`nl80211_get_reg_do`，2026-09 系统日志核查中发现，实测近 4 次开机 3 次命中，只影响日志不影响功能） |
 | `etc/systemd/system/wifi-fw-reset.service` `usr/local/bin/wifi-fw-reset` | BE200 冷开机固件在 `CTDP_CONFIG_CMD` 断言崩溃后 wlan0 全程 unavailable（热重启不复现）；开机延迟 8s 自检，命中则重载 iwlmld/iwlwifi，仍不行再 PCI remove/rescan。手动：`sudo wifi-fw-reset --force` |
@@ -259,8 +259,8 @@ nmcli con add type ethernet ifname rmk0 con-name remarkable-usb \
 | `etc/tmpfiles.d/thp.conf` | Transparent Huge Pages 改为 `madvise`（默认 always 会周期性延迟抖动） |
 | `etc/tmpfiles.d/howdy-permissions.conf` | 授予 video 组读取 howdy 配置/模型 |
 | `etc/pacman.d/hooks/50-howdy-libguard.hook` + `usr/local/bin/howdy-libguard` | 包事务后校验 howdy 共享库，缺库自动禁用 / 补回自动恢复 |
-| `etc/smartd.conf` | NVMe 盘（`/dev/nvme0n1`）SMART 健康监控：全量属性/自检/错误日志，温度超 70℃/80℃ 分别记警告/严重（最初设的 45/55℃ 部署后实测本机空载就有 49℃，一启用就误报，已改成更贴近实际的档位），每天短自检、每周六长自检；异常同时记 journal（`journalctl -u smartd`）和弹桌面通知（见下一行） |
-| `usr/share/smartmontools/smartd_warning.d/notify-desktop` | smartd 告警走 smartmontools 自带插件机制（`-m '@notify-desktop' -M exec smartd_warning.sh`，不发邮件本机没 MTA）转成桌面通知：root 身份的 smartd 用 `sudo -u afu`（免密，pam_rootok）接到 DMS/Quickshell 的会话总线，`notify-send` 打过去；已实测通知能弹出 |
+| `etc/smartd.conf` | NVMe 盘（`/dev/nvme0n1`）SMART 健康监控：全量属性/自检/错误日志，温度超 70℃/80℃ 分别记警告/严重（最初设的 45/55℃ 部署后实测本机空载就有 49℃，一启用就误报，已改成更贴近实际的档位并确认不再误报），每天短自检、每周六长自检；异常同时记 journal（`journalctl -u smartd`）和弹桌面通知（见下一行） |
+| `usr/share/smartmontools/smartd_warning.d/notify-desktop` | smartd 告警走 smartmontools 自带插件机制（`-m '@notify-desktop' -M exec smartd_warning.sh`，不发邮件本机没 MTA）转成桌面通知：root 身份的 smartd 用 `sudo -u afu`（免密，pam_rootok）接到 DMS/Quickshell 的会话总线，`notify-send` 打过去；已实测通知能弹出（流程见表格下方的图） |
 | `etc/sudoers.d/papirus-folders` | wheel 免密执行 papirus-folders（matugen 主题同步） |
 | `etc/pam.d/dankshell` `sudo` `greetd` `polkit-1` | howdy 人脸识别接入 DMS 锁屏 / sudo / greetd 登录 / polkit 图形提权（greetd 还接 gnome-keyring 自动解锁）；dankshell 的密码回退不带 `nullok`，空密码账户无法解锁 |
 | `etc/sysctl.d/99-ip-forward.conf` | `net.ipv4.ip_forward=1`，热点 / USB 共享上网的内核转发 |
@@ -273,6 +273,8 @@ nmcli con add type ethernet ifname rmk0 con-name remarkable-usb \
 | `etc/NetworkManager/conf.d/wifi-backend.conf` | Wi-Fi 后端 iwd（`wpa_supplicant` 被 disable） |
 | `etc/NetworkManager/conf.d/99-firewall.conf` | NM 防火墙后端 iptables（共享连接 NAT 与 ufw 同链） |
 | `dconf/interface.ini` | `org.gnome.desktop.interface` 字体/主题/光标（`dconf load`） |
+
+![smartd 告警到桌面通知：root 跨越权限边界接到用户会话总线](docs/diagrams/smartd-notify.svg)
 
 ### NVIDIA
 
