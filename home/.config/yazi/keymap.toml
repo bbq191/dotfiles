@@ -3,7 +3,9 @@
 prepend_keymap = [
   # ── 编辑器 ────────────────────────────────────────────────────────────────
   # e — 在 Neovim 中编辑（阻塞，nvim 退出后回到 yazi）
-  { on = ["e"], run = "shell 'nvim \"$@\"' --block", desc = "Edit in Neovim" },
+  # shell 命令的占位符和 [opener] 一样用 %s（v26.9.1 起 "$@" 不再被替换，
+  # 会原样传给 nvim 导致零参数打开空 buffer）
+  { on = ["e"], run = "shell 'nvim %s' --block", desc = "Edit in Neovim" },
 
   # ── Git ───────────────────────────────────────────────────────────────────
   # <C-g> — 在当前目录打开 lazygit（接管终端，退出后回到 yazi）

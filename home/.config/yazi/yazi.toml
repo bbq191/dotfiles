@@ -18,26 +18,39 @@ image_quality = 75
 # kitty 图形协议由 yazi 自动检测，无需显式配置
 
 [opener]
+# "$@"/"$1" 那套位置参数占位符在 yazi v25.12.29 起弃用、v26.9.1 彻底移除，
+# 换成下面的 %s（全部选中文件）/ %s1（第一个）新占位符，写 "$@" 不会报错，
+# 但也不会被替换成任何文件路径，nvim 会收到零参数直接打开空 buffer——之前
+# 遇到的"多选后按 r 打开空文件"就是这个（keymap.toml 里 e 键同理已一并修）
 edit = [
-  { run = 'nvim "$@"', desc = "Neovim", block = true },
+  { run = 'nvim %s', desc = "Neovim", block = true },
 ]
 open = [
-  { run = 'xdg-open "$1"', desc = "Default app" },
+  { run = 'xdg-open %s1', desc = "Default app" },
+]
+# 批量重命名（多选后按 r）专用：不指定的话，bulk-rename.txt 走下面 text/* 规则，
+# 该规则同时列了 edit/open 两个候选，yazi 会弹"Open with"选择框而不是直接调用编辑器
+bulk-rename = [
+  { run = 'nvim %s', desc = "Neovim", block = true },
 ]
 video = [
-  { run = 'mpv "$@"', desc = "mpv" },
+  { run = 'mpv %s', desc = "mpv" },
 ]
 image_edit = [
-  { run = 'satty --filename "$1"', desc = "Satty（标注）" },
-  { run = 'xdg-open "$1"',         desc = "Default app" },
+  { run = 'satty --filename %s1', desc = "Satty（标注）" },
+  { run = 'xdg-open %s1',         desc = "Default app" },
 ]
 extract = [
-  { run = '7z x -o"${1%.*}" "$1"', desc = "7-Zip 解压" },
-  { run = 'unzip "$1"',             desc = "unzip" },
+  # %s1 是文本替换，不再是真正的 shell 位置参数，${1%.*} 那种参数展开用不了了，
+  # 先赋给变量 f 再展开
+  { run = 'f=%s1; 7z x -o"${f%.*}" "$f"', desc = "7-Zip 解压" },
+  { run = 'unzip %s1',                     desc = "unzip" },
 ]
 
 [open]
 rules = [
+  # 批量重命名临时文件，必须排在 text/* 前面才会命中
+  { url = "bulk-rename.txt", use = "bulk-rename" },
   # 文本 / 代码
   { mime = "text/*",           use = ["edit", "open"] },
   { mime = "application/json", use = ["edit", "open"] },
