@@ -78,6 +78,22 @@ cd ~/Projects/dotfiles
 | Ollama | 不开机自启：`sudo systemctl start ollama` 后 `ollama pull <model>`；模型在 `~/.local/share/ollama/models` |
 | 蓝信（人保 e 办） | 无 AUR 包：`debtap` 转换官方 deb 后 `pacman -U`；转换包不声明依赖，需手动 `pacman -S --asexplicit gtk2`（`LxMainNew`/`libcef.so` 链接 gtk2，被当孤儿清掉就起不来）；`.desktop` 在仓库（强制 X11 + fcitx XIM） |
 | Obsidian | 笔记库 `~/Documents/ikate` 为 git 仓库，`obsync` 一键 commit/pull --rebase/push |
+| 备份（restic） | `rbw add restic-repo-password` 先存好仓库密码；插上外接盘（`lsblk -o NAME,UUID,LABEL` 核对/改 `backup-home` 里的 `DRIVE_UUID`）后手动执行 `backup-home`。按需运行，不是定时任务——见「备份」 |
+
+---
+
+## 备份
+
+`backup-home` 备份 `~/Documents`、`~/Projects` 到外接盘（Kingston USB 盘，exFAT，卷标 `afu`）上的 restic 仓库（`<挂载点>/restic-repo`，不占用盘根目录，盘上还有其他既有文件）：
+
+- 排除可重建的构建产物/依赖缓存（`~/.config/restic/excludes.txt`）：`target/`（Rust）、`.venv`/`venv`、`node_modules`、`__pycache__` 等——不排除的话仅 `~/Projects` 现存的 `target/` 就有约 50G，93G 的盘装不下几份快照
+- 仓库密码存在 Bitwarden（`RESTIC_PASSWORD_COMMAND=rbw get restic-repo-password`），首次使用前手动 `rbw add restic-repo-password`
+- 脚本按 UUID 找外接盘，没挂载会先 `udisksctl mount` 自动挂载（`udisks2` 用户态挂载，不用 sudo）
+- 每次跑完 `restic forget --keep-last 5 --keep-weekly 4 --keep-monthly 6 --prune` 清理旧快照
+
+按需手动运行，没做成定时任务：外接盘不会一直插着，定时任务在盘不在时只会白白失败。
+
+**未实测**：restic 不在这台机器已安装的软件（`packages.txt` 已加，需要 `sudo pacman -S restic` 或重跑 `install.sh`），沙箱环境里也没有交互式 sudo 装它，所以完整的 `restic init` → `backup` → `forget --prune` 流程没能跑通验证，只验证了外接盘挂载（`udisksctl mount` 实测成功，挂载点 `/run/media/afu/afu`）和脚本本身的语法/shellcheck。首次使用请留意实际输出。
 
 ---
 
@@ -307,9 +323,9 @@ dotfiles/
 │   │   ├── fcitx5/              # Rime + wechat 主题
 │   │   ├── fontconfig/  gtk-3.0/  gtk-4.0/  qt5ct/  qt6ct/   # 字体与主题
 │   │   ├── environment.d/       # fcitx5 / gnupg / maven 环境变量
-│   │   ├── git/  maven/  gemini/  danksearch/  dankcal/
+│   │   ├── git/  maven/  gemini/  danksearch/  dankcal/  restic/   # excludes.txt，见「备份」
 │   │   └── mimeapps.list  user-dirs.dirs  user-dirs.locale  xdg-terminals.list  user-tmpfiles.d/
-│   ├── .local/bin/              # hotspot-internet、usb-internet（共享实现在 mihomo-direct-switch）、remarkable-usb-share、remarkable-usb-watch、x11-clipboard-bridge、rime-dict-sync、rbw-ssh-load、git-credential-rbw、wine-setup-fonts
+│   ├── .local/bin/              # hotspot-internet、usb-internet（共享实现在 mihomo-direct-switch）、backup-home、remarkable-usb-share、remarkable-usb-watch、x11-clipboard-bridge、rime-dict-sync、rbw-ssh-load、git-credential-rbw、wine-setup-fonts
 │   ├── .local/share/            # applications/*.desktop（蓝信、nvim 在 kitty 中打开）、fcitx5/rime/（*.custom.yaml、rime_ice_ext.dict.yaml）、rustup/settings.toml
 │   └── .ssh/config
 ├── system/
@@ -342,6 +358,7 @@ dotfiles/
 | DMS 第三方插件（calculator、emojiLauncher、niriWindows） | `install.sh` 用 `dms plugins install` 拉取（内含 git 仓库）；`plugin_settings.json` 记录了启用状态 |
 | `~/.config/DankMaterialShell/settings.json` | DMS 运行时设置，随操作频繁变化（主题、字体、通知等在 FEATURES 有记录） |
 | SDKMAN candidates、fnm Node、pyenv、cargo | 体积大且逐机器不同，`sdk install` / `fnm install` 重装 |
+| restic 仓库本体、Bitwarden 里的 `restic-repo-password` | 仓库数据在外接盘上（不在这台机器也不在 git 里）；密码见「备份」，`rbw add restic-repo-password` 重建 |
 | `~/.local/share/fcitx5/rime/` 除 `*.custom.yaml`、`rime_ice_ext.dict.yaml` 外 | 词库 userdb、build 产物、`iorest/`（由 `rime-dict-sync` 从 GitHub 克隆并转简体生成） |
 | `~/.local/share/applications/claude-code-url-handler.desktop` | Claude Code 安装器生成（`mimeapps.list` 的 `claude-cli` scheme 指向它） |
 

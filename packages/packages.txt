@@ -177,6 +177,7 @@ qt6-multimedia
 rbw
 rebuild-detector
 reflector
+restic  # 备份到外接盘，见 ~/.local/bin/backup-home
 ripgrep
 rsync
 satty

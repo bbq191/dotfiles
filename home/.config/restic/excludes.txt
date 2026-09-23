@@ -1,0 +1,14 @@
+# backup-home 备份 ~/Documents ~/Projects 时排除的路径（restic --exclude-file）。
+# 都是可以重新生成/重新下载的构建产物或依赖缓存，不是原始数据。
+# 实测 ~/Projects 现存的 target/（Rust）占大头，约 50G；.venv/venv 约 14G；
+# 不排除的话 93G 的外接盘装不下多份快照。
+node_modules/
+.venv/
+venv/
+__pycache__/
+target/
+build/
+dist/
+.terraform/
+vendor/
+*.pyc

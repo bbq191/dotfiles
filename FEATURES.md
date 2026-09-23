@@ -509,6 +509,7 @@ Satty：箭头 / 矩形 / 圆 / 文本 / 马赛克 / 荧光笔；右键即复制
 | NVIDIA 待机 | `NVreg_EnableS0ixPowerManagement=1`，s2idle 时 GPU 进入 S0ix |
 | Transparent Huge Pages | `madvise`（`tmpfiles.d/thp.conf`） |
 | Btrfs 快照 | snapper 仅 pacman 前后编号快照（上限 50，重要 15），timeline 关闭；`snapper-cleanup.timer` 清理；`limine-snapper-sync` 进启动菜单 |
+| 异地/离线备份 | 快照防不了盘物理损坏/失窃：`backup-home`（restic）按需备份 `~/Documents`、`~/Projects` 到外接盘，见 README「备份」 |
 | 键盘 | keyd：capslock ↔ leftcontrol，仅 DELL 外接键盘（内置键盘不换） |
 | 网络启动 | mask `NetworkManager-wait-online`；Wi-Fi 后端 iwd |
 | 日志 / 固件 / 镜像 | logrotate、fwupd、cachyos-rate-mirrors |
