@@ -164,6 +164,7 @@ deploy system/etc/keyd/default.conf /etc/keyd/default.conf
 deploy system/etc/snapper/configs/root /etc/snapper/configs/root
 # 磁盘健康监控：smartmontools 已在软件包清单里，之前只装了没启用，等于零监控
 deploy system/etc/smartd.conf /etc/smartd.conf
+SMARTD_CHANGED=$DEPLOY_CHANGED
 sudo systemctl mask NetworkManager-wait-online.service
 
 # ── 6. systemd 服务 ───────────────────────────────────────────────────────────
@@ -175,6 +176,7 @@ sudo systemctl enable --now iwd
 sudo systemctl enable wifi-fw-reset.service
 sudo systemctl enable --now keyd
 sudo systemctl enable --now smartd
+(( SMARTD_CHANGED )) && sudo systemctl restart smartd   # 配置变了才重启，重载配置生效
 # IR 补光服务（howdy 人脸识别依赖）；新机器需先 sudo linux-enable-ir-emitter configure
 sudo systemctl enable linux-enable-ir-emitter.service
 # 只有 NM 配置真的变了才重启（重启会让 Wi-Fi 断几秒）
