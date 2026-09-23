@@ -25,6 +25,7 @@ return {
         "jsonls",
         "html",
         "lua_ls",
+        "bashls", -- 仓库里 install.sh/uninstall.sh 等大量自维护 shell 脚本，编辑时要有实时诊断
       },
     },
   },
