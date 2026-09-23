@@ -353,6 +353,8 @@ zathura 已卸载（不再维护配色模板），PDF 默认交给 Brave 内置�
 
 LibreOffice 太重换成了 AbiWord（字处理）+ Gnumeric（表格），二者都是原生 GTK3，同样吃 `adw-gtk3` 配色。`mimeapps.list` 显式关联：docx/doc/rtf/odt → AbiWord，xlsx/xls/ods/csv → Gnumeric。演示文稿（pptx/ppt/odp）没配，AbiWord/Gnumeric 系没有对应的幻灯片编辑器，唯一像样的选择是把整个 LibreOffice 装回来（只为 Impress），暂时按下不表，等真有需要再评估。
 
+**已知限制**：AbiWord 的 docx 导入过滤器对内嵌字体（Office 内嵌 OpenType/ODTTF 解混淆）和合并单元格表格支持较弱，遇到用了专有中文字体（仿宋_GB2312、方正小标宋简体等）或复杂表格的申报表类文档，会出现乱码/大片内容缺失——这是这套轻量组合的已知代价，不是文件损坏。偶尔遇到时不必常驻装回 LibreOffice（违背这里精简依赖的取舍），一次性用 `flatpak run org.libreoffice.LibreOffice`（需先装 flatpak + 该 runtime）或临时 `paru -S libreoffice-fresh` 装完用完就卸载即可。
+
 ---
 
 ## 输入法（Fcitx5 + Rime）
