@@ -29,6 +29,7 @@ systemctl --user disable --now x11-clipboard-bridge.service 2>/dev/null || true
 systemctl --user disable --now remarkable-usb-share.service 2>/dev/null || true
 sudo systemctl disable --now wifi-fw-reset.service 2>/dev/null || true
 sudo systemctl disable --now mihomo 2>/dev/null || true
+sudo systemctl disable --now smartd 2>/dev/null || true
 sudo systemctl unmask NetworkManager-wait-online.service 2>/dev/null || true
 
 # GPG socket drop-in：只删本仓库生成的 drop-in，不动 gpg-agent 本体
@@ -64,6 +65,7 @@ for f in "$DOTFILES"/system/etc/udev/rules.d/*.rules; do
 done
 drop /etc/keyd/default.conf
 drop /etc/snapper/configs/root
+drop /etc/smartd.conf
 drop /etc/mihomo/config.yaml
 sudo rm -rf /etc/mihomo/flags
 

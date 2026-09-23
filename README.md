@@ -27,8 +27,8 @@ cd ~/Projects/dotfiles
 2. 通过 paru 安装 `packages/packages.txt` 中**尚未安装**的软件包（`pacman -T` 筛选；不升级已装包，升级用 `paru -Syu`）
 3. fnm 安装 Node LTS（已有默认版本则跳过），全局 npm 安装 `@google/gemini-cli` 与 `@mermaid-js/mermaid-cli`（pandoc 渲染 mermaid 用；命令已存在则跳过）
 4. stow 将 `home/` 链接到 `$HOME`（随后 `rime-dict-sync` 拉取 Iorest 增强词库、转简体、编译）：目标位置已有的实体文件按仓库清单逐个备份为 `*.bak-<时间戳>`（已经通过上级目录链接指向仓库的文件会跳过），旧的绝对路径链接原地重建为相对链接；随后 `dconf load` 同步 GTK 字体/主题（AbiWord/Gnumeric 等纯 GTK3 程序不读 `settings.ini`）、Nautilus 偏好
-5. 复制 `system/etc`、`system/usr/local/bin` 到系统：resolved / ollama drop-in / NVIDIA modprobe / greetd NVIDIA 覆盖 / tmpfiles（THP、howdy 权限）/ PAM（dankshell、sudo、greetd、polkit-1）/ howdy-libguard 与 pacman 钩子 / sudoers（papirus-folders）/ NetworkManager（iwd 后端、iptables 防火墙后端）/ `.link` 网卡命名（wlan0、rmk0）/ BE200 冷开机固件崩溃自愈（wifi-fw-reset + iwl-fwdump）/ sysctl（ip_forward、min_free_kbytes）/ udev（IO 调度器、uuu）/ keyd / snapper；并 mask `NetworkManager-wait-online`
-6. 启用 systemd 服务：系统级 iwd、wifi-fw-reset、keyd、linux-enable-ir-emitter（ollama 只装 override，不自启）；`dms plugins install` 拉取三个第三方启动器插件（calculator / emojiLauncher / niriWindows）；用户级 ssh-agent.socket、dms、cliphist、dcal、dsearch、remarkable-usb-share.service（事件驱动常驻）、systemd-tmpfiles-setup（否则 `user-tmpfiles.d/cleanup.conf` 不生效，本机实测默认 disabled）
+5. 复制 `system/etc`、`system/usr/local/bin` 到系统：resolved / ollama drop-in / NVIDIA modprobe / greetd NVIDIA 覆盖 / tmpfiles（THP、howdy 权限）/ PAM（dankshell、sudo、greetd、polkit-1）/ howdy-libguard 与 pacman 钩子 / sudoers（papirus-folders）/ NetworkManager（iwd 后端、iptables 防火墙后端）/ `.link` 网卡命名（wlan0、rmk0）/ BE200 冷开机固件崩溃自愈（wifi-fw-reset + iwl-fwdump）/ sysctl（ip_forward、min_free_kbytes）/ udev（IO 调度器、uuu）/ keyd / snapper / smartd（NVMe 健康监控）；并 mask `NetworkManager-wait-online`
+6. 启用 systemd 服务：系统级 iwd、wifi-fw-reset、keyd、smartd、linux-enable-ir-emitter（ollama 只装 override，不自启）；`dms plugins install` 拉取三个第三方启动器插件（calculator / emojiLauncher / niriWindows）；用户级 ssh-agent.socket、dms、cliphist、dcal、dsearch、remarkable-usb-share.service（事件驱动常驻）、systemd-tmpfiles-setup（否则 `user-tmpfiles.d/cleanup.conf` 不生效，本机实测默认 disabled）
 7. 初始化目录（wine prefix、ollama 模型、ssh ControlPath）
 8. GnuPG 迁移到 XDG 路径（`~/.local/share/gnupg`），生成 gpg-agent socket 单元 drop-in
 9. Maven 本地仓库迁移到 `~/.cache/maven/repository`
@@ -241,6 +241,7 @@ nmcli con add type ethernet ifname rmk0 con-name remarkable-usb \
 | `etc/tmpfiles.d/thp.conf` | Transparent Huge Pages 改为 `madvise`（默认 always 会周期性延迟抖动） |
 | `etc/tmpfiles.d/howdy-permissions.conf` | 授予 video 组读取 howdy 配置/模型 |
 | `etc/pacman.d/hooks/50-howdy-libguard.hook` + `usr/local/bin/howdy-libguard` | 包事务后校验 howdy 共享库，缺库自动禁用 / 补回自动恢复 |
+| `etc/smartd.conf` | NVMe 盘（`/dev/nvme0n1`）SMART 健康监控：全量属性/自检/错误日志，温度超 45℃/55℃ 分别记警告/严重，每天短自检、每周六长自检；没配邮件/桌面通知，异常看 `journalctl -u smartd` |
 | `etc/sudoers.d/papirus-folders` | wheel 免密执行 papirus-folders（matugen 主题同步） |
 | `etc/pam.d/dankshell` `sudo` `greetd` `polkit-1` | howdy 人脸识别接入 DMS 锁屏 / sudo / greetd 登录 / polkit 图形提权（greetd 还接 gnome-keyring 自动解锁）；dankshell 的密码回退不带 `nullok`，空密码账户无法解锁 |
 | `etc/sysctl.d/99-ip-forward.conf` | `net.ipv4.ip_forward=1`，热点 / USB 共享上网的内核转发 |

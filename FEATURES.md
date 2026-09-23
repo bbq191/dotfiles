@@ -513,6 +513,6 @@ Satty：箭头 / 矩形 / 圆 / 文本 / 马赛克 / 荧光笔；右键即复制
 | 网络启动 | mask `NetworkManager-wait-online`；Wi-Fi 后端 iwd |
 | 日志 / 固件 / 镜像 | logrotate、fwupd、cachyos-rate-mirrors |
 | $HOME 清洁 | XDG 环境变量 + `user-tmpfiles.d/cleanup.conf` |
-| 硬盘 | `fstrim.timer`；IO 调度器 NVMe `none` / SATA SSD `mq-deadline`（udev 覆盖） |
+| 硬盘 | `fstrim.timer`；IO 调度器 NVMe `none` / SATA SSD `mq-deadline`（udev 覆盖）；`smartd` 监控 NVMe 健康（温度阈值 + 每日短自检/每周长自检，见 README「系统配置说明」） |
 | 内存 | `vm.min_free_kbytes=512M` |
 | 内核参数 | `nvidia-drm.modeset=1 nvidia-drm.fbdev=1`，initramfs 预载 nvidia 模块（chwd） |
