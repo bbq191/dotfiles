@@ -307,7 +307,7 @@ dotfiles/
 │   │   ├── environment.d/       # fcitx5 / gnupg / maven 环境变量
 │   │   ├── git/  maven/  gemini/  danksearch/  dankcal/
 │   │   └── mimeapps.list  user-dirs.dirs  user-dirs.locale  xdg-terminals.list  user-tmpfiles.d/
-│   ├── .local/bin/              # hotspot-internet、usb-internet、remarkable-usb-share、remarkable-usb-watch、x11-clipboard-bridge、rime-dict-sync、rbw-ssh-load、git-credential-rbw、wine-setup-fonts
+│   ├── .local/bin/              # hotspot-internet、usb-internet（共享实现在 mihomo-direct-switch）、remarkable-usb-share、remarkable-usb-watch、x11-clipboard-bridge、rime-dict-sync、rbw-ssh-load、git-credential-rbw、wine-setup-fonts
 │   ├── .local/share/            # applications/*.desktop（蓝信、nvim 在 kitty 中打开）、fcitx5/rime/（*.custom.yaml、rime_ice_ext.dict.yaml）、rustup/settings.toml
 │   └── .ssh/config
 ├── system/

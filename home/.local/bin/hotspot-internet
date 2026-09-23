@@ -3,51 +3,11 @@
 # on  = 热点设备走 mihomo 完整分流，可翻墙；
 # off = 热点设备强制 DIRECT（经有线直连出去），国内可用、被墙的不通——不断网。
 #
-# 原理：mihomo rules 置顶有一条 `RULE-SET,hotspot_direct,DIRECT`，本脚本改写
-# flag 文件（payload 含 SRC-IP-CIDR = off）并调本机 API 刷新 provider，再断掉
-# 该来源的存量连接使切换立即生效。无需 root；状态在 flag 文件里，重启后保持。
+# 原理：mihomo rules 置顶有一条 `RULE-SET,hotspot_direct,DIRECT`，实际逻辑在
+# mihomo-direct-switch（改写 flag 文件 + 调 API 刷新 provider + 断存量连接）。
+# 无需 root；状态在 flag 文件里，重启后保持。DMS 插件 hotspotInternet 只调用
+# toggle，用 FileView 直接监听 flag 文件显示状态，不解析这里的输出。
 set -euo pipefail
-
-FLAG=/etc/mihomo/flags/hotspot-direct.yaml
-PROVIDER=hotspot_direct
-CIDR=10.42.0.0/24
-PREFIX=10.42.
-API=http://127.0.0.1:9090
-
-SECRET=$(awk -F'"' '/^secret:/{print $2}' /etc/mihomo/config.yaml)
-api() { curl -sf --connect-timeout 3 -H "Authorization: Bearer $SECRET" "$@"; }
-
-proxied() { ! grep -q SRC-IP "$FLAG"; }
-
-apply() {
-    api -X PUT "$API/providers/rules/$PROVIDER" -o /dev/null
-    # 断掉该来源的存量连接，避免长连接沿用旧策略
-    api "$API/connections" |
-        jq -r --arg p "$PREFIX" '.connections[]? | select(.metadata.sourceIP | startswith($p)) | .id' |
-        while read -r id; do api -X DELETE "$API/connections/$id" -o /dev/null || true; done
-}
-
-case "${1:-status}" in
-    on)
-        printf 'payload: []\n' > "$FLAG"
-        apply
-        ;;
-    off)
-        printf 'payload:\n  - SRC-IP-CIDR,%s\n' "$CIDR" > "$FLAG"
-        apply
-        ;;
-    toggle)
-        if proxied; then exec "$0" off; else exec "$0" on; fi
-        ;;
-    status) ;;
-    *)
-        echo "用法: ${0##*/} [on|off|toggle|status]" >&2
-        exit 2
-        ;;
-esac
-
-if proxied; then
-    echo "on — 热点设备经 mihomo 分流（可翻墙）"
-else
-    echo "off — 热点设备直连（不可翻墙，国内可用）"
-fi
+exec "$HOME/.local/bin/mihomo-direct-switch" \
+    /etc/mihomo/flags/hotspot-direct.yaml hotspot_direct 10.42.0.0/24 10.42. "热点设备" \
+    "${1:-status}"

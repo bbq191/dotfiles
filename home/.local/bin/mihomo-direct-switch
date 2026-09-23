@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+# 热点/USB 外网开关的共享实现：两者除了 flag 文件、mihomo provider 名、来源网段/
+# IP 前缀、描述文案外完全一致，抽到这里避免改一处忘改另一份。不直接手动调用，
+# 由 hotspot-internet / usb-internet 这两个瘦包装脚本传参调用。
+set -euo pipefail
+
+FLAG=$1 PROVIDER=$2 CIDR=$3 PREFIX=$4 DESC=$5 ACTION=${6:-status}
+API=http://127.0.0.1:9090
+
+SECRET=$(awk -F'"' '/^secret:/{print $2}' /etc/mihomo/config.yaml)
+api() { curl -sf --connect-timeout 3 -H "Authorization: Bearer $SECRET" "$@"; }
+
+proxied() { ! grep -q SRC-IP "$FLAG"; }
+
+apply() {
+    api -X PUT "$API/providers/rules/$PROVIDER" -o /dev/null
+    # 断掉该来源的存量连接，避免长连接沿用旧策略
+    api "$API/connections" |
+        jq -r --arg p "$PREFIX" '.connections[]? | select(.metadata.sourceIP | startswith($p)) | .id' |
+        while read -r id; do api -X DELETE "$API/connections/$id" -o /dev/null || true; done
+}
+
+if [[ "$ACTION" == toggle ]]; then
+    if proxied; then ACTION=off; else ACTION=on; fi
+fi
+
+case "$ACTION" in
+    on)
+        printf 'payload: []\n' > "$FLAG"
+        apply
+        ;;
+    off)
+        printf 'payload:\n  - SRC-IP-CIDR,%s\n' "$CIDR" > "$FLAG"
+        apply
+        ;;
+    status) ;;
+    *)
+        echo "用法: [on|off|toggle|status]（$DESC）" >&2
+        exit 2
+        ;;
+esac
+
+if proxied; then
+    echo "on — ${DESC}经 mihomo 分流（可翻墙）"
+else
+    echo "off — ${DESC}直连（不可翻墙，国内可用）"
+fi

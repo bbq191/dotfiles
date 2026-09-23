@@ -5,50 +5,9 @@
 #
 # 网络接入本身与本开关无关：remarkable-usb-share.service（事件驱动常驻）常开，设备一插上就被
 # 推送「网关/DNS 指向本机」的配置（enabled 用户单元，开机自动拉起）。
-# 本脚本只改写 mihomo 的 flag 文件（payload 含 SRC-IP-CIDR = off）并调 API
-# 刷新 provider + 断存量连接。无需 root、无需 SSH 上设备；状态重启后保持。
+# 本脚本的实际逻辑在 mihomo-direct-switch（改写 flag 文件 + 调 API 刷新
+# provider + 断存量连接）。无需 root、无需 SSH 上设备；状态重启后保持。
 set -euo pipefail
-
-FLAG=/etc/mihomo/flags/usb-direct.yaml
-PROVIDER=usb_direct
-CIDR=10.11.99.0/24
-PREFIX=10.11.99.
-API=http://127.0.0.1:9090
-
-SECRET=$(awk -F'"' '/^secret:/{print $2}' /etc/mihomo/config.yaml)
-api() { curl -sf --connect-timeout 3 -H "Authorization: Bearer $SECRET" "$@"; }
-
-proxied() { ! grep -q SRC-IP "$FLAG"; }
-
-apply() {
-    api -X PUT "$API/providers/rules/$PROVIDER" -o /dev/null
-    # 断掉该来源的存量连接，避免长连接沿用旧策略
-    api "$API/connections" |
-        jq -r --arg p "$PREFIX" '.connections[]? | select(.metadata.sourceIP | startswith($p)) | .id' |
-        while read -r id; do api -X DELETE "$API/connections/$id" -o /dev/null || true; done
-}
-
-case "${1:-status}" in
-    on)
-        printf 'payload: []\n' > "$FLAG"
-        apply
-        ;;
-    off)
-        printf 'payload:\n  - SRC-IP-CIDR,%s\n' "$CIDR" > "$FLAG"
-        apply
-        ;;
-    toggle)
-        if proxied; then exec "$0" off; else exec "$0" on; fi
-        ;;
-    status) ;;
-    *)
-        echo "用法: ${0##*/} [on|off|toggle|status]" >&2
-        exit 2
-        ;;
-esac
-
-if proxied; then
-    echo "on — USB 设备经 mihomo 分流（可翻墙）"
-else
-    echo "off — USB 设备直连（不可翻墙，国内可用）"
-fi
+exec "$HOME/.local/bin/mihomo-direct-switch" \
+    /etc/mihomo/flags/usb-direct.yaml usb_direct 10.11.99.0/24 10.11.99. "USB 设备" \
+    "${1:-status}"
