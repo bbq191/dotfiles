@@ -93,7 +93,7 @@ cd ~/Projects/dotfiles
 
 按需手动运行，没做成定时任务：外接盘不会一直插着，定时任务在盘不在时只会白白失败。
 
-**未实测**：restic 已经装上了（`packages.txt` 已加并在后续 `install.sh` 运行中确认安装），但完整的 `restic init` → `backup` → `forget --prune` 流程还没有实际跑过一遍——已验证的只是外接盘挂载（`udisksctl mount` 实测成功，挂载点 `/run/media/afu/afu`）和脚本本身的语法/shellcheck。首次使用请留意实际输出，尤其是 `restic init` 的密码确认交互。
+**已实测**：完整跑过一遍 `init` → `backup` → `forget --prune`，首次全量备份 20124 个文件 / 24.5GiB（去重后存了 22.2GiB），耗时约 54 分钟（外接盘速度是瓶颈），`forget` 的保留策略正确生效。踩过的坑：`rbw add`/`rbw edit` 交互没填内容会存成空密码，restic 会直接拒绝空密码仓库（`--insecure-no-password` 才能绕过，不建议）；`rbw add` 对同名条目不会报重复，跑两次会存出两条同名密码，`rbw get` 遇到多条同名匹配会直接报错拒绝返回，两者都需要手动清理（`rbw edit`/`rbw remove`）。
 
 ---
 
