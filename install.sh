@@ -143,6 +143,10 @@ for f in wifi-backend.conf 99-firewall.conf; do
     deploy "system/etc/NetworkManager/conf.d/$f" "/etc/NetworkManager/conf.d/$f"
     if (( DEPLOY_CHANGED )); then NM_CHANGED=1; fi
 done
+# iwd 有时抢在 cachyos-iw-set-regdomain.service 前面查询 regdom，触发内核 WARN
+# （nl80211_get_reg_do，!regdom && self_managed）；只是 WARN 不影响功能，daemon-reload
+# 后下次开机生效即可，不用现在重启 iwd
+deploy system/etc/systemd/system/iwd.service.d/override.conf /etc/systemd/system/iwd.service.d/override.conf
 # 固定 Wi-Fi 网卡名为 wlan0（iwlwifi 固件崩溃恢复后接口名会漂移成 wlan1）
 deploy system/etc/systemd/network/10-wlan0.link /etc/systemd/network/10-wlan0.link
 # 固定 reMarkable USB 网卡名为 rmk0（NM profile remarkable-usb 按此名绑定）；MAC 随设备而变，见文件注释

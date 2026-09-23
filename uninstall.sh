@@ -53,6 +53,7 @@ drop /etc/pacman.d/hooks/50-howdy-libguard.hook
 drop /etc/sudoers.d/papirus-folders
 drop /etc/NetworkManager/conf.d/wifi-backend.conf
 drop /etc/NetworkManager/conf.d/99-firewall.conf
+drop /etc/systemd/system/iwd.service.d/override.conf
 drop /etc/systemd/network/10-wlan0.link
 drop /etc/systemd/network/11-rmk0.link
 drop /usr/local/bin/wifi-fw-reset

@@ -252,6 +252,7 @@ nmcli con add type ethernet ifname rmk0 con-name remarkable-usb \
 | `etc/systemd/system/ollama.service.d/override.conf` | ollama 以 afu 用户运行，模型在 `~/.local/share/ollama/models`（系统单元里 `%h` 是 root 家目录，路径只能写死） |
 | `etc/systemd/system/mihomo.service.d/override.conf` | 收紧 mihomo-bin 自带单元过宽的 `CapabilityBoundingSet`（去掉 `SYS_PTRACE`/`SYS_TIME`/`DAC_OVERRIDE`/`DAC_READ_SEARCH`，只留 TUN 代理实际要用的 `NET_ADMIN`/`NET_RAW`/`NET_BIND_SERVICE`）；改动没能在部署环境实测，应用后请确认代理仍正常，回滚见文件内注释 |
 | `etc/systemd/network/10-wlan0.link` `11-rmk0.link` | 按 MAC 固定 Wi-Fi / reMarkable USB 网卡名（wlan0 / rmk0） |
+| `etc/systemd/system/iwd.service.d/override.conf` | `After=cachyos-iw-set-regdomain.service`：消掉 iwd 抢跑查询 regdom 触发的内核 WARN（`nl80211_get_reg_do`，2026-09 系统日志核查中发现，实测近 4 次开机 3 次命中，只影响日志不影响功能） |
 | `etc/systemd/system/wifi-fw-reset.service` `usr/local/bin/wifi-fw-reset` | BE200 冷开机固件在 `CTDP_CONFIG_CMD` 断言崩溃后 wlan0 全程 unavailable（热重启不复现）；开机延迟 8s 自检，命中则重载 iwlmld/iwlwifi，仍不行再 PCI remove/rescan。手动：`sudo wifi-fw-reset --force` |
 | `etc/udev/rules.d/85-iwl-dump.rules` `usr/local/bin/iwl-fwdump` | iwlwifi 固件崩溃时把 devcoredump 落盘到 `/var/lib/iwlwifi-dumps/`（默认 5 分钟销毁），供向 kernel bugzilla 提 bug 附件 |
 | `etc/modprobe.d/nvidia-local.conf` | `NVreg_EnableS0ixPowerManagement=1`：s2idle 休眠时 GPU 参与 S0ix，否则待机耗电 |
