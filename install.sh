@@ -107,6 +107,11 @@ deploy() {
 
 deploy system/etc/systemd/resolved.conf.d/no-mdns.conf /etc/systemd/resolved.conf.d/no-mdns.conf
 deploy system/etc/systemd/system/ollama.service.d/override.conf /etc/systemd/system/ollama.service.d/override.conf
+# mihomo-bin 自带单元的 CapabilityBoundingSet 比实际需要的宽（见文件内注释），
+# 用 drop-in 收紧；只有变了才在下面步骤 11 重启（改能力集不重启不生效）
+MIHOMO_OVERRIDE_CHANGED=0
+deploy system/etc/systemd/system/mihomo.service.d/override.conf /etc/systemd/system/mihomo.service.d/override.conf \
+    && MIHOMO_OVERRIDE_CHANGED=1
 deploy system/etc/modprobe.d/nvidia-local.conf /etc/modprobe.d/nvidia-local.conf
 # config.toml 本身由 `dms-greeter enable`/`dms-greeter sync` 生成管理（见下方手动步骤），
 # 这里只放 wrapper 每次启动都会 include、且不受 sync 覆盖的 NVIDIA 环境变量扩展点
@@ -282,6 +287,10 @@ if rbw get mihomo-sub-url &>/dev/null && rbw get mihomo-secret &>/dev/null; then
         sudo systemctl enable --now mihomo
         sudo systemctl restart mihomo   # 配置变了才重启（代理会断 1-2 秒）
         echo "    /etc/mihomo/config.yaml 已更新，mihomo 已重启"
+    elif (( MIHOMO_OVERRIDE_CHANGED )); then
+        sudo systemctl enable --now mihomo
+        sudo systemctl restart mihomo   # 收紧能力集的 override 变了，重启才生效
+        echo "    /etc/mihomo/config.yaml 无变化，但权限收紧的 override 变了，mihomo 已重启——请确认代理仍正常"
     else
         sudo systemctl enable --now mihomo
         echo "    /etc/mihomo/config.yaml 无变化，跳过"

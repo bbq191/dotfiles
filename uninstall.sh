@@ -43,6 +43,7 @@ systemctl --user daemon-reload
 echo "[+] 删除系统配置覆盖..."
 drop /etc/systemd/resolved.conf.d/no-mdns.conf
 drop /etc/systemd/system/ollama.service.d/override.conf
+drop /etc/systemd/system/mihomo.service.d/override.conf
 drop /etc/modprobe.d/nvidia-local.conf
 drop /etc/greetd/niri_overrides.kdl
 drop /etc/tmpfiles.d/thp.conf

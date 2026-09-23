@@ -27,7 +27,7 @@ cd ~/Projects/dotfiles
 2. 通过 paru 安装 `packages/packages.txt` 中**尚未安装**的软件包（`pacman -T` 筛选；不升级已装包，升级用 `paru -Syu`）
 3. fnm 安装 Node LTS（已有默认版本则跳过），全局 npm 安装 `@google/gemini-cli` 与 `@mermaid-js/mermaid-cli`（pandoc 渲染 mermaid 用；命令已存在则跳过）
 4. stow 将 `home/` 链接到 `$HOME`（随后 `rime-dict-sync` 拉取 Iorest 增强词库、转简体、编译）：目标位置已有的实体文件按仓库清单逐个备份为 `*.bak-<时间戳>`（已经通过上级目录链接指向仓库的文件会跳过），旧的绝对路径链接原地重建为相对链接；随后 `dconf load` 同步 GTK 字体/主题（AbiWord/Gnumeric 等纯 GTK3 程序不读 `settings.ini`）、Nautilus 偏好
-5. 复制 `system/etc`、`system/usr/local/bin` 到系统：resolved / ollama drop-in / NVIDIA modprobe / greetd NVIDIA 覆盖 / tmpfiles（THP、howdy 权限）/ PAM（dankshell、sudo、greetd、polkit-1）/ howdy-libguard 与 pacman 钩子 / sudoers（papirus-folders）/ NetworkManager（iwd 后端、iptables 防火墙后端）/ `.link` 网卡命名（wlan0、rmk0）/ BE200 冷开机固件崩溃自愈（wifi-fw-reset + iwl-fwdump）/ sysctl（ip_forward、min_free_kbytes）/ udev（IO 调度器、uuu）/ keyd / snapper / smartd（NVMe 健康监控）；并 mask `NetworkManager-wait-online`
+5. 复制 `system/etc`、`system/usr/local/bin` 到系统：resolved / ollama drop-in / mihomo 能力收紧 drop-in / NVIDIA modprobe / greetd NVIDIA 覆盖 / tmpfiles（THP、howdy 权限）/ PAM（dankshell、sudo、greetd、polkit-1）/ howdy-libguard 与 pacman 钩子 / sudoers（papirus-folders）/ NetworkManager（iwd 后端、iptables 防火墙后端）/ `.link` 网卡命名（wlan0、rmk0）/ BE200 冷开机固件崩溃自愈（wifi-fw-reset + iwl-fwdump）/ sysctl（ip_forward、min_free_kbytes）/ udev（IO 调度器、uuu）/ keyd / snapper / smartd（NVMe 健康监控）；并 mask `NetworkManager-wait-online`
 6. 启用 systemd 服务：系统级 iwd、wifi-fw-reset、keyd、smartd、linux-enable-ir-emitter（ollama 只装 override，不自启）；`dms plugins install` 拉取三个第三方启动器插件（calculator / emojiLauncher / niriWindows）；用户级 ssh-agent.socket、dms、cliphist、dcal、dsearch、remarkable-usb-share.service（事件驱动常驻）、systemd-tmpfiles-setup（否则 `user-tmpfiles.d/cleanup.conf` 不生效，本机实测默认 disabled）
 7. 初始化目录（wine prefix、ollama 模型、ssh ControlPath）
 8. GnuPG 迁移到 XDG 路径（`~/.local/share/gnupg`），生成 gpg-agent socket 单元 drop-in
@@ -234,6 +234,7 @@ nmcli con add type ethernet ifname rmk0 con-name remarkable-usb \
 | `etc/mihomo/config.template.yaml` | mihomo 配置模板（占位符见上文） |
 | `etc/systemd/resolved.conf.d/no-mdns.conf` | 禁用 systemd-resolved 的 mDNS（避免与 avahi 冲突） |
 | `etc/systemd/system/ollama.service.d/override.conf` | ollama 以 afu 用户运行，模型在 `~/.local/share/ollama/models`（系统单元里 `%h` 是 root 家目录，路径只能写死） |
+| `etc/systemd/system/mihomo.service.d/override.conf` | 收紧 mihomo-bin 自带单元过宽的 `CapabilityBoundingSet`（去掉 `SYS_PTRACE`/`SYS_TIME`/`DAC_OVERRIDE`/`DAC_READ_SEARCH`，只留 TUN 代理实际要用的 `NET_ADMIN`/`NET_RAW`/`NET_BIND_SERVICE`）；改动没能在部署环境实测，应用后请确认代理仍正常，回滚见文件内注释 |
 | `etc/systemd/network/10-wlan0.link` `11-rmk0.link` | 按 MAC 固定 Wi-Fi / reMarkable USB 网卡名（wlan0 / rmk0） |
 | `etc/systemd/system/wifi-fw-reset.service` `usr/local/bin/wifi-fw-reset` | BE200 冷开机固件在 `CTDP_CONFIG_CMD` 断言崩溃后 wlan0 全程 unavailable（热重启不复现）；开机延迟 8s 自检，命中则重载 iwlmld/iwlwifi，仍不行再 PCI remove/rescan。手动：`sudo wifi-fw-reset --force` |
 | `etc/udev/rules.d/85-iwl-dump.rules` `usr/local/bin/iwl-fwdump` | iwlwifi 固件崩溃时把 devcoredump 落盘到 `/var/lib/iwlwifi-dumps/`（默认 5 分钟销毁），供向 kernel bugzilla 提 bug 附件 |
