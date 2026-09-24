@@ -307,7 +307,7 @@ jmtpfs
 remanager-bin          # reMarkable 管理器
 debtap                 # 把 deb 转成 pacman 包（蓝信 com.picc.lanxin 即由此构建）
 ffuf-bin
-koodo-reader-bin       # 电子书阅读器；epub/mobi/djvu/漫画关联见 mimeapps.list（PDF 仍走 Brave）
+koodo-reader-bin       # 电子书阅读器；PDF/epub/mobi/djvu/漫画关联见 mimeapps.list
 lazysql-bin
 reqable-bin
 wechat-bin             # 微信；裸跑，见 ~/.local/bin/wechat 包装脚本（本机文件，不入库）

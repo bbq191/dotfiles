@@ -328,7 +328,7 @@ LSP → 路径 → LuaSnip（friendly-snippets）→ buffer（≥3 字符），R
 ### Yazi
 
 - 面板 1:2:4；图片预览 lanczos3、512MB 缓存；目录优先、自然排序、显示软链目标、size 行模式
-- 打开规则：文本 / JSON → nvim（`org.neovim.nvim.desktop` 覆盖版在 kitty 里启动，供 xdg-open / Nautilus 用）；图片 → satty（可直接标注）→ xdg-open；视频 → mpv；音频 → xdg-open；PDF → xdg-open（Brave 内置查看器，zathura 已卸载）；电子书 / 漫画（epub/mobi/djvu/cbz/cbr）→ xdg-open（Koodo Reader）；Office 文档（docx/doc/rtf/odt → LibreOffice Writer，xlsx/xls/ods/csv → LibreOffice Calc）→ xdg-open；压缩包 → 7z / unzip 解压；兜底先 nvim
+- 打开规则：文本 / JSON → nvim（`org.neovim.nvim.desktop` 覆盖版在 kitty 里启动，供 xdg-open / Nautilus 用）；图片 → satty（可直接标注）→ xdg-open；视频 → mpv；音频 → xdg-open；PDF / 电子书 / 漫画（epub/mobi/djvu/cbz/cbr）→ xdg-open（Koodo Reader，zathura 已卸载）；Office 文档（docx/doc/rtf/odt → LibreOffice Writer，xlsx/xls/ods/csv → LibreOffice Calc）→ xdg-open；压缩包 → 7z / unzip 解压；兜底先 nvim
 - 配色 `theme.toml` 为静态 Tokyo Night（不随 matugen）
 
 | 键位 | 功能 |
@@ -349,7 +349,9 @@ LSP → 路径 → LuaSnip（friendly-snippets）→ buffer（≥3 字符），R
 
 ### 电子书 / PDF 阅读
 
-zathura 已卸载（不再维护配色模板），PDF 默认交给 Brave 内置查看器。电子书用 Koodo Reader（`koodo-reader-bin`，AUR）；Calibre 及 DeDRM 插件已卸载。`mimeapps.list` 关联 epub / mobi / djvu / 漫画（cbz / cbr）→ Koodo Reader；它的 desktop 文件也声明了 PDF，但没有关联，PDF 仍走 Brave。cb7 / cbc 它不支持，这两种格式没有默认阅读器。
+zathura 已卸载（不再维护配色模板），PDF 和电子书统一用 Koodo Reader（`koodo-reader-bin`，AUR）；Calibre 及 DeDRM 插件已卸载。`mimeapps.list` 关联 epub / mobi / djvu / 漫画（cbz / cbr）、PDF → Koodo Reader（Brave 仍能通过其内置查看器打开网页里的 PDF）。cb7 / cbc 它不支持，这两种格式没有默认阅读器。
+
+**desktop 覆盖**：上游 `koodo-reader.desktop` 的 `Exec="/usr/bin/koodo-reader" %U` 带引号，xdg-utils 的 `xdg-mime` 检查可执行文件时会误判为不存在，回退到 mimeinfo.cache 里排第一的 Brave（epub 等只有它一个候选所以碰巧正常，PDF 有多个候选就中招）。所以仓库里放了去引号的覆盖版 `home/.local/share/applications/koodo-reader.desktop`；走 GLib 的程序（Nautilus 等）不受此影响。
 
 ### Office 文档
 

@@ -1,6 +1,7 @@
 [Default Applications]
 application/epub+zip=koodo-reader.desktop
 application/msword=libreoffice-writer.desktop
+application/pdf=koodo-reader.desktop
 application/rtf=libreoffice-writer.desktop
 application/vnd.comicbook+zip=koodo-reader.desktop
 application/vnd.comicbook-rar=koodo-reader.desktop
