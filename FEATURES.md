@@ -328,7 +328,7 @@ LSP → 路径 → LuaSnip（friendly-snippets）→ buffer（≥3 字符），R
 ### Yazi
 
 - 面板 1:2:4；图片预览 lanczos3、512MB 缓存；目录优先、自然排序、显示软链目标、size 行模式
-- 打开规则：文本 / JSON → nvim（`org.neovim.nvim.desktop` 覆盖版在 kitty 里启动，供 xdg-open / Nautilus 用）；图片 → satty（可直接标注）→ xdg-open；视频 → mpv；音频 → xdg-open；PDF → xdg-open（Brave 内置查看器，zathura 已卸载）；电子书 / 漫画（epub/mobi/djvu/cbz/cbr/cb7/cbc）→ xdg-open（calibre-ebook-viewer）；Office 文档（docx/doc/rtf/odt → AbiWord，xlsx/xls/ods/csv → Gnumeric）→ xdg-open；压缩包 → 7z / unzip 解压；兜底先 nvim
+- 打开规则：文本 / JSON → nvim（`org.neovim.nvim.desktop` 覆盖版在 kitty 里启动，供 xdg-open / Nautilus 用）；图片 → satty（可直接标注）→ xdg-open；视频 → mpv；音频 → xdg-open；PDF → xdg-open（Brave 内置查看器，zathura 已卸载）；Office 文档（docx/doc/rtf/odt → LibreOffice Writer，xlsx/xls/ods/csv → LibreOffice Calc）→ xdg-open；电子书 / 漫画（epub/mobi/djvu/cbz 等）已没有默认阅读器；压缩包 → 7z / unzip 解压；兜底先 nvim
 - 配色 `theme.toml` 为静态 Tokyo Night（不随 matugen）
 
 | 键位 | 功能 |
@@ -349,13 +349,11 @@ LSP → 路径 → LuaSnip（friendly-snippets）→ buffer（≥3 字符），R
 
 ### 电子书 / PDF 阅读
 
-zathura 已卸载（不再维护配色模板），PDF 默认交给 Brave 内置查看器；epub / mobi / djvu / 漫画压缩包（cbz / cbr / cb7 / cbc）默认用 calibre-ebook-viewer 打开，微信改裸跑 wechat-bin 后顺带把 Calibre 定位成纯书库管理 + 阅读器角色。
+zathura 已卸载（不再维护配色模板），PDF 默认交给 Brave 内置查看器。Calibre 及 DeDRM 插件已卸载，`mimeapps.list` 里 epub / mobi / djvu / 漫画压缩包（cbz / cbr / cb7 / cbc）的关联一并删除，目前这些格式没有默认阅读器；要读时再挑一个装上并补关联。
 
 ### Office 文档
 
-LibreOffice 太重换成了 AbiWord（字处理）+ Gnumeric（表格），二者都是原生 GTK3，同样吃 `adw-gtk3` 配色。`mimeapps.list` 显式关联：docx/doc/rtf/odt → AbiWord，xlsx/xls/ods/csv → Gnumeric。演示文稿（pptx/ppt/odp）没配，AbiWord/Gnumeric 系没有对应的幻灯片编辑器，唯一像样的选择是把整个 LibreOffice 装回来（只为 Impress），暂时按下不表，等真有需要再评估。
-
-**已知限制**：AbiWord 的 docx 导入过滤器对内嵌字体（Office 内嵌 OpenType/ODTTF 解混淆）和合并单元格表格支持较弱，遇到用了专有中文字体（仿宋_GB2312、方正小标宋简体等）或复杂表格的申报表类文档，会出现乱码/大片内容缺失——这是这套轻量组合的已知代价，不是文件损坏。偶尔遇到时不必常驻装回 LibreOffice（违背这里精简依赖的取舍），一次性用 `flatpak run org.libreoffice.LibreOffice`（需先装 flatpak + 该 runtime）或临时 `paru -S libreoffice-fresh` 装完用完就卸载即可。
+用 `libreoffice-fresh`。曾试过 AbiWord（字处理）+ Gnumeric（表格）以求轻量，但 AbiWord 的 docx 导入对内嵌字体和合并单元格表格支持太弱（专有中文字体或复杂申报表会乱码、大片内容缺失），最终换回 LibreOffice。`mimeapps.list` 显式关联：docx/doc/rtf/odt → Writer，xlsx/xls/ods/csv → Calc。演示文稿（pptx/ppt/odp）未显式配置，走 LibreOffice 自己注册的 Impress 关联。
 
 ---
 

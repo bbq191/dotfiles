@@ -1,4 +1,3 @@
-abiword                 # 轻量字处理，代替 LibreOffice Writer；docx/doc/rtf/odt 关联见 mimeapps.list
 accountsservice
 alsa-firmware
 alsa-plugins
@@ -76,7 +75,6 @@ git-delta
 greetd
 git-lfs
 gnome-keyring
-gnumeric                # 轻量表格，代替 LibreOffice Calc；xlsx/xls/ods/csv 关联见 mimeapps.list
 grim
 gst-libav
 gst-plugin-pipewire
@@ -112,6 +110,7 @@ libdvdcss
 libgepub
 libgsf
 libopenraw
+libreoffice-fresh       # 办公套件；docx/xlsx/odt 等关联见 mimeapps.list
 libva-nvidia-driver
 libva-utils
 limine
@@ -306,7 +305,6 @@ brave-nightly-bin      # 默认浏览器（mimeapps.list / Mod+B）
 mpv-uosc               # mpv UI，装到 /usr/share/mpv，mpv.conf 用 script= 显式加载（取代 vendored 副本）
 jmtpfs
 remanager-bin          # reMarkable 管理器
-calibre-plugin-dedrm
 debtap                 # 把 deb 转成 pacman 包（蓝信 com.picc.lanxin 即由此构建）
 ffuf-bin
 lazysql-bin
