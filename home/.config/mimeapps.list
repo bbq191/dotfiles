@@ -1,12 +1,16 @@
 [Default Applications]
+application/epub+zip=koodo-reader.desktop
 application/msword=libreoffice-writer.desktop
 application/rtf=libreoffice-writer.desktop
+application/vnd.comicbook+zip=koodo-reader.desktop
+application/vnd.comicbook-rar=koodo-reader.desktop
 application/vnd.oasis.opendocument.spreadsheet=libreoffice-calc.desktop
 application/vnd.oasis.opendocument.text=libreoffice-writer.desktop
 application/vnd.openxmlformats-officedocument.spreadsheetml.sheet=libreoffice-calc.desktop
 application/vnd.openxmlformats-officedocument.wordprocessingml.document=libreoffice-writer.desktop
 application/vnd.ms-excel=libreoffice-calc.desktop
 application/x-gnome-saved-search=org.gnome.Nautilus.desktop
+application/x-mobipocket-ebook=koodo-reader.desktop
 application/xhtml+xml=brave-browser-nightly.desktop
 image/avif=satty.desktop
 image/bmp=satty.desktop
@@ -14,6 +18,7 @@ image/gif=satty.desktop
 image/jpeg=satty.desktop
 image/png=satty.desktop
 image/svg+xml=satty.desktop
+image/vnd.djvu=koodo-reader.desktop
 image/webp=satty.desktop
 inode/directory=org.gnome.Nautilus.desktop
 text/csv=libreoffice-calc.desktop

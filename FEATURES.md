@@ -328,7 +328,7 @@ LSP → 路径 → LuaSnip（friendly-snippets）→ buffer（≥3 字符），R
 ### Yazi
 
 - 面板 1:2:4；图片预览 lanczos3、512MB 缓存；目录优先、自然排序、显示软链目标、size 行模式
-- 打开规则：文本 / JSON → nvim（`org.neovim.nvim.desktop` 覆盖版在 kitty 里启动，供 xdg-open / Nautilus 用）；图片 → satty（可直接标注）→ xdg-open；视频 → mpv；音频 → xdg-open；PDF → xdg-open（Brave 内置查看器，zathura 已卸载）；Office 文档（docx/doc/rtf/odt → LibreOffice Writer，xlsx/xls/ods/csv → LibreOffice Calc）→ xdg-open；电子书 / 漫画（epub/mobi/djvu/cbz 等）已没有默认阅读器；压缩包 → 7z / unzip 解压；兜底先 nvim
+- 打开规则：文本 / JSON → nvim（`org.neovim.nvim.desktop` 覆盖版在 kitty 里启动，供 xdg-open / Nautilus 用）；图片 → satty（可直接标注）→ xdg-open；视频 → mpv；音频 → xdg-open；PDF → xdg-open（Brave 内置查看器，zathura 已卸载）；电子书 / 漫画（epub/mobi/djvu/cbz/cbr）→ xdg-open（Koodo Reader）；Office 文档（docx/doc/rtf/odt → LibreOffice Writer，xlsx/xls/ods/csv → LibreOffice Calc）→ xdg-open；压缩包 → 7z / unzip 解压；兜底先 nvim
 - 配色 `theme.toml` 为静态 Tokyo Night（不随 matugen）
 
 | 键位 | 功能 |
@@ -349,7 +349,7 @@ LSP → 路径 → LuaSnip（friendly-snippets）→ buffer（≥3 字符），R
 
 ### 电子书 / PDF 阅读
 
-zathura 已卸载（不再维护配色模板），PDF 默认交给 Brave 内置查看器。Calibre 及 DeDRM 插件已卸载，`mimeapps.list` 里 epub / mobi / djvu / 漫画压缩包（cbz / cbr / cb7 / cbc）的关联一并删除，目前这些格式没有默认阅读器；要读时再挑一个装上并补关联。
+zathura 已卸载（不再维护配色模板），PDF 默认交给 Brave 内置查看器。电子书用 Koodo Reader（`koodo-reader-bin`，AUR）；Calibre 及 DeDRM 插件已卸载。`mimeapps.list` 关联 epub / mobi / djvu / 漫画（cbz / cbr）→ Koodo Reader；它的 desktop 文件也声明了 PDF，但没有关联，PDF 仍走 Brave。cb7 / cbc 它不支持，这两种格式没有默认阅读器。
 
 ### Office 文档
 
