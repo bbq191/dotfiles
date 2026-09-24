@@ -273,6 +273,7 @@ shellcheck             # 脚本静态检查（install.sh / .local/bin）
 shfmt                  # nvim conform 格式化 sh/bash
 stylua                 # nvim conform 格式化 lua（本配置自身）
 uv
+go
 cmake
 ninja
 android-tools
@@ -280,6 +281,7 @@ python-fonttools
 curl-impersonate
 nmap
 radare2
+ghidra                 # 逆向分析框架（与 radare2 互补）
 sshpass
 aarch64-linux-gnu-gcc
 aarch64-linux-gnu-binutils
