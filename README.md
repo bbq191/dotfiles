@@ -28,7 +28,8 @@ cd ~/Projects/dotfiles
 3. fnm 安装 Node LTS（已有默认版本则跳过），全局 npm 安装 `@google/gemini-cli` 与 `@mermaid-js/mermaid-cli`（pandoc 渲染 mermaid 用；命令已存在则跳过）
 4. stow 将 `home/` 链接到 `$HOME`（随后 `rime-dict-sync` 拉取 Iorest 增强词库、转简体、编译）：目标位置已有的实体文件按仓库清单逐个备份为 `*.bak-<时间戳>`（已经通过上级目录链接指向仓库的文件会跳过），旧的绝对路径链接原地重建为相对链接；随后 `dconf load` 同步 GTK 字体/主题（纯 GTK3 程序不读 `settings.ini`）、Nautilus 偏好
 5. 复制 `system/etc`、`system/usr/local/bin` 到系统：resolved / ollama drop-in / mihomo 能力收紧 drop-in / iwd 启动顺序 drop-in / NVIDIA modprobe / greetd NVIDIA 覆盖 / tmpfiles（THP、howdy 权限）/ PAM（dankshell、sudo、greetd、polkit-1）/ howdy-libguard 与 pacman 钩子 / sudoers（papirus-folders）/ NetworkManager（iwd 后端、iptables 防火墙后端）/ `.link` 网卡命名（wlan0、rmk0）/ BE200 冷开机固件崩溃自愈（wifi-fw-reset + iwl-fwdump）/ sysctl（ip_forward、min_free_kbytes）/ udev（IO 调度器、uuu）/ keyd / snapper / smartd（NVMe 健康监控 + 桌面通知插件）；并 mask `NetworkManager-wait-online`
-6. 启用 systemd 服务：系统级 iwd、wifi-fw-reset、keyd、smartd、linux-enable-ir-emitter（ollama 只装 override，不自启）；`dms plugins install` 拉取三个第三方启动器插件（calculator / emojiLauncher / niriWindows）；用户级 ssh-agent.socket、dms、cliphist、dcal、dsearch、remarkable-usb-share.service（事件驱动常驻）、systemd-tmpfiles-setup（否则 `user-tmpfiles.d/cleanup.conf` 不生效，本机实测默认 disabled）
+6. 启用 systemd 服务：系统级 iwd、wifi-fw-reset、keyd、smartd、linux-enable-ir-emitter、`paccache.timer`（每周清旧包缓存）、`btrfs-scrub@-` / `btrfs-scrub@home` 定时器（每月校验 `/` 与 `/home`，两个独立的 btrfs）（ollama 只装 override，不自启）；`dms plugins install` 拉取三个第三方启动器插件（calculator / emojiLauncher / niriWindows）；用户级 ssh-agent.socket、dms、cliphist、dcal、dsearch、remarkable-usb-share.service（事件驱动常驻）、backup-reminder.timer、systemd-tmpfiles-setup（否则 `user-tmpfiles.d/cleanup.conf` 不生效，本机实测默认 disabled）
+   随后是启动调优（见下方「启动调优」）
 7. 初始化目录（wine prefix、ollama 模型、ssh ControlPath）
 8. GnuPG 迁移到 XDG 路径（`~/.local/share/gnupg`），生成 gpg-agent socket 单元 drop-in
 9. Maven 本地仓库迁移到 `~/.cache/maven/repository`
@@ -82,6 +83,19 @@ cd ~/Projects/dotfiles
 
 ---
 
+## 启动调优
+
+一次冷开机约 35 秒（`systemd-analyze`：固件 15.9s + loader 3.4s + 内核 0.7s + initrd 3.8s + 用户态 11.3s），大头不在系统里。逐项审过后，能动的只有这几处：
+
+| 项 | 做法 | 依据 |
+|---|---|---|
+| `wifi-fw-reset` 拖慢 graphical.target | 改 `Type=simple`，8 秒延迟移进 `ExecStart` | 原先 `oneshot` + `ExecStartPre=sleep 8`，而 `multi-user.target` 会隐式等它，用户态 11.3s 里有 8s 就是这个 sleep；greetd 登录本身不受影响，所以主要改善开机统计数字。用临时单元实测：`Type=simple` 的 start 阻塞 0.0s，`oneshot` 阻塞 3.0s |
+| plymouth 启动画面 | 内核参数 `splash` → `plymouth.enable=0`（`install.sh` 改 `/etc/default/limine` 后 `limine-update`） | `plymouth-quit-wait` 在关键路径上 2.9s，greetd 排在它后面；本机无加密盘，启动画面纯装饰。不需要重建 initrd。**改动后的开机耗时尚未实测** |
+| limine 菜单等待 | `install.sh` 把 `/boot/limine.conf` 里大于 1 的 `timeout:` 改为 1（先备份 `.bak-dotfiles`；格式对不上就跳过） | loader 阶段 3.4s。开机后按住任意键可停住倒计时选快照/旧内核。**改动后的开机耗时尚未实测** |
+| iwd 抢跑 regdomain | `iwd.service.d/override.conf` 加 `After=` | 消掉内核 `nl80211_get_reg_do` WARN；部署后是否真消掉待验证 |
+
+固件 15.9s（BIOS 自检）系统改不了；BIOS 里若有 Fast Boot / 内存快速训练类选项可以试，但那是固件设置，不在本仓库范围。
+
 ## 备份
 
 `backup-home` 备份 `~/Documents`、`~/Projects` 到外接盘（Kingston USB 盘，exFAT，卷标 `afu`）上的 restic 仓库（`<挂载点>/restic-repo`，不占用盘根目录，盘上还有其他既有文件）：
@@ -91,7 +105,7 @@ cd ~/Projects/dotfiles
 - 脚本按 UUID 找外接盘，没挂载会先 `udisksctl mount` 自动挂载（`udisks2` 用户态挂载，不用 sudo）
 - 每次跑完 `restic forget --keep-last 5 --keep-weekly 4 --keep-monthly 6 --prune` 清理旧快照
 
-按需手动运行，没做成定时任务：外接盘不会一直插着，定时任务在盘不在时只会白白失败。
+备份本身按需手动运行，没做成定时任务：外接盘不会一直插着，定时任务在盘不在时只会白白失败。为免忘记，`backup-home` 成功后会写时间戳（`~/.local/state/backup-home/last-success`），用户级 `backup-reminder.timer` 每天检查一次，超过 14 天没成功备份（或从没备份过）就弹桌面通知。
 
 **已实测**：完整跑过一遍 `init` → `backup` → `forget --prune`，首次全量备份 20124 个文件 / 24.5GiB（去重后存了 22.2GiB），耗时约 54 分钟（外接盘速度是瓶颈），`forget` 的保留策略正确生效。踩过的坑：`rbw add`/`rbw edit` 交互没填内容会存成空密码，restic 会直接拒绝空密码仓库（`--insecure-no-password` 才能绕过，不建议）；`rbw add` 对同名条目不会报重复，跑两次会存出两条同名密码，`rbw get` 遇到多条同名匹配会直接报错拒绝返回，两者都需要手动清理（`rbw edit`/`rbw remove`）。
 
@@ -329,7 +343,7 @@ dotfiles/
 │   │   ├── environment.d/       # fcitx5 / gnupg / maven 环境变量
 │   │   ├── git/  maven/  gemini/  danksearch/  dankcal/  restic/   # excludes.txt，见「备份」
 │   │   └── mimeapps.list  user-dirs.dirs  user-dirs.locale  xdg-terminals.list  user-tmpfiles.d/
-│   ├── .local/bin/              # hotspot-internet、usb-internet（共享实现在 mihomo-direct-switch）、backup-home、remarkable-usb-share、remarkable-usb-watch、x11-clipboard-bridge、rime-dict-sync、rbw-ssh-load、git-credential-rbw、wine-setup-fonts
+│   ├── .local/bin/              # hotspot-internet、usb-internet（共享实现在 mihomo-direct-switch）、backup-home、backup-reminder、remarkable-usb-share、remarkable-usb-watch、x11-clipboard-bridge、rime-dict-sync、rbw-ssh-load、git-credential-rbw、wine-setup-fonts
 │   ├── .local/share/            # applications/*.desktop（蓝信、nvim 在 kitty 中打开）、fcitx5/rime/（*.custom.yaml、rime_ice_ext.dict.yaml）、rustup/settings.toml
 │   └── .ssh/config
 ├── system/

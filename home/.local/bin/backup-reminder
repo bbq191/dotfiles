@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+# 距上次成功 backup-home 超过 MAX_DAYS 天（或从没成功过）就弹桌面通知。
+# 由 backup-reminder.timer 每天触发；备份本身仍需手动插盘执行（见 backup-home）。
+set -euo pipefail
+
+MAX_DAYS=14
+STAMP="${XDG_STATE_HOME:-$HOME/.local/state}/backup-home/last-success"
+
+if [[ ! -f "$STAMP" ]]; then
+    msg="还没有成功备份的记录。插上外接盘后运行 backup-home。"
+else
+    age_days=$(( ( $(date +%s) - $(stat -c %Y "$STAMP") ) / 86400 ))
+    (( age_days >= MAX_DAYS )) || exit 0
+    msg="已有 ${age_days} 天没备份（阈值 ${MAX_DAYS} 天）。插上外接盘后运行 backup-home。"
+fi
+
+notify-send --urgency=normal --app-name=backup-reminder "该备份了" "$msg"

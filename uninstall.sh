@@ -30,6 +30,8 @@ systemctl --user disable --now remarkable-usb-share.service 2>/dev/null || true
 sudo systemctl disable --now wifi-fw-reset.service 2>/dev/null || true
 sudo systemctl disable --now mihomo 2>/dev/null || true
 sudo systemctl disable --now smartd 2>/dev/null || true
+sudo systemctl disable --now paccache.timer 'btrfs-scrub@-.timer' btrfs-scrub@home.timer 2>/dev/null || true
+systemctl --user disable --now backup-reminder.timer 2>/dev/null || true
 sudo systemctl unmask NetworkManager-wait-online.service 2>/dev/null || true
 
 # GPG socket drop-in：只删本仓库生成的 drop-in，不动 gpg-agent 本体
@@ -87,6 +89,8 @@ echo "        sudo pacman -S pambase --overwrite '/etc/pam.d/sudo'"
 echo "        sudo pacman -S greetd   --overwrite '/etc/pam.d/greetd'"
 echo "    /etc/pam.d/polkit-1 是 /etc 覆盖 /usr/lib/pam.d 默认值，直接 sudo rm /etc/pam.d/polkit-1 即可回落"
 echo "    /etc/pam.d/dankshell 是本仓库独有文件，非包管理覆盖：sudo rm /etc/pam.d/dankshell"
+echo "  - 启动调优：install.sh 把 /etc/default/limine 里的 splash 换成了 plymouth.enable=0，limine 菜单等待改成了 1 秒；"
+echo "    还原：把 plymouth.enable=0 改回 splash 后 sudo limine-update；菜单等待用 /boot/limine.conf.bak-dotfiles 覆盖回去"
 echo "  - 软件包：packages/packages.txt 里的包未卸载（多数是通用工具，批量卸载影响面不可控）"
 echo "  - XDG 数据迁移（~/.local/share/{gnupg,maven,sdkman}）未回滚，避免误删密钥/缓存"
 echo "  - DMS 插件（calculator/emojiLauncher/niriWindows）未卸载：dms plugins uninstall <name>"

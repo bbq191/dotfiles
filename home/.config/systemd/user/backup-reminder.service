@@ -1,0 +1,6 @@
+[Unit]
+Description=Notify when backup-home has not succeeded for a while
+
+[Service]
+Type=oneshot
+ExecStart=%h/.local/bin/backup-reminder

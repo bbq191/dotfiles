@@ -511,11 +511,13 @@ Satty：箭头 / 矩形 / 圆 / 文本 / 马赛克 / 荧光笔；右键即复制
 | NVIDIA 待机 | `NVreg_EnableS0ixPowerManagement=1`，s2idle 时 GPU 进入 S0ix |
 | Transparent Huge Pages | `madvise`（`tmpfiles.d/thp.conf`） |
 | Btrfs 快照 | snapper 仅 pacman 前后编号快照（上限 50，重要 15），timeline 关闭；`snapper-cleanup.timer` 清理；`limine-snapper-sync` 进启动菜单 |
-| 异地/离线备份 | 快照防不了盘物理损坏/失窃：`backup-home`（restic）按需备份 `~/Documents`、`~/Projects` 到外接盘，见 README「备份」 |
+| 异地/离线备份 | 快照防不了盘物理损坏/失窃：`backup-home`（restic）按需备份 `~/Documents`、`~/Projects` 到外接盘；`backup-reminder.timer` 每天检查，超过 14 天没成功备份就弹桌面通知，见 README「备份」 |
 | 键盘 | keyd：capslock ↔ leftcontrol，仅 DELL 外接键盘（内置键盘不换） |
+| 启动速度 | `wifi-fw-reset` 用 `Type=simple` 避免把 graphical.target 拖 8 秒；内核参数关 plymouth（`plymouth.enable=0`）；limine 菜单等待 1 秒；详见 README「启动调优」 |
 | 网络启动 | mask `NetworkManager-wait-online`；Wi-Fi 后端 iwd；`iwd.service.d/override.conf` 加 `After=cachyos-iw-set-regdomain.service` 消掉抢跑查询 regdom 的内核 WARN |
 | 日志 / 固件 / 镜像 | logrotate、fwupd、cachyos-rate-mirrors |
 | $HOME 清洁 | XDG 环境变量 + `user-tmpfiles.d/cleanup.conf` |
+| 例行维护 | `paccache.timer` 每周清旧包缓存；`btrfs-scrub@-` / `btrfs-scrub@home` 每月校验（`/` 与 `/home` 是两个独立的 btrfs；单盘只能发现坏块，恢复靠备份） |
 | 硬盘 | `fstrim.timer`；IO 调度器 NVMe `none` / SATA SSD `mq-deadline`（udev 覆盖）；`smartd` 监控 NVMe 健康（温度阈值 + 每日短自检/每周长自检，异常弹桌面通知，见 README「系统配置说明」） |
 | 内存 | `vm.min_free_kbytes=512M` |
 | 内核参数 | `nvidia-drm.modeset=1 nvidia-drm.fbdev=1`，initramfs 预载 nvidia 模块（chwd） |

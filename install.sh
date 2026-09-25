@@ -187,6 +187,9 @@ sudo systemctl enable --now iwd
 sudo systemctl enable wifi-fw-reset.service
 sudo systemctl enable --now keyd
 sudo systemctl enable --now smartd
+# 例行维护：paccache 每周清旧包缓存；btrfs scrub 每月校验（/ 和 /home 是两个独立的 btrfs，各一个定时器）。
+# 单盘 scrub 只能发现坏块不能自修复，发现后靠 backup-home 的备份恢复
+sudo systemctl enable --now paccache.timer 'btrfs-scrub@-.timer' btrfs-scrub@home.timer
 (( SMARTD_CHANGED )) && sudo systemctl restart smartd   # 配置变了才重启，重载配置生效
 # IR 补光服务（howdy 人脸识别依赖）；新机器需先 sudo linux-enable-ir-emitter configure
 sudo systemctl enable linux-enable-ir-emitter.service
@@ -208,6 +211,28 @@ systemctl --user enable --now systemd-tmpfiles-setup.service systemd-tmpfiles-cl
 # `ip monitor` 上，设备重启/重插拔（rmk0 链路/地址事件）才推送，不再每 45s 轮询。旧版是 .timer，顺手停掉。
 systemctl --user disable --now remarkable-usb-share.timer 2>/dev/null || true
 systemctl --user enable --now remarkable-usb-share.service
+# 备份提醒：backup-home 需要手动插盘，超过 14 天没成功就弹通知（时间戳由 backup-home 成功后写入）
+systemctl --user enable --now backup-reminder.timer
+
+# ── 6b. 启动调优（limine）─────────────────────────────────────────────────────
+# 只在识别到预期格式时才改，格式对不上就原样跳过，不会硬改引导配置。
+echo "[+] 检查启动调优..."
+LIMINE_DEFAULT=/etc/default/limine
+# plymouth 退出动画占关键路径约 3 秒（greetd 排在 plymouth-quit-wait 之后）；本机没有加密盘，
+# 启动画面纯属装饰。plymouth.enable=0 让 plymouth 各单元直接跳过，不需要重建 initrd
+# （想恢复：把 plymouth.enable=0 改回 splash，再 sudo limine-update）
+if [[ -f "$LIMINE_DEFAULT" ]] && grep -qE '^KERNEL_CMDLINE\[default\].*\bsplash\b' "$LIMINE_DEFAULT"; then
+    sudo sed -i -E '/^KERNEL_CMDLINE\[default\]/ s/\bsplash\b/plymouth.enable=0/' "$LIMINE_DEFAULT"
+    sudo limine-update
+    echo "    已在内核参数里关闭 plymouth（下次开机生效）"
+fi
+# limine 菜单默认要等几秒才进系统；要选快照/旧内核时开机后按住任意键即可停住倒计时。
+# ESP 上先留一份 .bak-dotfiles 再改
+if sudo grep -qE '^timeout: *([2-9]|[1-9][0-9]+) *$' /boot/limine.conf 2>/dev/null; then
+    sudo cp -n /boot/limine.conf /boot/limine.conf.bak-dotfiles
+    sudo sed -i -E 's/^timeout:.*/timeout: 1/' /boot/limine.conf
+    echo "    limine 菜单等待改为 1 秒（原文件备份在 /boot/limine.conf.bak-dotfiles）"
+fi
 
 # ── 7. 目录初始化 ─────────────────────────────────────────────────────────────
 mkdir -p "$HOME/.local/share/wine"

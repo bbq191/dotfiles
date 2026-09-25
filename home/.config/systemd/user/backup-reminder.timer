@@ -1,0 +1,11 @@
+[Unit]
+Description=Daily check for stale backups
+
+[Timer]
+# 登录后 10 分钟检查一次（错过的每日检查靠 Persistent 补上），之后每天一次
+OnStartupSec=10min
+OnCalendar=daily
+Persistent=true
+
+[Install]
+WantedBy=timers.target
