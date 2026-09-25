@@ -27,7 +27,7 @@ cd ~/Projects/dotfiles
 2. 通过 paru 安装 `packages/packages.txt` 中**尚未安装**的软件包（`pacman -T` 筛选；不升级已装包，升级用 `paru -Syu`）
 3. fnm 安装 Node LTS（已有默认版本则跳过），全局 npm 安装 `@google/gemini-cli` 与 `@mermaid-js/mermaid-cli`（pandoc 渲染 mermaid 用；命令已存在则跳过）
 4. stow 将 `home/` 链接到 `$HOME`（随后 `rime-dict-sync` 拉取 Iorest 增强词库、转简体、编译）：目标位置已有的实体文件按仓库清单逐个备份为 `*.bak-<时间戳>`（已经通过上级目录链接指向仓库的文件会跳过），旧的绝对路径链接原地重建为相对链接；随后 `dconf load` 同步 GTK 字体/主题（纯 GTK3 程序不读 `settings.ini`）、Nautilus 偏好
-5. 复制 `system/etc`、`system/usr/local/bin` 到系统：resolved / ollama drop-in / mihomo 能力收紧 drop-in / iwd 启动顺序 drop-in / NVIDIA modprobe / greetd NVIDIA 覆盖 / tmpfiles（THP、howdy 权限）/ PAM（dankshell、sudo、greetd、polkit-1）/ howdy-libguard 与 pacman 钩子 / sudoers（papirus-folders）/ NetworkManager（iwd 后端、iptables 防火墙后端）/ `.link` 网卡命名（wlan0、rmk0）/ BE200 冷开机固件崩溃自愈（wifi-fw-reset + iwl-fwdump）/ sysctl（ip_forward、min_free_kbytes）/ udev（IO 调度器、uuu）/ keyd / snapper / smartd（NVMe 健康监控 + 桌面通知插件）；并 mask `NetworkManager-wait-online`
+5. 复制 `system/etc`、`system/usr/local/bin` 到系统：resolved / ollama drop-in / mihomo 能力收紧 drop-in / NVIDIA modprobe / greetd NVIDIA 覆盖 / tmpfiles（THP、howdy 权限）/ PAM（dankshell、sudo、greetd、polkit-1）/ howdy-libguard 与 pacman 钩子 / sudoers（papirus-folders）/ NetworkManager（iwd 后端、iptables 防火墙后端）/ `.link` 网卡命名（wlan0、rmk0）/ BE200 冷开机固件崩溃自愈（wifi-fw-reset + iwl-fwdump）/ sysctl（ip_forward、min_free_kbytes）/ udev（IO 调度器、uuu）/ keyd / snapper / smartd（NVMe 健康监控 + 桌面通知插件）；并 mask `NetworkManager-wait-online`
 6. 启用 systemd 服务：系统级 iwd、wifi-fw-reset、keyd、smartd、linux-enable-ir-emitter、`paccache.timer`（每周清旧包缓存）、`btrfs-scrub@-` / `btrfs-scrub@home` 定时器（每月校验 `/` 与 `/home`，两个独立的 btrfs）（ollama 只装 override，不自启）；`dms plugins install` 拉取三个第三方启动器插件（calculator / emojiLauncher / niriWindows）；用户级 ssh-agent.socket、dms、cliphist、dcal、dsearch、remarkable-usb-share.service（事件驱动常驻）、backup-reminder.timer、systemd-tmpfiles-setup（否则 `user-tmpfiles.d/cleanup.conf` 不生效，本机实测默认 disabled）
    随后是启动调优（见下方「启动调优」）
 7. 初始化目录（wine prefix、ollama 模型、ssh ControlPath）
@@ -85,14 +85,16 @@ cd ~/Projects/dotfiles
 
 ## 启动调优
 
-一次冷开机约 35 秒（`systemd-analyze`：固件 15.9s + loader 3.4s + 内核 0.7s + initrd 3.8s + 用户态 11.3s），大头不在系统里。逐项审过后，能动的只有这几处：
+优化前一次冷开机约 35 秒（`systemd-analyze`：固件 15.9s + loader 3.4s + 内核 0.7s + initrd 3.8s + 用户态 11.3s），大头不在系统里。逐项审过后，能动的只有这几处。
+
+改动后重启实测（2026-09-25，单次，未取平均）：**26.8s**（固件 15.86s + loader 2.41s + 内核 0.67s + initrd 3.81s + 用户态 4.04s），其中用户态 −7.3s、loader −1.0s，`graphical.target` 在用户态 4.03s 到达。
 
 | 项 | 做法 | 依据 |
 |---|---|---|
 | `wifi-fw-reset` 拖慢 graphical.target | 改 `Type=simple`，8 秒延迟移进 `ExecStart` | 原先 `oneshot` + `ExecStartPre=sleep 8`，而 `multi-user.target` 会隐式等它，用户态 11.3s 里有 8s 就是这个 sleep；greetd 登录本身不受影响，所以主要改善开机统计数字。用临时单元实测：`Type=simple` 的 start 阻塞 0.0s，`oneshot` 阻塞 3.0s |
-| plymouth 启动画面 | 内核参数 `splash` → `plymouth.enable=0`（`install.sh` 改 `/etc/default/limine` 后 `limine-update`） | `plymouth-quit-wait` 在关键路径上 2.9s，greetd 排在它后面；本机无加密盘，启动画面纯装饰。不需要重建 initrd。**改动后的开机耗时尚未实测** |
-| limine 菜单等待 | `install.sh` 把 `/boot/limine.conf` 里大于 1 的 `timeout:` 改为 1（先备份 `.bak-dotfiles`；格式对不上就跳过） | loader 阶段 3.4s。开机后按住任意键可停住倒计时选快照/旧内核。**改动后的开机耗时尚未实测** |
-| iwd 抢跑 regdomain | `iwd.service.d/override.conf` 加 `After=` | 消掉内核 `nl80211_get_reg_do` WARN；部署后是否真消掉待验证 |
+| plymouth 启动画面 | 内核参数 `splash` → `plymouth.enable=0`（`install.sh` 改 `/etc/default/limine` 后 `limine-update`） | `plymouth-quit-wait` 在关键路径上 2.9s，greetd 排在它后面；本机无加密盘，启动画面纯装饰。不需要重建 initrd。`/proc/cmdline` 已含 `plymouth.enable=0`；initrd 阶段耗时无变化（3.8s），收益在用户态关键链 |
+| limine 菜单等待 | `install.sh` 把 `/boot/limine.conf` 里大于 1 的 `timeout:` 改为 1（先备份 `.bak-dotfiles`；格式对不上就跳过） | loader 阶段 3.4s → 2.41s。开机后按住任意键可停住倒计时选快照/旧内核。未读 `/boot/limine.conf` 核对（需 root），减少量是从耗时推断 |
+| ~~iwd 抢跑 regdomain~~（已撤销） | 曾加 `iwd.service.d/override.conf`（`After=cachyos-iw-set-regdomain.service`） | **无效，已删除**。实测顺序已满足（regdomain 服务 12:42:23.253 完成，iwd 12:42:23.254 启动），内核 `nl80211_get_reg_do` WARN 仍在 240ms 后出现；推断原因是 BE200 自管理 regdom，固件尚未上报时就被查询，systemd 顺序管不到。只是日志里的 WARN，`iw reg get` 为 CN，Wi-Fi 正常，不处理 |
 
 固件 15.9s（BIOS 自检）系统改不了；BIOS 里若有 Fast Boot / 内存快速训练类选项可以试，但那是固件设置，不在本仓库范围。
 
@@ -266,7 +268,6 @@ nmcli con add type ethernet ifname rmk0 con-name remarkable-usb \
 | `etc/systemd/system/ollama.service.d/override.conf` | ollama 以 afu 用户运行，模型在 `~/.local/share/ollama/models`（系统单元里 `%h` 是 root 家目录，路径只能写死） |
 | `etc/systemd/system/mihomo.service.d/override.conf` | 收紧 mihomo-bin 自带单元过宽的 `CapabilityBoundingSet`（去掉 `SYS_PTRACE`/`SYS_TIME`/`DAC_OVERRIDE`/`DAC_READ_SEARCH`，只留 TUN 代理实际要用的 `NET_ADMIN`/`NET_RAW`/`NET_BIND_SERVICE`）；已部署并实测确认（`systemctl show mihomo -p CapabilityBoundingSet` 核实生效，代理正常），回滚见文件内注释 |
 | `etc/systemd/network/10-wlan0.link` `11-rmk0.link` | 按 MAC 固定 Wi-Fi / reMarkable USB 网卡名（wlan0 / rmk0） |
-| `etc/systemd/system/iwd.service.d/override.conf` | `After=cachyos-iw-set-regdomain.service`：消掉 iwd 抢跑查询 regdom 触发的内核 WARN（`nl80211_get_reg_do`，2026-09 系统日志核查中发现，实测近 4 次开机 3 次命中，只影响日志不影响功能） |
 | `etc/systemd/system/wifi-fw-reset.service` `usr/local/bin/wifi-fw-reset` | BE200 冷开机固件在 `CTDP_CONFIG_CMD` 断言崩溃后 wlan0 全程 unavailable（热重启不复现）；开机延迟 8s 自检（Type=simple，不会拖慢 graphical.target），命中则重载 iwlmld/iwlwifi，仍不行再 PCI remove/rescan。手动：`sudo wifi-fw-reset --force` |
 | `etc/udev/rules.d/85-iwl-dump.rules` `usr/local/bin/iwl-fwdump` | iwlwifi 固件崩溃时把 devcoredump 落盘到 `/var/lib/iwlwifi-dumps/`（默认 5 分钟销毁），供向 kernel bugzilla 提 bug 附件 |
 | `etc/modprobe.d/nvidia-local.conf` | `NVreg_EnableS0ixPowerManagement=1`：s2idle 休眠时 GPU 参与 S0ix，否则待机耗电 |

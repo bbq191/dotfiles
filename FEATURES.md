@@ -514,7 +514,7 @@ Satty：箭头 / 矩形 / 圆 / 文本 / 马赛克 / 荧光笔；右键即复制
 | 异地/离线备份 | 快照防不了盘物理损坏/失窃：`backup-home`（restic）按需备份 `~/Documents`、`~/Projects` 到外接盘；`backup-reminder.timer` 每天检查，超过 14 天没成功备份就弹桌面通知，见 README「备份」 |
 | 键盘 | keyd：capslock ↔ leftcontrol，仅 DELL 外接键盘（内置键盘不换） |
 | 启动速度 | `wifi-fw-reset` 用 `Type=simple` 避免把 graphical.target 拖 8 秒；内核参数关 plymouth（`plymouth.enable=0`）；limine 菜单等待 1 秒；详见 README「启动调优」 |
-| 网络启动 | mask `NetworkManager-wait-online`；Wi-Fi 后端 iwd；`iwd.service.d/override.conf` 加 `After=cachyos-iw-set-regdomain.service` 消掉抢跑查询 regdom 的内核 WARN |
+| 网络启动 | mask `NetworkManager-wait-online`；Wi-Fi 后端 iwd；内核 `nl80211_get_reg_do` WARN 是 BE200 自管理 regdom 所致，无害，systemd 顺序约束无效，不处理 |
 | 日志 / 固件 / 镜像 | logrotate、fwupd、cachyos-rate-mirrors |
 | $HOME 清洁 | XDG 环境变量 + `user-tmpfiles.d/cleanup.conf` |
 | 例行维护 | `paccache.timer` 每周清旧包缓存；`btrfs-scrub@-` / `btrfs-scrub@home` 每月校验（`/` 与 `/home` 是两个独立的 btrfs；单盘只能发现坏块，恢复靠备份） |
