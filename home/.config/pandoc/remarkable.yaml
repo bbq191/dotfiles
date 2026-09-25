@@ -4,7 +4,9 @@
 # 换字体/颜色/页边距改 remarkable.tex；换 mermaid 行为改 filters.lua。
 # 字体在 ~/.local/share/fonts/remarkable-pandoc/（与项目解耦）。
 
-from: markdown
+# 关掉 markdown_in_html_blocks / native_divs：<div> 整块作为 raw HTML 透传，
+# 其中的内联 <svg>（含空行）才能完整交给 filters.lua 转成图；副作用是 <div> 内的 markdown 不再解析
+from: markdown-markdown_in_html_blocks-native_divs
 to: pdf
 pdf-engine: xelatex
 

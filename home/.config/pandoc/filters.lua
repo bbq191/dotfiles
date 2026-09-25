@@ -1,6 +1,9 @@
 -- pandoc Lua 过滤器（配合 remarkable.yaml / remarkable.tex）
 --   1) 让长内联代码（路径/函数名）在 PDF 里可断行，修复溢出
 --   2) mermaid 代码块：装了 mermaid-cli(mmdc) 就渲染成图，否则给出占位卡片
+--   3) emoji 兜底字体
+--   4) SVG：<div> 里的内联 <svg>…</svg> 与 ![](x.svg) 经 rsvg-convert 转矢量 PDF 嵌入
+--      （xelatex 不认 SVG，pandoc 默认会把内联 SVG 当 raw HTML 直接丢掉）
 
 ------------------------------------------------------------------
 -- 1) 长内联代码断点
@@ -121,4 +124,96 @@ if FORMAT:match('latex') then
   end
 end
 
-return { Code_filter, Mermaid_filter, Emoji_filter }
+------------------------------------------------------------------
+-- 4) SVG → 矢量 PDF（rsvg-convert）
+--    内联 SVG 必须放在 <div>…</div> 里（remarkable.yaml 关掉了 markdown_in_html_blocks，
+--    div 整块作为 raw HTML 透传，SVG 内部有空行也不会被拆碎）。
+--    产物按内容 sha1 缓存在 ~/.cache/pandoc-svg。
+------------------------------------------------------------------
+local rsvg_ok = has_cmd('rsvg-convert')
+-- svg 根元素上的字体设置优先级最低：没写 font-family 的文字用简体中文无衬线，
+-- 否则 fontconfig 会给 CJK 挑到韩文变体衬线；SVG 自己指定的 font-family 不受影响
+local SVG_CSS = 'svg { font-family: "Noto Sans CJK SC", "Noto Sans", sans-serif; }'
+
+local function svg_to_pdf(svg_text, key)
+  if not rsvg_ok then return nil end
+  local home = os.getenv('HOME') or '.'
+  local dir = (os.getenv('XDG_CACHE_HOME') or (home .. '/.cache')) .. '/pandoc-svg'
+  os.execute('mkdir -p ' .. dir)
+  local hash = pandoc.utils.sha1(SVG_CSS .. svg_text .. (key or ''))
+  local pdf = dir .. '/' .. hash .. '.pdf'
+  local ok = io.open(pdf, 'rb')
+  if ok then
+    local nonempty = ok:seek('end') > 0
+    ok:close()
+    if nonempty then return pdf end
+  end
+  local svg, css = dir .. '/' .. hash .. '.svg', dir .. '/style.css'
+  local f = io.open(svg, 'w'); f:write(svg_text); f:close()
+  f = io.open(css, 'w'); f:write(SVG_CSS); f:close()
+  os.execute('rsvg-convert -f pdf --stylesheet ' .. css .. ' -o ' .. pdf .. ' ' .. svg .. ' 2>/dev/null')
+  ok = io.open(pdf, 'rb')
+  if ok then
+    local nonempty = ok:seek('end') > 0
+    ok:close()
+    if nonempty then return pdf end
+  end
+  return nil
+end
+
+local function include_pdf(pdf)
+  return '\\begin{center}\\includegraphics[width=\\linewidth]{' .. pdf .. '}\\end{center}'
+end
+
+local Svg_filter = {}
+if FORMAT:match('latex') then
+  -- reader 已关 markdown_in_html_blocks，<div> 里的 markdown 得在这里补解析，否则 LaTeX 会整块丢掉
+  local function md_blocks(text)
+    if not text:find('%S') then return {} end
+    return pandoc.read(text, 'markdown').blocks
+  end
+
+  function Svg_filter.RawBlock(el)
+    if el.format ~= 'html' then return nil end
+    if not el.text:find('<svg') then
+      if el.text:match('^%s*<div') then return md_blocks(el.text) end
+      return nil
+    end
+    -- 剥掉最外层 <div …>/</div>（否则各段单独解析时会报 unclosed div）；SVG 本身按居中排版
+    local text = el.text:gsub('^%s*<div[^>]*>', '', 1):gsub('</div>%s*$', '', 1)
+    local out, pos = {}, 1
+    while true do
+      local s, e = text:find('<svg.-</svg>', pos)
+      if not s then break end
+      -- <svg> 之前的文字（div 开标签、说明文字等）
+      for _, b in ipairs(md_blocks(text:sub(pos, s - 1))) do out[#out+1] = b end
+      local pdf = svg_to_pdf(text:sub(s, e))
+      if pdf then
+        out[#out+1] = pandoc.RawBlock('latex', include_pdf(pdf))
+      else
+        io.stderr:write('[filters.lua] SVG 转 PDF 失败（rsvg-convert 缺失或 SVG 非法），已跳过\n')
+      end
+      pos = e + 1
+    end
+    for _, b in ipairs(md_blocks(text:sub(pos))) do out[#out+1] = b end
+    return out
+  end
+
+  function Svg_filter.Image(el)
+    if not el.src:lower():match('%.svg$') then return nil end
+    local f = io.open(el.src, 'rb')
+    if not f then return nil end
+    local text = f:read('*a'); f:close()
+    local pdf = svg_to_pdf(text, el.src)
+    if not pdf then return nil end
+    local width = el.attributes['width']
+    if width and width:match('%%$') then
+      width = tonumber(width:match('^[%d%.]+')) / 100 .. '\\linewidth'
+    elseif not width then
+      width = '\\linewidth'
+    end
+    return pandoc.RawInline('latex', '\\includegraphics[width=' .. width .. ',keepaspectratio]{' .. pdf .. '}')
+  end
+end
+
+return { Code_filter, Mermaid_filter, Emoji_filter, Svg_filter }
