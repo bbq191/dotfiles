@@ -120,7 +120,10 @@ map("n", "<leader>mp", function()
   local defaults = vim.fn.expand("~/.config/pandoc/remarkable.yaml")
   local err = {}
   vim.notify("Exporting: " .. out, vim.log.levels.INFO)
+  -- cwd 设为文档所在目录：pandoc 按 cwd 解析 ![](images/x.svg) 这类相对路径，
+  -- 否则从别的目录打开 nvim 时图片全找不到（pandoc 只报 warning，退出码仍是 0）
   vim.fn.jobstart({ "pandoc", src, "-o", out, "-d", defaults }, {
+    cwd = vim.fn.expand("%:p:h"),
     stderr_buffered = true,
     on_stderr = function(_, data)
       if data then

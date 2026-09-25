@@ -320,7 +320,7 @@ LSP → 路径 → LuaSnip（friendly-snippets）→ buffer（≥3 字符），R
 `<leader>mp` 先保存，再 `pandoc <file> -d ~/.config/pandoc/remarkable.yaml -o <file>.pdf`（xelatex）：
 - `remarkable.tex`：纸色底、KF Readerly 拉丁 + 霞鹜文楷中文 + 京華老宋标题、A4 2.2cm 边距、行距 1.32、代码块/引用块卡片化、长行折行、宽表缩字、中文删除线用 `\CJKsout`（soul 对 CJK 报错）、符号/emoji 映射到 Noto 单色
 - `filters.lua`：内联代码在 `/ . : _ -` 处插入断点；mermaid 代码块有 `mmdc` 就渲染成 PDF 内嵌（缓存 `~/.cache/pandoc-mermaid`），否则占位卡片；正文 emoji 包进单色 Noto Emoji
-- SVG：`<div>` 里的内联 `<svg>…</svg>` 和 `![](x.svg)` 经 `rsvg-convert`（librsvg，已装）转矢量 PDF 嵌入（缓存 `~/.cache/pandoc-svg`；未指定 font-family 的文字用 Noto Sans CJK SC）。xelatex 不认 SVG，pandoc 默认把内联 SVG 当 raw HTML 丢掉。为此 `remarkable.yaml` 的 reader 关了 `markdown_in_html_blocks` / `native_divs`（SVG 内部有空行时才不会被拆碎），`<div>` 里的 markdown 由过滤器补解析；裸写不套 `<div>` 的内联 `<svg>` 不支持。SVG 本身的排版问题（文字超出色块、相邻文字重叠）不会被修正，浏览器里也一样
+- SVG：`<div>` 里的内联 `<svg>…</svg>` 和 `![](x.svg)` 经 `rsvg-convert`（librsvg，已装）转矢量 PDF 嵌入（缓存 `~/.cache/pandoc-svg`；未指定 font-family 的文字用 Noto Sans CJK SC）。xelatex 不认 SVG，pandoc 默认把内联 SVG 当 raw HTML 丢掉。为此 `remarkable.yaml` 的 reader 关了 `markdown_in_html_blocks` / `native_divs`（SVG 内部有空行时才不会被拆碎），`<div>` 里的 markdown 由过滤器补解析；裸写不套 `<div>` 的内联 `<svg>` 不支持。`<leader>mp` 以文档所在目录为 cwd 运行 pandoc，相对路径图片（`images/x.svg`）才找得到；从别的目录打开 nvim 时曾整批丢图（pandoc 只报 warning、退出码 0）。SVG 本身的排版问题（文字超出色块、相邻文字重叠）不会被修正，浏览器里也一样
 
 ---
 
