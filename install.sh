@@ -4,11 +4,20 @@ set -euo pipefail
 DOTFILES="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # 第 4 步会 stow --adopt 后 git restore home/，任何未提交的 home/ 改动都会被还原，先拦住
-DIRTY=$(git -C "$DOTFILES" status --porcelain -- home/)
+# matugen 主题产物：DMS 每次换壁纸/明暗切换都会重写，不算"手改"。既不拦截，第 4 步也不 restore
+# （restore 会把正在用的配色倒回旧提交，直到下次重生成才恢复）；积攒够了单独提交"主题重生成"即可
+GENERATED=(
+    ':!home/.config/kitty/dank-*.conf'
+    ':!home/.config/niri/dms/colors.kdl'
+    ':!home/.config/nvim/colors/dms.lua'
+    ':!home/.config/qt5ct/colors/matugen.conf'
+    ':!home/.config/qt6ct/colors/matugen.conf'
+)
+DIRTY=$(git -C "$DOTFILES" status --porcelain -- home/ "${GENERATED[@]}")
 if [[ -n "$DIRTY" ]]; then
     echo "home/ 有未提交的改动，先 commit 或 stash 再运行（stow --adopt + git restore 会把它们还原）：" >&2
     echo "$DIRTY" >&2
-    echo "（stow 链接的配置常被应用自己回写，如 dankcal/ui-settings.json、mimeapps.list；确认是想要的设置就直接提交）" >&2
+    echo "（stow 链接的配置常被应用自己回写，如 dankcal/ui-settings.json、mimeapps.list；确认是想要的设置就直接提交。matugen 主题产物已自动豁免）" >&2
     exit 1
 fi
 
@@ -86,7 +95,7 @@ done < <(find "$DOTFILES/home" -mindepth 1 -print0)
 # --adopt 处理运行中进程（如 niri/DMS）在 stow 执行期间重建的文件
 # git restore 将被 --adopt 吸入的系统文件还原为仓库版本
 stow --adopt --target="$HOME" home
-git -C "$DOTFILES" restore home/
+git -C "$DOTFILES" restore -- home/ "${GENERATED[@]}"
 
 # Rime 增强词库：克隆 Iorest/rime-dict → opencc 转简体 → 编译（见 ~/.local/bin/rime-dict-sync）
 rime-dict-sync --no-restart || echo "    rime-dict-sync 失败（网络？），稍后手动执行"
