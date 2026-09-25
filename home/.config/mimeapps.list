@@ -33,6 +33,7 @@ x-scheme-handler/claude-cli=claude-code-url-handler.desktop
 x-scheme-handler/http=brave-browser-nightly.desktop
 x-scheme-handler/https=brave-browser-nightly.desktop
 x-scheme-handler/unknown=brave-browser-nightly.desktop
+x-scheme-handler/koodo-reader=koodo-reader.desktop
 
 [Added Associations]
 application/json=org.neovim.nvim.desktop;

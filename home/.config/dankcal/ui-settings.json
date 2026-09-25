@@ -4,13 +4,17 @@
     "allDayReminders": false,
     "closeBehavior": "minimize",
     "colorSource": "auto",
-    "coreHoursEnabled": false,
+    "coreHoursEnabled": true,
     "coreHoursEnd": 17,
     "coreHoursStart": 9,
     "customThemeFile": "",
+    "defaultCalendarId": "",
     "defaultEventDurationMinutes": 30,
     "defaultReminderMinutes": 10,
+    "dismissedAccountNotices": [
+    ],
     "firstDayOfWeek": 0,
+    "language": "zh_CN",
     "lastView": "month",
     "monthEventTitleLines": 1,
     "monthShowAllEvents": false,
@@ -27,6 +31,7 @@
     "syncIntervalMinutes": 30,
     "themeMode": "auto",
     "timeFormat": "auto",
+    "timeLocale": "zh_CN",
     "use24HourClock": true,
     "weekEventTitleLines": 1
 }
