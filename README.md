@@ -253,7 +253,7 @@ nmcli con add type ethernet ifname rmk0 con-name remarkable-usb \
 | `etc/systemd/system/mihomo.service.d/override.conf` | 收紧 mihomo-bin 自带单元过宽的 `CapabilityBoundingSet`（去掉 `SYS_PTRACE`/`SYS_TIME`/`DAC_OVERRIDE`/`DAC_READ_SEARCH`，只留 TUN 代理实际要用的 `NET_ADMIN`/`NET_RAW`/`NET_BIND_SERVICE`）；已部署并实测确认（`systemctl show mihomo -p CapabilityBoundingSet` 核实生效，代理正常），回滚见文件内注释 |
 | `etc/systemd/network/10-wlan0.link` `11-rmk0.link` | 按 MAC 固定 Wi-Fi / reMarkable USB 网卡名（wlan0 / rmk0） |
 | `etc/systemd/system/iwd.service.d/override.conf` | `After=cachyos-iw-set-regdomain.service`：消掉 iwd 抢跑查询 regdom 触发的内核 WARN（`nl80211_get_reg_do`，2026-09 系统日志核查中发现，实测近 4 次开机 3 次命中，只影响日志不影响功能） |
-| `etc/systemd/system/wifi-fw-reset.service` `usr/local/bin/wifi-fw-reset` | BE200 冷开机固件在 `CTDP_CONFIG_CMD` 断言崩溃后 wlan0 全程 unavailable（热重启不复现）；开机延迟 8s 自检，命中则重载 iwlmld/iwlwifi，仍不行再 PCI remove/rescan。手动：`sudo wifi-fw-reset --force` |
+| `etc/systemd/system/wifi-fw-reset.service` `usr/local/bin/wifi-fw-reset` | BE200 冷开机固件在 `CTDP_CONFIG_CMD` 断言崩溃后 wlan0 全程 unavailable（热重启不复现）；开机延迟 8s 自检（Type=simple，不会拖慢 graphical.target），命中则重载 iwlmld/iwlwifi，仍不行再 PCI remove/rescan。手动：`sudo wifi-fw-reset --force` |
 | `etc/udev/rules.d/85-iwl-dump.rules` `usr/local/bin/iwl-fwdump` | iwlwifi 固件崩溃时把 devcoredump 落盘到 `/var/lib/iwlwifi-dumps/`（默认 5 分钟销毁），供向 kernel bugzilla 提 bug 附件 |
 | `etc/modprobe.d/nvidia-local.conf` | `NVreg_EnableS0ixPowerManagement=1`：s2idle 休眠时 GPU 参与 S0ix，否则待机耗电 |
 | `etc/tmpfiles.d/thp.conf` | Transparent Huge Pages 改为 `madvise`（默认 always 会周期性延迟抖动） |

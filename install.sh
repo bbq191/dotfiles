@@ -4,8 +4,11 @@ set -euo pipefail
 DOTFILES="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # 第 4 步会 stow --adopt 后 git restore home/，任何未提交的 home/ 改动都会被还原，先拦住
-if [[ -n "$(git -C "$DOTFILES" status --porcelain -- home/)" ]]; then
-    echo "home/ 有未提交的改动，先 commit 或 stash 再运行（stow --adopt + git restore 会把它们还原）" >&2
+DIRTY=$(git -C "$DOTFILES" status --porcelain -- home/)
+if [[ -n "$DIRTY" ]]; then
+    echo "home/ 有未提交的改动，先 commit 或 stash 再运行（stow --adopt + git restore 会把它们还原）：" >&2
+    echo "$DIRTY" >&2
+    echo "（stow 链接的配置常被应用自己回写，如 dankcal/ui-settings.json、mimeapps.list；确认是想要的设置就直接提交）" >&2
     exit 1
 fi
 
